@@ -3,7 +3,7 @@
 (function (root, factory) {
     if (typeof define === "function" && define.amd) {
         define([], function () {
-            root.RouteAble = factory();
+            return factory();
         });
     } else {
         root.RouteAble = factory();
@@ -28,6 +28,9 @@
         //  最后的配置参数
         "finalCfg": {},
 
+        //  模板显示区域
+        "container": document.getElementById("route-app"),
+
         /**
          * 配置方法
          * @param opt   配置对象,结构和cfg类似
@@ -36,7 +39,16 @@
             if (!_isType(opt, "Object")) {
                 throw "config exception!the config method expect an argument which is an Object!";
             }
-            this.finalCfg = _merge(this.cfg, opt, true);
+            //  处理div#route-app不存在的情况
+            if (!this.container) {
+                var body = document.getElementsByTagName("body")[0];
+                var first = body.getElementsByTagName("*")[0];
+                this.container = document.createElement("div");
+                this.container.id = "route-app";
+                body.insertBefore(this.container, first);
+            }
+            var finalCfg = _merge(this.cfg, opt, true);
+            this.finalCfg = finalCfg;
         },
 
         /**
@@ -65,18 +77,47 @@
          * @param callback  回调
          */
         "navigate": function (path, callback) {
+            var cfg = this.finalCfg;
+            if (cfg.pushState && _isSupportPushState) {
+            } else {
+            }
         },
 
         /**
          * 初始化事件(有效a标签的click事件,浏览器的前进后退)
          */
         "initEvents": function () {
-            _aTag = _getATags();
+            var cfg = this.finalCfg;
+            var _this = this;
             var path;
+            _aTag = _getATags();
             for (var i = 0, len = _aTag.length; i < len; i++) {
                 path = _aTag[i].href;
                 _removeEvent(_aTag[i], "click", this.navigate);
                 _addEvent(_aTag[i], "click", this.navigate(path));
+            }
+
+            //  浏览器前进后退
+            if (_isSupportPushState && cfg.pushState) {
+                _removeEvent(root, "popstate", function (ev) {
+                    ev = ev || event;
+                    var state = ev.state;
+                    _this.navigate(state);
+                });
+                _addEvent(root, "popstate", function (ev) {
+                    ev = ev || event;
+                    var state = ev.state;
+                    _this.navigate(state);
+                });
+            } else if (!_isSupportPushState || cfg.pushState) {
+                _removeEvent(root, "hashchange", function (ev) {
+                    var hash = _getHashOrState(ev || event).hash;
+                    _this.navigate(hash);
+                });
+                _addEvent(root, "hashchange", function (ev) {
+                    var hash = _getHashOrState(ev || event).hash;
+                    _this.navigate(hash);
+                });
             }
         },
 
@@ -144,7 +185,7 @@
         if (obj.attachEvent) {
             obj["e" + type + fn] = fn;
             obj[type + fn] = function () {
-                obj["e" + type + fn](window.event);
+                obj["e" + type + fn](root.event);
             };
             obj.attachEvent("on" + type, obj[type + fn]);
         } else {
@@ -182,16 +223,17 @@
 
     /**
      * 获取页面的hash和state值
+     * @param ev    事件句柄
      * @returns {hash: "", state: ""}
      * @private
      */
-    function _getHashOrState() {
+    function _getHashOrState(ev) {
         var output = {};
         var hash = location.hash;
         if (hash.length) {
             output.hash = hash;
         }
-        output.state = "";
+        output.state = ev.state;
         return output;
     }
 
@@ -227,7 +269,7 @@
         if (!_isType(obj1, "Object") || !_isType(obj2, "Object")) {
             return;
         }
-        for (var i in obj) {
+        for (var i in obj1) {
             if (obj1[i] && override) {
                 obj1[i] = obj2[i];
             } else if (!obj1) {
