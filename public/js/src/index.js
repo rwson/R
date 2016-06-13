@@ -1,3 +1,7 @@
+/**
+ * RouteAble前端路由
+ */
+
 "use strict";
 
 (function (root, factory) {
@@ -63,8 +67,8 @@
                 output = route[path];
             } else if (_isType(route, "Array")) {
                 for (var i = 0, len = route.length; i < len; i++) {
-                    if (route["path"] === path) {
-                        output = route[path];
+                    if (route[i]["path"] === path) {
+                        output = route[i];
                     }
                 }
             }
@@ -77,10 +81,19 @@
          * @param callback  回调
          */
         "navigate": function (path, callback) {
+            var _this = this;
             var cfg = this.finalCfg;
-            if (cfg.pushState && _isSupportPushState) {
-            } else {
-            }
+            var target = this.getCurrent(path);
+            var tpl;
+            _xhrGET(target.tplPath, function(xhr) {
+                tpl = xhr.responseText;
+                _this.container.innerHTML = tpl;
+                if (cfg.pushState && _isSupportPushState) {
+                } else {
+                }
+            }, function(xhr) {
+                throw xhr.responseText;
+            });
         },
 
         /**
@@ -123,9 +136,11 @@
 
         /**
          * 运行事件
-         * @param callback
+         * @param callback  回调函数
          */
         "run": function (callback) {
+            var cfg = this.finalCfg;
+            this.navigate(cfg.default);
         }
 
     };
@@ -142,14 +157,16 @@
             throw "the method _xhrGET must pass in the url!";
         }
         var xhr = new XMLHttpRequest();
-        xhr.open("GET", url);
+        xhr.withCredentials = true;
+        xhr.open("GET", url, true);
+        xhr.send(null);
         xhr.onreadystatechange = function () {
-            if (xhr.readyState == 4 && xhr.status == 200) {
-                if (_isType(success, "Function")) {
-                    success.call(root, xhr);
-                }
-            } else {
-                if (_isType(fail, "Function")) {
+            if(xhr.readyState === 4) {
+                if((xhr.status >= 200 && xhr.status < 300) || xhr.status == 304) {
+                    if (_isType(success, "Function")) {
+                        success.call(root, xhr);
+                    }
+                } else if (_isType(fail, "Function")) {
                     fail.call(root, xhr);
                 }
             }
@@ -269,10 +286,10 @@
         if (!_isType(obj1, "Object") || !_isType(obj2, "Object")) {
             return;
         }
-        for (var i in obj1) {
+        for (var i in obj2) {
             if (obj1[i] && override) {
                 obj1[i] = obj2[i];
-            } else if (!obj1) {
+            } else if (!obj1[i] && obj2[i]) {
                 obj1[i] = obj2[i];
             }
         }
@@ -288,6 +305,11 @@
     function _isType(obj, typeStr) {
         return _class2.toString.call(obj).toLowerCase() === ("[object " + typeStr + "]").toLowerCase();
     }
+
+    _xhrGET("/tpl/detail.html", function(xhr) {
+    }, function(xhr) {
+        console.log(xhr);
+    });
 
     return RouteAble;
 

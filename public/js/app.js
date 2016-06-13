@@ -7,5 +7,6 @@
 define(["routable", "config"], function(routable, config) {
 
     routable.config(config);
+    routable.run();
 
 });

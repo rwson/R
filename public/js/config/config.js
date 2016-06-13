@@ -12,17 +12,17 @@ define([], function() {
         "path": [
             {
                 "path": "/",
-                "tplPath": "tpl/index.html",
+                "tplPath": "/tpl/index.html",
                 "controller": "indexCtrl"
             },
             {
                 "path": "/list",
-                "tplPath": "tpl/list.html",
+                "tplPath": "/tpl/list.html",
                 "controller": "listCtrl"
             },
             {
                 "path": "/detail",
-                "tplPath": "tpl/detail.html",
+                "tplPath": "/tpl/detail.html",
                 "controller": "detailCtrl"
             }
         ],
