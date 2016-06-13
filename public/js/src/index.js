@@ -85,13 +85,17 @@
             var cfg = this.finalCfg;
             var target = this.getCurrent(path);
             var tpl;
-            _xhrGET(target.tplPath, function(xhr) {
+            if (!target || !target.path) {
+                return;
+            }
+            _xhrGET(target.tplPath, function (xhr) {
                 tpl = xhr.responseText;
                 _this.container.innerHTML = tpl;
                 if (cfg.pushState && _isSupportPushState) {
                 } else {
                 }
-            }, function(xhr) {
+                _this.initEvents();
+            }, function (xhr) {
                 throw xhr.responseText;
             });
         },
@@ -107,7 +111,7 @@
             for (var i = 0, len = _aTag.length; i < len; i++) {
                 path = _aTag[i].href;
                 _removeEvent(_aTag[i], "click", this.navigate);
-                _addEvent(_aTag[i], "click", this.navigate(path));
+                _addEvent(_aTag[i], "click", this.navigate);
             }
 
             //  浏览器前进后退
@@ -161,8 +165,8 @@
         xhr.open("GET", url, true);
         xhr.send(null);
         xhr.onreadystatechange = function () {
-            if(xhr.readyState === 4) {
-                if((xhr.status >= 200 && xhr.status < 300) || xhr.status == 304) {
+            if (xhr.readyState === 4) {
+                if ((xhr.status >= 200 && xhr.status < 300) || xhr.status == 304) {
                     if (_isType(success, "Function")) {
                         success.call(root, xhr);
                     }
@@ -199,14 +203,27 @@
      * @private
      */
     function _addEvent(obj, type, fn) {
+        if (!obj) {
+            return;
+        }
         if (obj.attachEvent) {
             obj["e" + type + fn] = fn;
-            obj[type + fn] = function () {
-                obj["e" + type + fn](root.event);
+            obj[type + fn] = function (ev) {
+                ev = ev || root.event;
+                obj["e" + type + fn](ev);
+                _prevDefault(ev);
             };
-            obj.attachEvent("on" + type, obj[type + fn]);
+            obj.attachEvent("on" + type, function (ev) {
+                ev = ev || root.event;
+                obj[type + fn](ev);
+                _prevDefault(ev);
+            });
         } else {
-            obj.addEventListener(type, fn, false);
+            obj.addEventListener(type, function (ev) {
+                ev = ev || root.event;
+                fn();
+                _prevDefault(ev);
+            }, false);
         }
     }
 
@@ -218,11 +235,35 @@
      * @private
      */
     function _removeEvent(obj, type, fn) {
+        if (!obj) {
+            return;
+        }
         if (obj.detachEvent) {
             obj.detachEvent("on" + type, obj[type + fn]);
             obj[type + fn] = null;
         } else {
             obj.removeEventListener(type, fn, false);
+        }
+    }
+
+    /**
+     * 阻止默认事件和事件冒泡
+     * @param ev    事件句柄
+     * @private
+     */
+    function _prevDefault(ev) {
+        //  阻止冒泡
+        if (ev.stopPropagation) {
+            ev.stopPropagation();
+        } else {
+            root.event.cancelBubble = true;
+        }
+
+        //  阻止默认事件
+        if (ev.preventDefault) {
+            ev.preventDefault();
+        } else {
+            root.event.returnValue = false;
         }
     }
 
@@ -306,8 +347,8 @@
         return _class2.toString.call(obj).toLowerCase() === ("[object " + typeStr + "]").toLowerCase();
     }
 
-    _xhrGET("/tpl/detail.html", function(xhr) {
-    }, function(xhr) {
+    _xhrGET("/tpl/detail.html", function (xhr) {
+    }, function (xhr) {
         console.log(xhr);
     });
 
