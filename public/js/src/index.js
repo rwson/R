@@ -51,7 +51,7 @@
                 output = route[path];
             } else if (_isType(route, "Array")) {
                 for (var i = 0, len = route.length; i < len; i++) {
-                    if(route["path"] === path) {
+                    if (route["path"] === path) {
                         output = route[path];
                     }
                 }
@@ -71,6 +71,13 @@
          * 初始化事件(有效a标签的click事件,浏览器的前进后退)
          */
         "initEvents": function () {
+            _aTag = _getATags();
+            var path;
+            for (var i = 0, len = _aTag.length; i < len; i++) {
+                path = _aTag[i].href;
+                _removeEvent(_aTag[i], "click", this.navigate);
+                _addEvent(_aTag[i], "click", this.navigate(path));
+            }
         },
 
         /**
@@ -82,8 +89,30 @@
 
     };
 
-    function _xhr(opt) {
-
+    /**
+     * GET形式的http请求
+     * @param url       请求路径
+     * @param success   成功回调
+     * @param fail      失败回调
+     * @private
+     */
+    function _xhrGET(url, success, fail) {
+        if (!url) {
+            throw "the method _xhrGET must pass in the url!";
+        }
+        var xhr = new XMLHttpRequest();
+        xhr.open("GET", url);
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState == 4 && xhr.status == 200) {
+                if (_isType(success, "Function")) {
+                    success.call(root, xhr);
+                }
+            } else {
+                if (_isType(fail, "Function")) {
+                    fail.call(root, xhr);
+                }
+            }
+        };
     }
 
     /**
@@ -118,8 +147,9 @@
                 obj["e" + type + fn](window.event);
             };
             obj.attachEvent("on" + type, obj[type + fn]);
-        } else
+        } else {
             obj.addEventListener(type, fn, false);
+        }
     }
 
     /**
@@ -129,12 +159,13 @@
      * @param fn    回调函数
      * @private
      */
-    function removeEvent(obj, type, fn) {
+    function _removeEvent(obj, type, fn) {
         if (obj.detachEvent) {
             obj.detachEvent("on" + type, obj[type + fn]);
             obj[type + fn] = null;
-        } else
+        } else {
             obj.removeEventListener(type, fn, false);
+        }
     }
 
     /**
