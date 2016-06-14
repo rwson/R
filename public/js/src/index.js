@@ -7,10 +7,10 @@
 (function (root, factory) {
     if (typeof define === "function" && define.amd) {
         define([], function () {
-            return factory();
+            return factory(window);
         });
     } else {
-        root.RouteAble = factory();
+        root.RouteAble = factory(window);
     }
 
 }(window, function (root) {
@@ -87,13 +87,19 @@
             if (!target || !target.path) {
                 return;
             }
+            var finalCallback = function () {
+                target.controller.call(this);
+                _execCallback(callback);
+            };
             _xhrGET(target.tplPath, function (xhr) {
                 tpl = xhr.responseText;
                 _this.container.innerHTML = tpl;
                 if (cfg.pushState && _isSupportPushState) {
+                    history.pushState("", "", path);
                 } else {
+                    location.hash = path;
                 }
-                _this.initEvents();
+                _execCallback(finalCallback);
             }, function (xhr) {
                 throw xhr.responseText;
             });
@@ -120,23 +126,15 @@
 
             //  浏览器前进后退
             if (_isSupportPushState && cfg.pushState) {
-                _removeEvent(root, "popstate", function (ev) {
-                    ev = ev || event;
-                    var state = ev.state;
-                    _this.navigate(state);
-                });
+                _removeEvent(root, "popstate");
                 _addEvent(root, "popstate", function (ev) {
-                    ev = ev || event;
-                    var state = ev.state;
-                    _this.navigate(state);
+                    var path = _getHashOrState().state;
+                    _this.navigate(path);
                 });
-            } else if (!_isSupportPushState || cfg.pushState) {
-                _removeEvent(root, "hashchange", function (ev) {
-                    var hash = _getHashOrState(ev || event).hash;
-                    _this.navigate(hash);
-                });
+            } else if (!_isSupportPushState || !cfg.pushState) {
+                _removeEvent(root, "hashchange");
                 _addEvent(root, "hashchange", function (ev) {
-                    var hash = _getHashOrState(ev || event).hash;
+                    var hash = _getHashOrState().hash;
                     _this.navigate(hash);
                 });
             }
@@ -149,6 +147,7 @@
         "run": function (callback) {
             var cfg = this.finalCfg;
             this.navigate(cfg.default);
+            this.initEvents();
         }
 
     };
@@ -257,7 +256,7 @@
      * 执行一个回调,并且传入相关参数
      * @returns {*}
      */
-    function execCallback() {
+    function _execCallback() {
         var fn = arguments[0];
         var args = Array.prototype.slice.call(arguments, 1);
         if (_isType(fn, "Function")) {
@@ -271,13 +270,13 @@
      * @returns {hash: "", state: ""}
      * @private
      */
-    function _getHashOrState(ev) {
+    function _getHashOrState() {
         var output = {};
         var hash = location.hash;
         if (hash.length) {
             output.hash = hash;
         }
-        output.state = ev.state;
+        output.state = decodeURIComponent(location.pathname);
         return output;
     }
 

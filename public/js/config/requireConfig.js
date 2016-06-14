@@ -6,6 +6,9 @@ require.config({
     baseUrl: "js/",
     paths: {
         "routable": "src/index",
-        "config": "config/config"
+        "config": "config/config",
+        "index": "controllers/index",
+        "list": "controllers/list",
+        "detail": "controllers/detail"
     }
 });

@@ -6,24 +6,24 @@
 
 "use strict";
 
-define([], function() {
+define(["index", "list", "detail"], function(indexCtrl, listCtrl, detailCtrl) {
 
     var routeConfig = {
         "path": [
             {
                 "path": "/",
                 "tplPath": "/tpl/index.html",
-                "controller": "indexCtrl"
+                "controller": indexCtrl
             },
             {
                 "path": "/list",
                 "tplPath": "/tpl/list.html",
-                "controller": "listCtrl"
+                "controller": listCtrl
             },
             {
                 "path": "/detail",
                 "tplPath": "/tpl/detail.html",
-                "controller": "detailCtrl"
+                "controller": detailCtrl
             }
         ],
         "pushState": true
