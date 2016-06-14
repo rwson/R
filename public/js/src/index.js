@@ -17,7 +17,6 @@
 
     var _class2 = {};                                   //  Object.prototype
     var _isSupportPushState = !!history.pushState;      //  当前浏览器支持pushState
-    var _aTag;                                          //  存储a标签
 
     var RouteAble = {
 
@@ -107,12 +106,17 @@
             var cfg = this.finalCfg;
             var _this = this;
             var path;
-            _aTag = _getATags();
-            for (var i = 0, len = _aTag.length; i < len; i++) {
-                path = _aTag[i].href;
-                _removeEvent(_aTag[i], "click", this.navigate);
-                _addEvent(_aTag[i], "click", this.navigate);
-            }
+
+            //  document代理a标签的点击事件
+            _removeEvent(document, "click");
+            _addEvent(document, "click", function (ev) {
+                ev = ev || event;
+                var target = ev.target;
+                path = target.getAttribute("href");
+                if (target.tagName.toLowerCase() === "a" && path) {
+                    _this.navigate(path);
+                }
+            });
 
             //  浏览器前进后退
             if (_isSupportPushState && cfg.pushState) {
@@ -175,24 +179,6 @@
                 }
             }
         };
-    }
-
-    /**
-     * 获取所有含有有效href属性(href存在,且不为空)的a标签
-     * @returns {Array}
-     * @private
-     */
-    function _getATags() {
-        var tags = document.getElementsByTagName("a");
-        var output = [];
-        if (tags.length) {
-            for (var i = 0, len = tags.length; i < len; i++) {
-                if (!!tags[i].href) {
-                    output.push(tags[i]);
-                }
-            }
-        }
-        return output;
     }
 
     /**
