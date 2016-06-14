@@ -7,7 +7,8 @@
 define(["routable"], function (routable) {
 
     function listCtrl() {
-        alert("我是列表页");
+        console.log(routable.pageParams);
+        console.log("我是列表页");
     }
 
     return listCtrl;

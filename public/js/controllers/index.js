@@ -7,7 +7,7 @@
 define(["routable"], function (routable) {
 
     function indexCtrl() {
-        alert("我是首页");
+        console.log("我是首页");
     }
 
     return indexCtrl;

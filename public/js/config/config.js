@@ -6,7 +6,7 @@
 
 "use strict";
 
-define(["index", "list", "detail"], function(indexCtrl, listCtrl, detailCtrl) {
+define(["index", "list", "detail"], function (indexCtrl, listCtrl, detailCtrl) {
 
     var routeConfig = {
         "path": [
@@ -21,7 +21,17 @@ define(["index", "list", "detail"], function(indexCtrl, listCtrl, detailCtrl) {
                 "controller": listCtrl
             },
             {
+                "path": "/list/:page",
+                "tplPath": "/tpl/list.html",
+                "controller": listCtrl
+            },
+            {
                 "path": "/detail",
+                "tplPath": "/tpl/detail.html",
+                "controller": detailCtrl
+            },
+            {
+                "path": "/detail/:id",
                 "tplPath": "/tpl/detail.html",
                 "controller": detailCtrl
             }

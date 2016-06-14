@@ -6,7 +6,10 @@
   </head>
   <body>
     <div id="route-app"></div>
-    <script src="/js/lib/require.min.js" data-main="/js/app"></script>
+    <script src="/js/lib/require.min.js"></script>
     <script src="/js/config/requireConfig.js"></script>
+    <script>
+      require(["app"]);
+    </script>
   </body>
 </html>

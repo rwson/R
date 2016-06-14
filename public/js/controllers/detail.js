@@ -7,7 +7,8 @@
 define(["routable"], function (routable) {
 
     function detailCtrl() {
-        alert("我是详情页");
+        console.log(routable.pageParams);
+        console.log("我是详情页");
     }
 
     return detailCtrl;

@@ -4,7 +4,7 @@
 
 "use strict";
 
-define(["routable", "config"], function(routable, config) {
+define("app", ["routable", "config"], function (routable, config) {
 
     routable.config(config);
     routable.run();

@@ -17,6 +17,10 @@
 
     var _class2 = {};                                   //  Object.prototype
     var _isSupportPushState = !!history.pushState;      //  当前浏览器支持pushState
+    var paramRoute = /(\/\:\w+)+/g;                     //  带url参数REST风格的路由
+    var replaceParam = /(\/\:\w+)/g;                    //  替换掉url中参数的表示
+
+    //console.log(new RegExp("/list/:id/:page".replace(replaceParam, "\\/\\w+"), "g"));
 
     var RouteAble = {
 
@@ -30,6 +34,9 @@
 
         //  最后的配置参数
         "finalCfg": {},
+
+        //  url中所带参数,包含queryString和path
+        "pageParams": {},
 
         //  模板显示区域
         "container": document.getElementById("route-app"),
@@ -51,6 +58,22 @@
                 body.insertBefore(this.container, first);
             }
             var finalCfg = _merge(this.cfg, opt, true);
+            var res = [];
+            var regex;
+            if (_isType(finalCfg.path, "Array")) {
+                //  Array形式的配置
+                for (var i = 0, len = finalCfg.path.length; i < len; i++) {
+                    res = finalCfg.path[i].path.match(paramRoute);
+                    regex = new RegExp(finalCfg.path[i].path.replace(replaceParam, "\\/\\w+"), "g");
+                    if (res) {
+                        finalCfg.originPath = finalCfg.path[i].path;
+                        finalCfg.path[i].path = regex;
+                        finalCfg.path[i].regex = regex;
+                    }
+                }
+            } else if (_isType(finalCfg.path, "Object")) {
+                //  Object形式的配置
+            }
             this.finalCfg = finalCfg;
         },
 
@@ -61,13 +84,19 @@
          */
         "getCurrent": function (path) {
             var route = this.finalCfg.path;
+            var tPath;
             var output;
             if (_isType(route, "Object")) {
                 output = route[path];
             } else if (_isType(route, "Array")) {
                 for (var i = 0, len = route.length; i < len; i++) {
-                    if (route[i]["path"] === path) {
+                    tPath = route[i]["path"];
+                    if (_isType(tPath, "String") && tPath === path) {
                         output = route[i];
+                    } else if (_isType(tPath, "RegExp") && tPath.test(path)) {
+                        output = _merge(route[i], {
+                            "path": path
+                        }, true);
                     }
                 }
             }
@@ -128,13 +157,13 @@
             if (_isSupportPushState && cfg.pushState) {
                 _removeEvent(root, "popstate");
                 _addEvent(root, "popstate", function (ev) {
-                    var path = _getHashOrState().state;
+                    var path = _getHashOrState(cfg.default || "/").path;
                     _this.navigate(path);
                 });
             } else if (!_isSupportPushState || !cfg.pushState) {
                 _removeEvent(root, "hashchange");
                 _addEvent(root, "hashchange", function (ev) {
-                    var hash = _getHashOrState().hash;
+                    var path = _getHashOrState(cfg.default || "/").path;
                     _this.navigate(hash);
                 });
             }
@@ -146,7 +175,12 @@
          */
         "run": function (callback) {
             var cfg = this.finalCfg;
-            this.navigate(cfg.default);
+            var path = cfg.default;
+            var cPath = _getHashOrState(cfg.default || "/").path;
+            if (cPath) {
+                path = cPath;
+            }
+            this.navigate(path);
             this.initEvents();
         }
 
@@ -267,17 +301,30 @@
     /**
      * 获取页面的hash和state值
      * @param ev    事件句柄
-     * @returns {hash: "", state: ""}
+     * @returns {hash: "", path: ""}
      * @private
      */
-    function _getHashOrState() {
+    function _getHashOrState(rootPath) {
         var output = {};
-        var hash = location.hash;
-        if (hash.length) {
-            output.hash = hash;
+        var hash = location.href.match(/#(.*)$/);
+        hash = hash ? hash[0] : "";
+        var path = decodeURIComponent(location.pathname + _getSearch());
+        if (!path.indexOf((rootPath || "/"))) {
+            path = "/" + path.slice(rootPath.length);
         }
-        output.state = decodeURIComponent(location.pathname);
+        output.hash = hash;
+        output.path = path;
         return output;
+    }
+
+    /**
+     * 获取url中那一串?xxx=yyy
+     * @returns {String || ""}
+     * @private
+     * */
+    function _getSearch() {
+        var match = location.href.replace(/#.*/, "").match(/\?.+/);
+        return match ? match[0] : "";
     }
 
     /**

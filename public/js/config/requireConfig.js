@@ -3,12 +3,13 @@
  */
 "use strict";
 require.config({
-    baseUrl: "js/",
+    baseUrl: "/js/",
     paths: {
         "routable": "src/index",
         "config": "config/config",
         "index": "controllers/index",
         "list": "controllers/list",
-        "detail": "controllers/detail"
+        "detail": "controllers/detail",
+        "app": "app"
     }
 });
