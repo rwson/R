@@ -20,6 +20,7 @@
     var _isSupportPushState = !!history.pushState;      //  当前浏览器支持pushState
     var paramRoute = /(\/\:\w+)+/g;                     //  带url参数REST风格的路由
     var replaceParam = /(\/\:\w+)/g;                    //  替换掉url中参数的表示
+    var urlQueryStr = /\?[\S=\S]+/g;                    //  url中带有queryString
 
     var RouteAble = {
 
@@ -83,16 +84,22 @@
          */
         "getCurrent": function (path) {
             var route = this.finalCfg.path;
+            var fPath = path;
             var tPath;
             var output;
+            //  url中存在查询字符串,将url转换成"?"前面的内容,再进行比对
+            if (fPath.match(urlQueryStr)) {
+                this.pageParams.queryString = _getQueryString(fPath);
+                fPath = fPath.split("?")[0];
+            }
             if (_isType(route, "Object")) {
                 output = route[path];
             } else if (_isType(route, "Array")) {
                 for (var i = 0, len = route.length; i < len; i++) {
                     tPath = route[i]["path"];
-                    if (_isType(tPath, "String") && tPath === path) {
+                    if (_isType(tPath, "String") && tPath === fPath) {
                         output = route[i];
-                    } else if (_isType(tPath, "RegExp") && tPath.test(path)) {
+                    } else if (_isType(tPath, "RegExp") && tPath.test(fPath)) {
                         output = _merge(route[i], {
                             "path": path
                         }, true);
@@ -366,6 +373,7 @@
      */
     function _getQueryString(url) {
         var output = {};
+        console.log(url);
         var arr = url.split("?")[1].split("&");
         if (!url || url.indexOf("?") < 0) {
             return output;
