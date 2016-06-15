@@ -9,34 +9,56 @@
 define(["index", "list", "detail"], function (indexCtrl, listCtrl, detailCtrl) {
 
     var routeConfig = {
-        "path": [
-            {
-                "path": "/",
+        //"path": [
+        //    {
+        //        "path": "/",
+        //        "tplPath": "/tpl/index.html",
+        //        "controller": indexCtrl
+        //    },
+        //    {
+        //        "path": "/list",
+        //        "tplPath": "/tpl/list.html",
+        //        "controller": listCtrl
+        //    },
+        //    {
+        //        "path": "/list/:page",
+        //        "tplPath": "/tpl/list.html",
+        //        "controller": listCtrl
+        //    },
+        //    {
+        //        "path": "/detail",
+        //        "tplPath": "/tpl/detail.html",
+        //        "controller": detailCtrl
+        //    },
+        //    {
+        //        "path": "/detail/:id",
+        //        "tplPath": "/tpl/detail.html",
+        //        "controller": detailCtrl
+        //    }
+        //],
+        "path": {
+            "/": {
                 "tplPath": "/tpl/index.html",
                 "controller": indexCtrl
             },
-            {
-                "path": "/list",
+            "/list": {
                 "tplPath": "/tpl/list.html",
                 "controller": listCtrl
             },
-            {
-                "path": "/list/:page",
+            "/list/:page": {
                 "tplPath": "/tpl/list.html",
                 "controller": listCtrl
             },
-            {
-                "path": "/detail",
+            "/detail": {
                 "tplPath": "/tpl/detail.html",
                 "controller": detailCtrl
             },
-            {
-                "path": "/detail/:id",
+            "/detail/:id": {
                 "tplPath": "/tpl/detail.html",
                 "controller": detailCtrl
             }
-        ],
-        "pushState": false
+        },
+        "pushState": true
     };
 
     return routeConfig;

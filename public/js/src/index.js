@@ -75,6 +75,25 @@
                 }
             } else if (_isType(finalCfg.path, "Object")) {
                 //  Object形式的配置
+                var cfgArr = [];
+                var toMerge = {};
+                for (var i in finalCfg.path) {
+                    var cPath = finalCfg.path[i];
+                    res = ("" + i).match(paramRoute);
+                    regex = new RegExp(("" + i).replace(replaceParam, "\\/\\w+"), "g");
+                    toMerge = {
+                        "path": i
+                    };
+                    if (res) {
+                        toMerge = {
+                            "config": i,
+                            "path": regex,
+                            "regex": regex
+                        };
+                    }
+                    cfgArr.push(_merge(cPath, toMerge, true));
+                }
+                finalCfg.path = cfgArr;
             }
             this.finalCfg = finalCfg;
         },
