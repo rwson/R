@@ -172,19 +172,15 @@
             });
 
             //  浏览器前进后退
-            if (_isSupportPushState && cfg.pushState) {
-                _removeEvent(root, "popstate");
-                _addEvent(root, "popstate", function (ev) {
-                    var path = _getHashOrState(cfg.default || "/").path;
-                    _this.prevOrBack(path);
-                });
-            } else if (!_isSupportPushState || !cfg.pushState) {
-                _removeEvent(root, "hashchange");
-                _addEvent(root, "hashchange", function (ev) {
-                    var path = _getHashOrState(cfg.default || "/").path;
-                    _this.navigate(hash);
-                });
-            }
+            _removeEvent(root, "popstate");
+            _addEvent(root, "popstate", function (ev) {
+                var res = _getHashOrState(cfg.default || "/");
+                var path = res.path;
+                if (!cfg.pushState) {
+                    path = res.hash;
+                }
+                _this.prevOrBack(path);
+            });
         },
 
         /**
@@ -342,7 +338,7 @@
     function _getHashOrState(rootPath) {
         var output = {};
         var hash = location.href.match(/#(.*)$/);
-        hash = hash ? hash[0] : "";
+        hash = hash ? hash[0].replace(/\#/g, "") : "";
         var path = decodeURIComponent(location.pathname + _getSearch());
         if (!path.indexOf((rootPath || "/"))) {
             path = "/" + path.slice(rootPath.length);

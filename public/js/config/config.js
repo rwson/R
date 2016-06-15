@@ -36,7 +36,7 @@ define(["index", "list", "detail"], function (indexCtrl, listCtrl, detailCtrl) {
                 "controller": detailCtrl
             }
         ],
-        "pushState": true
+        "pushState": false
     };
 
     return routeConfig;
