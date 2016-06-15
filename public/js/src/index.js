@@ -254,6 +254,16 @@
     };
 
     /**
+     * 加入前端模板
+     * @param str   HTML字符串
+     * @param data  数据
+     * @private
+     */
+    function _compileTemplate(str, data) {
+        var evlute = /\{-\s+\S+\s\}/g;
+    }
+
+    /**
      * 处理state或者hash值
      * @param needState 是否支持
      * @param path      目标路由
