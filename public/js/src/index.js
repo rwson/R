@@ -16,11 +16,10 @@
 }(window, function (root) {
 
     var _class2 = {};                                   //  Object.prototype
+    var _array2 = [];                                   //  Array.prototype
     var _isSupportPushState = !!history.pushState;      //  当前浏览器支持pushState
     var paramRoute = /(\/\:\w+)+/g;                     //  带url参数REST风格的路由
     var replaceParam = /(\/\:\w+)/g;                    //  替换掉url中参数的表示
-
-    //console.log(new RegExp("/list/:id/:page".replace(replaceParam, "\\/\\w+"), "g"));
 
     var RouteAble = {
 
@@ -113,6 +112,7 @@
             var cfg = this.finalCfg;
             var target = this.getCurrent(path);
             var tpl;
+            //  该路由没有配置或者上一条路由等于要跳转的,就不用pushState来新增
             if (!target || !target.path) {
                 return;
             }
@@ -123,12 +123,30 @@
             _xhrGET(target.tplPath, function (xhr) {
                 tpl = xhr.responseText;
                 _this.container.innerHTML = tpl;
-                if (cfg.pushState && _isSupportPushState) {
-                    history.pushState("", "", path);
-                } else {
-                    location.hash = path;
-                }
+                _pushStateOrHash(cfg.pushState && _isSupportPushState, path);
                 _execCallback(finalCallback);
+            }, function (xhr) {
+                throw xhr.responseText;
+            });
+        },
+
+        /**
+         * 跳转到某个页面
+         * @param path      路径
+         * @param callback  回调
+         */
+        "prevOrBack": function (path, callback) {
+            var _this = this;
+            var target = this.getCurrent(path);
+            var tpl;
+            //  该路由没有配置或者上一条路由等于要跳转的,就不用pushState来新增
+            if (!target || !target.path) {
+                return;
+            }
+            _xhrGET(target.tplPath, function (xhr) {
+                tpl = xhr.responseText;
+                _this.container.innerHTML = tpl;
+                _execCallback(callback);
             }, function (xhr) {
                 throw xhr.responseText;
             });
@@ -158,7 +176,7 @@
                 _removeEvent(root, "popstate");
                 _addEvent(root, "popstate", function (ev) {
                     var path = _getHashOrState(cfg.default || "/").path;
-                    _this.navigate(path);
+                    _this.prevOrBack(path);
                 });
             } else if (!_isSupportPushState || !cfg.pushState) {
                 _removeEvent(root, "hashchange");
@@ -185,6 +203,23 @@
         }
 
     };
+
+    /**
+     * 处理state或者hash值
+     * @param needState 是否支持
+     * @param path      目标路由
+     * @private
+     */
+    function _pushStateOrHash(needState, path) {
+        if (!path) {
+            return;
+        }
+        if (needState) {
+            history.pushState("", "", path);
+        } else {
+            location.hash = path;
+        }
+    }
 
     /**
      * GET形式的http请求
@@ -292,7 +327,7 @@
      */
     function _execCallback() {
         var fn = arguments[0];
-        var args = Array.prototype.slice.call(arguments, 1);
+        var args = _array2.slice.call(arguments, 1);
         if (_isType(fn, "Function")) {
             return fn.apply(root, args);
         }
@@ -378,11 +413,6 @@
     function _isType(obj, typeStr) {
         return _class2.toString.call(obj).toLowerCase() === ("[object " + typeStr + "]").toLowerCase();
     }
-
-    _xhrGET("/tpl/detail.html", function (xhr) {
-    }, function (xhr) {
-        console.log(xhr);
-    });
 
     return RouteAble;
 
