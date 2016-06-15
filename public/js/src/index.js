@@ -13,7 +13,7 @@
         root.RouteAble = factory(window);
     }
 
-}(window, function (root) {
+}(window, function (root, undefined) {
 
     var _class2 = {};                                   //  Object.prototype
     var _array2 = [];                                   //  Array.prototype
@@ -66,9 +66,11 @@
                     res = finalCfg.path[i].path.match(paramRoute);
                     regex = new RegExp(finalCfg.path[i].path.replace(replaceParam, "\\/\\w+"), "g");
                     if (res) {
-                        finalCfg.originPath = finalCfg.path[i].path;
-                        finalCfg.path[i].path = regex;
-                        finalCfg.path[i].regex = regex;
+                        finalCfg.path[i] = _merge(finalCfg.path[i], {
+                            "config": finalCfg.path[i].path,
+                            "path": regex,
+                            "regex": regex
+                        }, true);
                     }
                 }
             } else if (_isType(finalCfg.path, "Object")) {
@@ -83,6 +85,8 @@
          * @returns {*}
          */
         "getCurrent": function (path) {
+            //  置成一个空对象,防止后一条url中不含参数的情况下,受到前一条url含参数的影响
+            this.pageParams = {};
             var route = this.finalCfg.path;
             var fPath = path;
             var tPath;
@@ -93,6 +97,16 @@
                 fPath = fPath.split("?")[0];
             }
             if (_isType(route, "Object")) {
+                for (var i in route) {
+                    tPath = route[i]["path"];
+                    if (_isType(tPath, "String")) {
+                        output = route[i];
+                    } else if (_isType(tPath, "Regexp") && tPath.test(fPath)) {
+                        output = _merge(route[i], {
+                            "path": fPath
+                        }, true);
+                    }
+                }
                 output = route[path];
             } else if (_isType(route, "Array")) {
                 for (var i = 0, len = route.length; i < len; i++) {
@@ -101,8 +115,21 @@
                         output = route[i];
                     } else if (_isType(tPath, "RegExp") && tPath.test(fPath)) {
                         output = _merge(route[i], {
-                            "path": path
+                            "path": fPath
                         }, true);
+                    }
+                }
+            }
+            //  url中带参数配置项
+            if (output.regex) {
+                var urlSplits = fPath.split("/");
+                var cfgSplits = output.config.split("/");
+                for (var i = 0, len = cfgSplits.length; i < len; i++) {
+                    if (("" + cfgSplits[i]).indexOf(":") > -1) {
+                        if (!this.pageParams.path) {
+                            this.pageParams.path = {};
+                        }
+                        this.pageParams.path[("" + cfgSplits[i]).replace(":", "")] = urlSplits[i];
                     }
                 }
             }
@@ -373,7 +400,6 @@
      */
     function _getQueryString(url) {
         var output = {};
-        console.log(url);
         var arr = url.split("?")[1].split("&");
         if (!url || url.indexOf("?") < 0) {
             return output;
