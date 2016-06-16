@@ -53,13 +53,17 @@
          */
         "setData": function (data) {
             //  设置数据
-            this.data = data;
-            console.group("update data");
-            console.log("the new data");
-            console.log(this.data);
-            console.groupEnd("update data");
+            this.data.data = data;
             //  数据设置完成,调用模板选,更新视图
             this.container.innerHTML = _compileTemplate(this.tplStr, data);
+        },
+
+        /**
+         * 获取数据
+         * @returns {*}
+         */
+        "getData": function () {
+            return this.data.data;
         },
 
         /**
@@ -195,7 +199,8 @@
             };
             _xhrGET(target.tplPath, function (xhr) {
                 _this.tplStr = xhr.responseText;
-                if(_this.data instanceof _Observer) {
+                //  解除之前页面的监听
+                if (_this.data instanceof _Observer) {
                     _this.data.unsubscribe(_this.setData);
                     _this.data = null;
                 }
@@ -222,16 +227,21 @@
             if (!target || !target.path) {
                 return;
             }
+            var finalCallback = function () {
+                target.controller.call(this);
+                _execCallback(callback);
+            };
             _xhrGET(target.tplPath, function (xhr) {
                 _this.tplStr = xhr.responseText;
-                if(_this.data instanceof Observer) {
+                //  解除之前页面的监听
+                if (_this.data instanceof _Observer) {
                     _this.data.unsubscribe(_this.setData);
                     _this.data = null;
                 }
-                _this.data = new Observer();
+                _this.data = new _Observer();
                 _this.data.subscribe(_this.setData);
                 _this.container.innerHTML = _this.tplStr;
-                _execCallback(callback);
+                _execCallback(finalCallback);
             }, function (xhr) {
                 throw xhr.responseText;
             });
@@ -291,7 +301,10 @@
      * @private
      */
     function _Observer() {
+        //  监听函数列表
         this.fns = [];
+        //  数据
+        this.data = {};
     }
 
     /**
@@ -341,16 +354,26 @@
 
     /**
      * 加入前端模板
-     * @param str   HTML字符串
-     * @param data  数据
+     * @param html      HTML字符串
+     * @param options   数据
      * @private
      */
-    function _compileTemplate(str, data) {
-        var evlute = /\{-\s+\S+\s+\-}/g;
-        var parseParam = /\{\%\s+\S+\s+\%\}/g;
-
-        return "<div>" + JSON.stringify(data) + "</div>";
-
+    function _compileTemplate(html, options) {
+        var re = /<-([^%>]+)?->/g,
+            reExp = /(^( )?(if|for|else|switch|case|break|{|}))(.*)?/g, code = 'var r=[];\n', cursor = 0,
+            match;
+        var add = function (line, js) {
+            js ? (code += line.match(reExp) ? line + '\n' : 'r.push(' + line + ');\n') :
+                (code += line != '' ? 'r.push("' + line.replace(/"/g, '\\"') + '");\n' : '');
+            return add;
+        };
+        while (match = re.exec(html)) {
+            add(html.slice(cursor, match.index))(match[1], true);
+            cursor = match.index + match[0].length;
+        }
+        add(html.substr(cursor, html.length - cursor));
+        code += 'return r.join("");';
+        return new Function(code.replace(/[\r\t\n]/g, '')).apply(options);
     }
 
     /**

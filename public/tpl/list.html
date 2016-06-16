@@ -1,15 +1,8 @@
 <div class="list-container">
+    第 <- this.current -> 页
     <ul class="list-item">
-        <li><a href="/detail">详情页</a></li>
-        <li><a href="/detail">详情页</a></li>
-        <li><a href="/detail">详情页</a></li>
-        <li><a href="/detail">详情页</a></li>
-        <li><a href="/detail">详情页</a></li>
-        <li><a href="/detail?arg1=val1&arg2=val2">详情页(带url查询字符串)</a></li>
-        <li><a href="/detail/123">详情页(带参数)</a></li>
-        <li><a href="/detail/456">详情页(带参数)</a></li>
-        <li><a href="/detail/789">详情页(带参数)</a></li>
-        <li><a href="/detail/12345">详情页(带参数)</a></li>
-        <li><a href="/detail/123?argnum=111">详情页(带参数)</a></li>
+        <- for(var i = 0,len = this.data.length; i < len; i ++){ ->
+        <li><a href="<- this.data[i].link ->"><- this.data[i].title -></a></li>
+        <- } ->
     </ul>
 </div>
