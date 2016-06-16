@@ -52,8 +52,14 @@
          * @param data  数据
          */
         "setData": function (data) {
+            //  设置数据
             this.data = data;
-            _compileTemplate(this, data);
+            console.group("update data");
+            console.log("the new data");
+            console.log(this.data);
+            console.groupEnd("update data");
+            //  数据设置完成,调用模板选,更新视图
+            this.container.innerHTML = _compileTemplate(this.tplStr, data);
         },
 
         /**
@@ -189,11 +195,11 @@
             };
             _xhrGET(target.tplPath, function (xhr) {
                 _this.tplStr = xhr.responseText;
-                if(_this.data instanceof Observer) {
+                if(_this.data instanceof _Observer) {
                     _this.data.unsubscribe(_this.setData);
                     _this.data = null;
                 }
-                _this.data = new Observer();
+                _this.data = new _Observer();
                 _this.data.subscribe(_this.setData);
                 _this.container.innerHTML = _this.tplStr;
                 _pushStateOrHash(cfg.pushState && _isSupportPushState, path);
@@ -342,6 +348,9 @@
     function _compileTemplate(str, data) {
         var evlute = /\{-\s+\S+\s+\-}/g;
         var parseParam = /\{\%\s+\S+\s+\%\}/g;
+
+        return "<div>" + JSON.stringify(data) + "</div>";
+
     }
 
     /**
