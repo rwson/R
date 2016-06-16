@@ -13,10 +13,14 @@ define(["routable"], function (routable) {
             "oldData": "老数据"
         });
 
-        routable.setData({
-            "test": 111
-        });
+        //  setTimeout模拟异步请求
+        setTimeout(function(){
 
+            routable.setData({
+                "test": 111
+            });
+
+        }, 1000);
 
         setTimeout(function(){
 
