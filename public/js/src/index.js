@@ -32,6 +32,9 @@
             "default": "/"          //  首页
         },
 
+        //  页面结构数据
+        "data": null,
+
         //  最后的配置参数
         "finalCfg": {},
 
@@ -40,6 +43,18 @@
 
         //  模板显示区域
         "container": document.getElementById("route-app"),
+
+        //  模板字符串,方便后面双向绑定数据
+        "tplStr": "",
+
+        /**
+         * 设置页面数据
+         * @param data  数据
+         */
+        "setData": function (data) {
+            this.data = data;
+            _compileTemplate(this, data);
+        },
 
         /**
          * 配置方法
@@ -164,7 +179,6 @@
             var _this = this;
             var cfg = this.finalCfg;
             var target = this.getCurrent(path);
-            var tpl;
             //  该路由没有配置或者上一条路由等于要跳转的,就不用pushState来新增
             if (!target || !target.path) {
                 return;
@@ -174,8 +188,14 @@
                 _execCallback(callback);
             };
             _xhrGET(target.tplPath, function (xhr) {
-                tpl = xhr.responseText;
-                _this.container.innerHTML = tpl;
+                _this.tplStr = xhr.responseText;
+                if(_this.data instanceof Observer) {
+                    _this.data.unsubscribe(_this.setData);
+                    _this.data = null;
+                }
+                _this.data = new Observer();
+                _this.data.subscribe(_this.setData);
+                _this.container.innerHTML = _this.tplStr;
                 _pushStateOrHash(cfg.pushState && _isSupportPushState, path);
                 _execCallback(finalCallback);
             }, function (xhr) {
@@ -197,8 +217,14 @@
                 return;
             }
             _xhrGET(target.tplPath, function (xhr) {
-                tpl = xhr.responseText;
-                _this.container.innerHTML = tpl;
+                _this.tplStr = xhr.responseText;
+                if(_this.data instanceof Observer) {
+                    _this.data.unsubscribe(_this.setData);
+                    _this.data = null;
+                }
+                _this.data = new Observer();
+                _this.data.subscribe(_this.setData);
+                _this.container.innerHTML = _this.tplStr;
                 _execCallback(callback);
             }, function (xhr) {
                 throw xhr.responseText;
@@ -254,13 +280,68 @@
     };
 
     /**
+     * 观察者构造器
+     * @constructor
+     * @private
+     */
+    function _Observer() {
+        this.fns = [];
+    }
+
+    /**
+     * 观察者原型对象
+     * @type {{constructor: _Observer, subscribe: Function, unsubscribe: Function, update: Function}}
+     */
+    _Observer.prototype = {
+
+        "constructor": _Observer,
+
+        /**
+         * 相关事件
+         * @param fn    事件
+         */
+        "subscribe": function (fn) {
+            this.fns.push(fn);
+        },
+
+        /**
+         * 取消订阅某个事件
+         * @param fn
+         */
+        "unsubscribe": function (fn) {
+            this.fns = this.fns.filter(
+                function (el) {
+                    if (el !== fn) {
+                        return el;
+                    }
+                }
+            );
+        },
+
+        /**
+         * 对象发生变化,开始更新
+         * @param o
+         * @param thisObj
+         */
+        "update": function (o, thisObj) {
+            var scope = thisObj || window;
+            this.fns.forEach(
+                function (el) {
+                    el.call(scope, o);
+                }
+            );
+        }
+    };
+
+    /**
      * 加入前端模板
      * @param str   HTML字符串
      * @param data  数据
      * @private
      */
     function _compileTemplate(str, data) {
-        var evlute = /\{-\s+\S+\s\}/g;
+        var evlute = /\{-\s+\S+\s+\-}/g;
+        var parseParam = /\{\%\s+\S+\s+\%\}/g;
     }
 
     /**
