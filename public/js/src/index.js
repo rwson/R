@@ -359,18 +359,41 @@
      * @private
      */
     function _compileTemplate(html, options) {
-        var re = /<-([^%>]+)?->/g,
-            reExp = /(^( )?(if|for|else|switch|case|break|{|}))(.*)?/g, code = 'var r=[];\n', cursor = 0,
-            match;
+        var control = ["if","for","else","switch","case","break"],      //  流程控制语句相关关键字
+            re = /<-([^%>]+)?->/g,                                      //  以"<-"开头并且以"->"结尾
+            code = "var r=[];\n",                                       //  最后要执行的js代码
+            thisStart = /^this\.(\S)+/,                                 //  this.xxx
+            cursor = 0,                                                 //  字符串开始截取位置
+            reExp,                                                      //  匹配流程控制语句的正则表达式
+            match;                                                      //  匹配结果
+
+        //  组织正则表达式
+        reExp = new RegExp("(^( )?(" + control.join("|") + "|{|}))(.*)?", "g");
+
+        /**
+         * 工具函数,将匹配出来的各语句加到数组
+         * @param line      当前匹配结果
+         * @param js        是否为js代码
+         * @returns {Function}
+         */
         var add = function (line, js) {
+            var injectCode = line;
+            //  模板中出现的js代码,避免使用this
+            if(js) {
+                injectCode = "with(this){" + code + "};";
+            }
             js ? (code += line.match(reExp) ? line + '\n' : 'r.push(' + line + ');\n') :
                 (code += line != '' ? 'r.push("' + line.replace(/"/g, '\\"') + '");\n' : '');
             return add;
         };
+
+        //  循环匹配
         while (match = re.exec(html)) {
             add(html.slice(cursor, match.index))(match[1], true);
             cursor = match.index + match[0].length;
         }
+
+        //  加到函数体
         add(html.substr(cursor, html.length - cursor));
         code += 'return r.join("");';
         return new Function(code.replace(/[\r\t\n]/g, '')).apply(options);

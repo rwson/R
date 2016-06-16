@@ -85,15 +85,21 @@ Object:
 
 ##### 参数说明
 
-    
-
 参数名称 | 意义 | 可选值
 ---|---|---
 path | 路由匹配 | [{...}]或者{}
 pushState | 是否开启pushState | true/false
 index | 首页路由 | 之前path里面配置的路由
 
-##### demo
+##### API
+
+- RouteAble.config();       配置路由选项
+- RouteAble.setData();      设置页面渲染所需数据
+- RouteAble.setData();      取得数据
+- RouteAble.navigate();     跳转到指定的路由
+- RouteAble.pageParams;     取得url中的参数(path/queryString)
+
+##### DEMO
 
     git https://github.com/rwson/routeable
     
