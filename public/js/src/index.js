@@ -54,7 +54,7 @@
          */
         "setData": function (data, attribute) {
             //  设置数据
-            if(attribute) {
+            if (attribute) {
                 this.data.data = data;
             } else {
                 this.data.data = _merge(this.data.data, data, true);
@@ -285,6 +285,12 @@
         },
 
         /**
+         * 绑定一些简单的指令
+         */
+        "bindScopeData": function () {
+        },
+
+        /**
          * 运行事件
          * @param callback  回调函数
          */
@@ -322,8 +328,8 @@
          * 设置监听函数列表
          * @param fnList
          */
-        this.setFnList = function(fnList) {
-            if(_isType(fnList, "Array")) {
+        this.setFnList = function (fnList) {
+            if (_isType(fnList, "Array")) {
                 _fns = fnList;
             }
         };
@@ -332,7 +338,7 @@
          * 取得当前监听的对象列表
          * @returns {Array}
          */
-        this.getFnList = function() {
+        this.getFnList = function () {
             return _fns;
         };
     }
@@ -377,7 +383,7 @@
         "update": function (o, thisObj) {
             var scope = thisObj || window;
             var fns = this.getFnList();
-            fns.forEach(function(el) {
+            fns.forEach(function (el) {
                 el.call(scope, o);
             });
         }
@@ -390,10 +396,9 @@
      * @private
      */
     function _compileTemplate(html, options) {
-        var control = ["if", "for", "else", "switch", "case", "break"],      //  流程控制语句相关关键字
+        var control = ["if", "for", "else", "switch", "case", "break"], //  流程控制语句相关关键字
             re = /<-([^%>]+)?->/g,                                      //  以"<-"开头并且以"->"结尾
             code = "var r=[];\n",                                       //  最后要执行的js代码
-            thisStart = /^this\.(\S)+/,                                 //  this.xxx
             cursor = 0,                                                 //  字符串开始截取位置
             reExp,                                                      //  匹配流程控制语句的正则表达式
             match;                                                      //  匹配结果
@@ -408,17 +413,12 @@
          * @returns {Function}
          */
         var add = function (line, js) {
-            var injectCode = line;
-            //  模板中出现的js代码,避免使用this
-            if (js) {
-                injectCode = "with(this){" + code + "};";
-            }
             js ? (code += line.match(reExp) ? line + '\n' : 'r.push(' + line + ');\n') :
                 (code += line != '' ? 'r.push("' + line.replace(/"/g, '\\"') + '");\n' : '');
             return add;
         };
 
-        //  循环匹配
+        //  循环匹配相关字符串
         while (match = re.exec(html)) {
             add(html.slice(cursor, match.index))(match[1], true);
             cursor = match.index + match[0].length;
@@ -426,8 +426,11 @@
 
         //  加到函数体
         add(html.substr(cursor, html.length - cursor));
-        code += 'return r.join("");';
-        return new Function(code.replace(/[\r\t\n]/g, '')).apply(options);
+
+        //  with改变执行所需的作用域
+        code = "with(this){" + code + "return r.join('');}";
+
+        return new Function(code.replace(/[\r\t\n]/g, '')).apply(this, options);
     }
 
     /**
@@ -459,6 +462,7 @@
             throw "the method _xhrGET must pass in the url!";
         }
         var xhr = new XMLHttpRequest();
+        //  支持带cookie参数发起请求
         xhr.withCredentials = true;
         xhr.open("GET", url, true);
         xhr.send(null);
