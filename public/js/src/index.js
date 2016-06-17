@@ -49,13 +49,19 @@
 
         /**
          * 设置页面数据
-         * @param data  数据
+         * @param data          需要对象或者属性
+         * @param attribute     是否为属性
          */
-        "setData": function (data) {
+        "setData": function (data, attribute) {
             //  设置数据
-            this.data.data = data;
+            if(attribute) {
+                this.data.data = data;
+            } else {
+                this.data.data = _merge(this.data.data, data, true);
+            }
+
             //  数据设置完成,调用模板选,更新视图
-            this.container.innerHTML = _compileTemplate(this.tplStr, data);
+            this.container.innerHTML = _compileTemplate(this.tplStr, this.data.data);
         },
 
         /**
@@ -301,10 +307,34 @@
      * @private
      */
     function _Observer() {
-        //  监听函数列表
-        this.fns = [];
+
+        /**
+         * 当前页面实例的监听列表
+         * @type {Array}
+         * @private
+         */
+        var _fns = [];
+
         //  数据
         this.data = {};
+
+        /**
+         * 设置监听函数列表
+         * @param fnList
+         */
+        this.setFnList = function(fnList) {
+            if(_isType(fnList, "Array")) {
+                _fns = fnList;
+            }
+        };
+
+        /**
+         * 取得当前监听的对象列表
+         * @returns {Array}
+         */
+        this.getFnList = function() {
+            return _fns;
+        };
     }
 
     /**
@@ -316,11 +346,13 @@
         "constructor": _Observer,
 
         /**
-         * 相关事件
+         * 订阅相关事件
          * @param fn    事件
          */
         "subscribe": function (fn) {
-            this.fns.push(fn);
+            var fns = this.getFnList();
+            fns.push(fns);
+            this.setFnList(fns);
         },
 
         /**
@@ -328,27 +360,26 @@
          * @param fn
          */
         "unsubscribe": function (fn) {
-            this.fns = this.fns.filter(
-                function (el) {
-                    if (el !== fn) {
-                        return el;
-                    }
+            var fns = this.getFnList();
+            fns = fns.filter(function (el) {
+                if (el !== fn) {
+                    return el;
                 }
-            );
+            });
+            this.setFnList(fns);
         },
 
         /**
          * 对象发生变化,开始更新
-         * @param o
-         * @param thisObj
+         * @param o         回调参数
+         * @param thisObj   context上下文
          */
         "update": function (o, thisObj) {
             var scope = thisObj || window;
-            this.fns.forEach(
-                function (el) {
-                    el.call(scope, o);
-                }
-            );
+            var fns = this.getFnList();
+            fns.forEach(function(el) {
+                el.call(scope, o);
+            });
         }
     };
 
@@ -359,7 +390,7 @@
      * @private
      */
     function _compileTemplate(html, options) {
-        var control = ["if","for","else","switch","case","break"],      //  流程控制语句相关关键字
+        var control = ["if", "for", "else", "switch", "case", "break"],      //  流程控制语句相关关键字
             re = /<-([^%>]+)?->/g,                                      //  以"<-"开头并且以"->"结尾
             code = "var r=[];\n",                                       //  最后要执行的js代码
             thisStart = /^this\.(\S)+/,                                 //  this.xxx
@@ -379,7 +410,7 @@
         var add = function (line, js) {
             var injectCode = line;
             //  模板中出现的js代码,避免使用this
-            if(js) {
+            if (js) {
                 injectCode = "with(this){" + code + "};";
             }
             js ? (code += line.match(reExp) ? line + '\n' : 'r.push(' + line + ');\n') :

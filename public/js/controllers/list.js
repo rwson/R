@@ -33,7 +33,7 @@ define(["routable"], function (routable) {
             "data": list
         });
 
-        //console.log(routable.pageParams);
+        console.log(routable.pageParams);
 
         console.log("我是列表页");
     }
