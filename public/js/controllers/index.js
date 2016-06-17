@@ -8,12 +8,15 @@ define(["routable"], function (routable) {
 
     function indexCtrl() {
 
-        console.log("我是首页");
-
         routable.setData({
-            "data": "original data"
-        });
+            "classTest": true
+        },true);
 
+        routable.assignEvents({
+            "testFn": function () {
+                alert("我日了狗!!!");
+            }
+        });
     }
 
     return indexCtrl;

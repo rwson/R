@@ -22,6 +22,27 @@
     var replaceParam = /(\/\:\w+)/g;                    //  替换掉url中参数的表示
     var urlQueryStr = /\?[\S=\S]+/g;                    //  url中带有queryString
 
+    var eventFnDirecives = /event[-\S+]{1}/;            //  事件(回调)类型的指令
+    var eventModelDirectives = /event[-\S+]-model{1}/;  //  事件(模型)类型的指令
+    var attrDirectives = /attr-[-\S+]/;                 //  attr-xxx绑定元素属性
+
+    //  支持的一些指令
+    var directives = {
+        "event-click": function (ele) {
+            var callback = ele.getAttribute("event-click");
+            _execCallback(callback);
+        },
+        "event-change-model": function (ele) {
+        },
+        "attr-value": function (ele, attrName) {
+            var data = RouteAble.getData();
+            ele.setAttribute("value", data[attrName]);
+        },
+        "attr-class": function (ele) {
+            var finalClass = new Function();
+        }
+    };
+
     var RouteAble = {
 
         //  默认配置
@@ -40,6 +61,9 @@
 
         //  url中所带参数,包含queryString和path
         "pageParams": {},
+
+        //  modal上对应的事件回调对象
+        "events": {},
 
         //  模板显示区域
         "container": document.getElementById("route-app"),
@@ -73,6 +97,15 @@
         },
 
         /**
+         * 给当前页面模型定义modal事件
+         * @param evtsMap
+         */
+        "assignEvents": function (evtsMap) {
+            var evs = this.events;
+            this.events = _merge(evs, evtsMap, true);
+        },
+
+        /**
          * 配置方法
          * @param opt   配置对象,结构和cfg类似
          */
@@ -93,37 +126,39 @@
             var regex;
             if (_isType(finalCfg.path, "Array")) {
                 //  Array形式的配置
-                for (var i = 0, len = finalCfg.path.length; i < len; i++) {
-                    res = finalCfg.path[i].path.match(paramRoute);
-                    regex = new RegExp(finalCfg.path[i].path.replace(replaceParam, "\\/\\w+"), "g");
+
+                finalCfg.path.map(function (item) {
+                    res = item.path.match(paramRoute);
                     if (res) {
-                        finalCfg.path[i] = _merge(finalCfg.path[i], {
-                            "config": finalCfg.path[i].path,
+                        regex = new RegExp(item.path.replace(replaceParam, "\\/\\w+"), "g");
+                        item = _merge(item, {
+                            "config": item.path,
                             "path": regex,
                             "regex": regex
                         }, true);
                     }
-                }
+                    return item;
+                });
             } else if (_isType(finalCfg.path, "Object")) {
                 //  Object形式的配置
                 var cfgArr = [];
                 var toMerge = {};
-                for (var i in finalCfg.path) {
-                    var cPath = finalCfg.path[i];
-                    res = ("" + i).match(paramRoute);
-                    regex = new RegExp(("" + i).replace(replaceParam, "\\/\\w+"), "g");
+                Object.keys(finalCfg.path).forEach(function (item) {
+                    var cPath = finalCfg.path[item];
+                    res = ("" + item).match(paramRoute);
+                    regex = new RegExp(("" + item).replace(replaceParam, "\\/\\w+"), "g");
                     toMerge = {
-                        "path": i
+                        "path": item
                     };
                     if (res) {
                         toMerge = {
-                            "config": i,
+                            "config": item,
                             "path": regex,
                             "regex": regex
                         };
                     }
                     cfgArr.push(_merge(cPath, toMerge, true));
-                }
+                });
                 finalCfg.path = cfgArr;
             }
             this.finalCfg = finalCfg;
@@ -147,41 +182,42 @@
                 fPath = fPath.split("?")[0];
             }
             if (_isType(route, "Object")) {
-                for (var i in route) {
-                    tPath = route[i]["path"];
+                Object.keys(route).forEach(function (item) {
+                    tPath = route[item]["path"];
                     if (_isType(tPath, "String")) {
-                        output = route[i];
+                        output = route[item];
                     } else if (_isType(tPath, "Regexp") && tPath.test(fPath)) {
-                        output = _merge(route[i], {
+                        output = _merge(route[item], {
                             "path": fPath
                         }, true);
                     }
-                }
+                });
                 output = route[path];
             } else if (_isType(route, "Array")) {
-                for (var i = 0, len = route.length; i < len; i++) {
-                    tPath = route[i]["path"];
+                route.forEach(function (item) {
+                    tPath = item["path"];
                     if (_isType(tPath, "String") && tPath === fPath) {
-                        output = route[i];
+                        output = item;
                     } else if (_isType(tPath, "RegExp") && tPath.test(fPath)) {
-                        output = _merge(route[i], {
+                        output = _merge(item, {
                             "path": fPath
                         }, true);
                     }
-                }
+                });
             }
             //  url中带参数配置项
             if (output.regex) {
                 var urlSplits = fPath.split("/");
                 var cfgSplits = output.config.split("/");
-                for (var i = 0, len = cfgSplits.length; i < len; i++) {
-                    if (("" + cfgSplits[i]).indexOf(":") > -1) {
-                        if (!this.pageParams.path) {
-                            this.pageParams.path = {};
+                var _this = this;
+                cfgSplits.forEach(function (item, index) {
+                    if (("" + item).indexOf(":") > -1) {
+                        if (!_this.pageParams.path) {
+                            _this.pageParams.path = {};
                         }
-                        this.pageParams.path[("" + cfgSplits[i]).replace(":", "")] = urlSplits[i];
+                        _this.pageParams.path[("" + item).replace(":", "")] = urlSplits[index];
                     }
-                }
+                });
             }
             return output;
         },
@@ -210,11 +246,13 @@
                     _this.data.unsubscribe(_this.setData);
                     _this.data = null;
                 }
+                _this.events = {};
                 _this.data = new _Observer();
                 _this.data.subscribe(_this.setData);
                 _this.container.innerHTML = _this.tplStr;
                 _pushStateOrHash(cfg.pushState && _isSupportPushState, path);
                 _execCallback(finalCallback);
+                _this.bindDirectives();
             }, function (xhr) {
                 throw xhr.responseText;
             });
@@ -244,10 +282,12 @@
                     _this.data.unsubscribe(_this.setData);
                     _this.data = null;
                 }
+                _this.events = {};
                 _this.data = new _Observer();
                 _this.data.subscribe(_this.setData);
                 _this.container.innerHTML = _this.tplStr;
                 _execCallback(finalCallback);
+                _this.bindDirectives();
             }, function (xhr) {
                 throw xhr.responseText;
             });
@@ -287,7 +327,45 @@
         /**
          * 绑定一些简单的指令
          */
-        "bindScopeData": function () {
+        "bindDirectives": function () {
+            var nodes = this.container.getElementsByTagName("*");
+            var modelEvents = this.events;
+            var modelData = this.getData();
+            var _this = this;
+            var rid;
+            nodes = Array.prototype.slice.call(nodes);
+            nodes.forEach(function (item) {
+                //  如果该元素在之前已经指定过rid属性,说明之前已经绑定过属性或计算过表达式了,就不再
+                if(item.getAttribute("rid")) {
+                    return;
+                }
+                Object.keys(directives).forEach(function (itemD) {
+                    var attrVal = item.getAttribute(itemD);                 //  标签上的取得属性值
+                    var isEvent = itemD.match(eventFnDirecives);            //  判断是否为事件回调指令
+                    var isAttribute = itemD.match(attrDirectives);          //  判断是否为标签属性
+
+                    if (attrVal) {
+                        //  当前是event事件回调指令
+                        if (isEvent) {
+                            var evName = itemD.replace("event-", "");
+                            var curEvent = modelEvents[attrVal];
+                            _removeEvent(item, evName);
+                            _addEvent(item, evName, curEvent);
+                        } else if (isAttribute) {
+                            //  元素属性指令
+                            var attrnName = itemD.replace("attr-", "");
+                            var fnStr = "with(this) { return (" + attrVal + ")}";
+                            var fnCal = new Function(fnStr);
+                            var execVal = fnCal.call(modelData);
+                            var curAttrVal = item.getAttribute(attrnName);
+                            item.setAttribute(attrnName, curAttrVal ? curAttrVal + " " + execVal : execVal);
+                        }
+                    }
+
+                    rid = _randomId();
+                    item.setAttribute("rid", rid);
+                });
+            });
         },
 
         /**
@@ -390,6 +468,15 @@
     };
 
     /**
+     * 生成一个随机字符串最id
+     * @returns {string}
+     * @private
+     */
+    function _randomId() {
+        return (Math.random()).toString(16).replace(".", "");
+    }
+
+    /**
      * 加入前端模板
      * @param html      HTML字符串
      * @param options   数据
@@ -430,7 +517,7 @@
         //  with改变执行所需的作用域
         code = "with(this){" + code + "return r.join('');}";
 
-        return new Function(code.replace(/[\r\t\n]/g, '')).apply(this, options);
+        return new Function(code.replace(/[\r\t\n]/g, '')).apply(options);
     }
 
     /**
@@ -604,11 +691,11 @@
         if (!url || url.indexOf("?") < 0) {
             return output;
         }
-        for (var i = 0, len = arr.length; i < len; i++) {
-            var _temp = arr[i].split("=");
+        arr.forEach(function (item) {
+            var _temp = item.split("=");
             output[_temp[0]] = decodeURIComponent(_temp[1]);
             _temp = null;
-        }
+        });
         return output;
     }
 
@@ -622,15 +709,15 @@
      */
     function _merge(obj1, obj2, override) {
         if (!_isType(obj1, "Object") || !_isType(obj2, "Object")) {
-            return;
+            throw "the method _merge need at last Object argument!";
         }
-        for (var i in obj2) {
+        Object.keys(obj2).forEach(function (i) {
             if (obj1[i] && override) {
                 obj1[i] = obj2[i];
             } else if (!obj1[i] && obj2[i]) {
                 obj1[i] = obj2[i];
             }
-        }
+        });
         return obj1;
     }
 

@@ -6,7 +6,20 @@
     <a href="/list?page=2">列表(带url查询字符串)</a>
     <a href="/list/3?page=3">列表(参数加url查询字符串)</a>
 </div>
+
 <div class="test-mvvm">
-    <input type="text" data-bind="name" placeholder="请输入..." />
+
+    <input type="text" ev-change-model="name" placeholder="请输入..." />
+    <input type="text" attr-value="name" />
+
+    <a event-click="testFn">卧槽,日了狗了!!!</a>
+
+    <div attr-class="classTest ? 'red' : 'green'">
+        我是测试attr-class内容
+    </div>
+
+    <div class="old-class" attr-class="classTest ? 'red' : 'green'">
+        我是测试attr-class内容
+    </div>
 
 </div>
