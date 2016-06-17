@@ -35,6 +35,8 @@ define(["routable"], function (routable) {
 
         console.log(routable.pageParams);
 
+        console.log(routable.getData());
+
         console.log("我是列表页");
     }
 

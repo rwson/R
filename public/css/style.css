@@ -1,8 +1,23 @@
 body {
-  padding: 50px;
-  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+    padding: 50px;
+    font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
 }
 
 a {
-  color: #00B7FF;
+    color: #00B7FF;
+}
+
+.old-class {
+    border: 5px solid #ccc;
+    margin: 10px;
+}
+
+.red {
+    background: red;
+    height: 50px;
+    margin: 10px 0 0 0;
+}
+
+.green {
+    background: green;
 }

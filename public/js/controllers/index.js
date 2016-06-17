@@ -9,7 +9,8 @@ define(["routable"], function (routable) {
     function indexCtrl() {
 
         routable.setData({
-            "classTest": true
+            "classTest": true,
+            "showPic": 1
         },true);
 
         routable.assignEvents({

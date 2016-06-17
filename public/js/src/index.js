@@ -15,16 +15,26 @@
 
 }(window, function (root, undefined) {
 
-    var _class2 = {};                                   //  Object.prototype
-    var _array2 = [];                                   //  Array.prototype
-    var _isSupportPushState = !!history.pushState;      //  当前浏览器支持pushState
-    var paramRoute = /(\/\:\w+)+/g;                     //  带url参数REST风格的路由
-    var replaceParam = /(\/\:\w+)/g;                    //  替换掉url中参数的表示
-    var urlQueryStr = /\?[\S=\S]+/g;                    //  url中带有queryString
+    var _class2 = {};                                       //  Object.prototype
+    var _array2 = [];                                       //  Array.prototype
+    var _isSupportPushState = !!history.pushState;          //  当前浏览器支持pushState
+    var paramRoute = /(\/\:\w+)+/g;                         //  带url参数REST风格的路由
+    var replaceParam = /(\/\:\w+)/g;                        //  替换掉url中参数的表示
+    var urlQueryStr = /\?[\S=\S]+/g;                        //  url中带有queryString
 
-    var eventFnDirecives = /event[-\S+]{1}/;            //  事件(回调)类型的指令
-    var eventModelDirectives = /event[-\S+]-model{1}/;  //  事件(模型)类型的指令
-    var attrDirectives = /attr-[-\S+]/;                 //  attr-xxx绑定元素属性
+    var eventFnDirecives = /event[-\S+]{1}/;                //  事件(回调)类型的指令
+    var eventModelDirectives = /event[-\S+]{1}-model{1}/;   //  事件(模型)类型的指令
+    var attrDirectives = /attr-[-\S+]/;                     //  attr-xxx绑定元素属性
+
+    var elementMap = {};                                    //  元素的map对象,只更新部分对象
+
+    var needAddAttrs = ["class", "style"];                  //  在attr-xxx中,有些属性是可以叠加的,现在指定class和type
+    var needConcatReg =                                     //  拼接成正则表达式
+        new RegExp(needAddAttrs.join("|"), "g");
+
+    var _Tool = {};                                         //  工具类(类型操作,方法,字符串等)
+    var _DOMTool = {};                                      //  DOM操作类
+    var _Event = {};                                        //  事件系统
 
     //  支持的一些指令
     var directives = {
@@ -54,7 +64,7 @@
         },
 
         //  页面结构数据
-        "data": null,
+        "obverseer": null,
 
         //  最后的配置参数
         "finalCfg": {},
@@ -79,13 +89,13 @@
         "setData": function (data, attribute) {
             //  设置数据
             if (attribute) {
-                this.data.data = data;
+                this.obverseer.data = data;
             } else {
-                this.data.data = _merge(this.data.data, data, true);
+                this.obverseer.data = _merge(this.obverseer.data || {}, data, true);
             }
 
             //  数据设置完成,调用模板选,更新视图
-            this.container.innerHTML = _compileTemplate(this.tplStr, this.data.data);
+            this.container.innerHTML = _compileTemplate(this.tplStr, this.obverseer.data);
         },
 
         /**
@@ -93,7 +103,7 @@
          * @returns {*}
          */
         "getData": function () {
-            return this.data.data;
+            return this.obverseer.data;
         },
 
         /**
@@ -113,6 +123,12 @@
             if (!_isType(opt, "Object")) {
                 throw "config exception!the config method expect an argument which is an Object!";
             }
+            var finalCfg = _merge(this.cfg, opt, true),         //  合并传入的参数和原来的默认配置                                           //
+                cfgArr = [],                                        //  用来缓存Object方式配置路由的数据
+                toMerge = {},                                       //  原来的正则表达式对象和新的属性合并
+                cPath,                                              //  Object方式配置路由,会遍历每一项,cPath表示当前一项
+                res,                                                //  路由带参数时匹配结果
+                regex;                                              //  正则表达式对象
             //  处理div#route-app不存在的情况
             if (!this.container) {
                 var body = document.getElementsByTagName("body")[0];
@@ -121,12 +137,9 @@
                 this.container.id = "route-app";
                 body.insertBefore(this.container, first);
             }
-            var finalCfg = _merge(this.cfg, opt, true);
-            var res = [];
-            var regex;
+
             if (_isType(finalCfg.path, "Array")) {
                 //  Array形式的配置
-
                 finalCfg.path.map(function (item) {
                     res = item.path.match(paramRoute);
                     if (res) {
@@ -141,10 +154,8 @@
                 });
             } else if (_isType(finalCfg.path, "Object")) {
                 //  Object形式的配置
-                var cfgArr = [];
-                var toMerge = {};
                 Object.keys(finalCfg.path).forEach(function (item) {
-                    var cPath = finalCfg.path[item];
+                    cPath = finalCfg.path[item];
                     res = ("" + item).match(paramRoute);
                     regex = new RegExp(("" + item).replace(replaceParam, "\\/\\w+"), "g");
                     toMerge = {
@@ -242,13 +253,13 @@
             _xhrGET(target.tplPath, function (xhr) {
                 _this.tplStr = xhr.responseText;
                 //  解除之前页面的监听
-                if (_this.data instanceof _Observer) {
-                    _this.data.unsubscribe(_this.setData);
-                    _this.data = null;
+                if (_this.obverseer instanceof _Observer) {
+                    _this.obverseer.unsubscribe(_this.setData);
+                    _this.obverseer = null;
                 }
                 _this.events = {};
-                _this.data = new _Observer();
-                _this.data.subscribe(_this.setData);
+                _this.obverseer = new _Observer();
+                _this.obverseer.subscribe(_this.setData);
                 _this.container.innerHTML = _this.tplStr;
                 _pushStateOrHash(cfg.pushState && _isSupportPushState, path);
                 _execCallback(finalCallback);
@@ -278,13 +289,13 @@
             _xhrGET(target.tplPath, function (xhr) {
                 _this.tplStr = xhr.responseText;
                 //  解除之前页面的监听
-                if (_this.data instanceof _Observer) {
-                    _this.data.unsubscribe(_this.setData);
-                    _this.data = null;
+                if (_this.obverseer instanceof _Observer) {
+                    _this.obverseer.unsubscribe(_this.setData);
+                    _this.obverseer = null;
                 }
                 _this.events = {};
-                _this.data = new _Observer();
-                _this.data.subscribe(_this.setData);
+                _this.obverseer = new _Observer();
+                _this.obverseer.subscribe(_this.setData);
                 _this.container.innerHTML = _this.tplStr;
                 _execCallback(finalCallback);
                 _this.bindDirectives();
@@ -336,7 +347,7 @@
             nodes = Array.prototype.slice.call(nodes);
             nodes.forEach(function (item) {
                 //  如果该元素在之前已经指定过rid属性,说明之前已经绑定过属性或计算过表达式了,就不再
-                if(item.getAttribute("rid")) {
+                if (item.getAttribute("rid")) {
                     return;
                 }
                 Object.keys(directives).forEach(function (itemD) {
@@ -391,7 +402,6 @@
      * @private
      */
     function _Observer() {
-
         /**
          * 当前页面实例的监听列表
          * @type {Array}
@@ -400,7 +410,7 @@
         var _fns = [];
 
         //  数据
-        this.data = {};
+        this.obverseer = {};
 
         /**
          * 设置监听函数列表
@@ -468,15 +478,6 @@
     };
 
     /**
-     * 生成一个随机字符串最id
-     * @returns {string}
-     * @private
-     */
-    function _randomId() {
-        return (Math.random()).toString(16).replace(".", "");
-    }
-
-    /**
      * 加入前端模板
      * @param html      HTML字符串
      * @param options   数据
@@ -518,6 +519,15 @@
         code = "with(this){" + code + "return r.join('');}";
 
         return new Function(code.replace(/[\r\t\n]/g, '')).apply(options);
+    }
+
+    /**
+     * 生成一个随机字符串最id
+     * @returns {string}
+     * @private
+     */
+    function _randomId() {
+        return (Math.random()).toString(16).replace(".", "");
     }
 
     /**
@@ -567,57 +577,6 @@
     }
 
     /**
-     * 添加事件监听
-     * @param obj   HTMLDOMElement
-     * @param type  事件类型
-     * @param fn    回调函数
-     * @private
-     */
-    function _addEvent(obj, type, fn) {
-        if (!obj) {
-            return;
-        }
-        if (obj.attachEvent) {
-            obj["e" + type + fn] = fn;
-            obj[type + fn] = function (ev) {
-                ev = ev || root.event;
-                obj["e" + type + fn](ev);
-                _prevDefault(ev);
-            };
-            obj.attachEvent("on" + type, function (ev) {
-                ev = ev || root.event;
-                obj[type + fn](ev);
-                _prevDefault(ev);
-            });
-        } else {
-            obj.addEventListener(type, function (ev) {
-                ev = ev || root.event;
-                fn();
-                _prevDefault(ev);
-            }, false);
-        }
-    }
-
-    /**
-     * 移除事件监听
-     * @param obj   HTMLDOMElement
-     * @param type  事件类型
-     * @param fn    回调函数
-     * @private
-     */
-    function _removeEvent(obj, type, fn) {
-        if (!obj) {
-            return;
-        }
-        if (obj.detachEvent) {
-            obj.detachEvent("on" + type, obj[type + fn]);
-            obj[type + fn] = null;
-        } else {
-            obj.removeEventListener(type, fn, false);
-        }
-    }
-
-    /**
      * 阻止默认事件和事件冒泡
      * @param ev    事件句柄
      * @private
@@ -652,15 +611,15 @@
 
     /**
      * 获取页面的hash和state值
-     * @param ev    事件句柄
+     * @param rootPath    事件句柄
      * @returns {hash: "", path: ""}
      * @private
      */
     function _getHashOrState(rootPath) {
         var output = {};
         var hash = location.href.match(/#(.*)$/);
-        hash = hash ? hash[0].replace(/\#/g, "") : "";
         var path = decodeURIComponent(location.pathname + _getSearch());
+        hash = hash ? hash[0].replace(/\#/g, "") : "";
         if (!path.indexOf((rootPath || "/"))) {
             path = "/" + path.slice(rootPath.length);
         }
@@ -730,6 +689,323 @@
     function _isType(obj, typeStr) {
         return _class2.toString.call(obj).toLowerCase() === ("[object " + typeStr + "]").toLowerCase();
     }
+
+    /**
+     * 添加事件监听
+     * @param obj   HTMLDOMElement
+     * @param type  事件类型
+     * @param fn    回调函数
+     * @private
+     */
+    function _addEvent(obj, type, fn) {
+        if (!obj) {
+            return;
+        }
+        if (obj.attachEvent) {
+            obj["e" + type + fn] = fn;
+            obj[type + fn] = function (ev) {
+                ev = ev || root.event;
+                obj["e" + type + fn](ev);
+                _prevDefault(ev);
+            };
+            obj.attachEvent("on" + type, function (ev) {
+                ev = ev || root.event;
+                obj[type + fn](ev);
+                _prevDefault(ev);
+            });
+        } else {
+            obj.addEventListener(type, function (ev) {
+                ev = ev || root.event;
+                fn();
+                _prevDefault(ev);
+            }, false);
+        }
+    }
+
+    /**
+     * 移除事件监听
+     * @param obj   HTMLDOMElement
+     * @param type  事件类型
+     * @param fn    回调函数
+     * @private
+     */
+    function _removeEvent(obj, type, fn) {
+        if (!obj) {
+            return;
+        }
+        if (obj.detachEvent) {
+            obj.detachEvent("on" + type, obj[type + fn]);
+            obj[type + fn] = null;
+        } else {
+            obj.removeEventListener(type, fn, false);
+        }
+    }
+
+    /***************
+     * 一些工具类
+     * *************/
+
+    _Tool = {
+
+        /**
+         * 获取页面的hash和state值
+         * @param   rootPath    首页路径
+         * @returns {hash: "", path: ""}
+         */
+        "getHashOrState": function (rootPath) {
+            var path = decodeURIComponent(location.pathname + _Tool.getSearch());
+            var hash = location.href.match(/#(.*)$/);
+            var output = {};
+            hash = hash ? hash[0].replace(/\#/g, "") : "";
+            if (!path.indexOf((rootPath || "/"))) {
+                path = "/" + path.slice(rootPath.length);
+            }
+            output.hash = hash;
+            output.path = path;
+            return output;
+        },
+
+        /**
+         * 获取url中那一串?xxx=yyy
+         * @returns {String || ""}
+         * */
+        "getSearch": function () {
+            var match = location.href.replace(/#.*/, "").match(/\?.+/);
+            return match ? match[0] : "";
+        },
+
+        /**
+         * 获取url中的查询字符串
+         * @param url   被获取的字符串
+         * @returns {{}||Object}
+         */
+        "getQueryStrng": function (url) {
+            var arr = url.split("?")[1].split("&");
+            var output = {};
+            if (!url || url.indexOf("?") < 0) {
+                return output;
+            }
+            arr.forEach(function (item) {
+                var _temp = item.split("=");
+                output[_temp[0]] = decodeURIComponent(_temp[1]);
+                _temp = null;
+            });
+            return output;
+        },
+
+        /**
+         * 合并两个对象
+         * @param obj1          第一个对象
+         * @param obj2          第二个对象
+         * @param override      是否支持相同属性值覆盖
+         * @returns {Object}
+         */
+        "merge": function (obj1, obj2, override) {
+            if (!_isType(obj1, "Object") || !_isType(obj2, "Object")) {
+                _Tool.exception("the method _merge need at last Object argument!");
+            }
+            Object.keys(obj2).forEach(function (i) {
+                if (obj1[i] && override) {
+                    obj1[i] = obj2[i];
+                } else if (!obj1[i] && obj2[i]) {
+                    obj1[i] = obj2[i];
+                }
+            });
+            return obj1;
+        },
+
+        /**
+         * 判断一个对象是否为指定类型
+         * @param obj       被判断的类型
+         * @param typeStr   希望的类型字符串(Boolean Number String Function Array Date RegExp Object)
+         * @returns {boolean}
+         */
+        "isType": function (obj, typeStr) {
+            return _class2.toString.call(obj).toLowerCase() === ("[object " + typeStr + "]").toLowerCase();
+        },
+
+        /**
+         * 判断一个对象是否为伪数组
+         * @param list  被判断的对象
+         * @returns {*|boolean}
+         */
+        "isFakeArray": function (list) {
+            return list && (typeof list.length === "number") && !(list instanceof Array);
+        },
+
+        /**
+         * 把一个伪数组(有length属性,没有数组原型下的方法)转换真数组
+         * @param fakeArray     伪数组
+         * @returns {Array.<T>}
+         */
+        "toArray": function (fakeArray) {
+            var res = [];
+            if (_Tool.isFakeArray(fakeArray)) {
+                res = _array2.slice.call(fakeArray);
+            }
+            return res;
+        },
+
+        /**
+         * 生成一个随机字符串
+         * @returns {string}
+         */
+        "randomStr": function () {
+            return ("" + Math.random()).toString(16).replace(".", "");
+        },
+
+        /**
+         * 执行回调函数
+         * @returns {*}
+         */
+        "executeCallback": function () {
+            var fn = arguments[0];
+            var args = _array2.slice.call(arguments, 1);
+            if (_Tool.isType(fn, "Function")) {
+                return fn.apply(root, args);
+            }
+        },
+
+        /**
+         * http请求(GET)
+         * @param opts  配置参数
+         */
+        "getRequest": function (opts) {
+            if (!opts.url) {
+                _Tool.exception("the method _Tool.httpRequest must pass in the url!");
+            }
+            var xhr = new XMLHttpRequest();
+
+            //  支持带cookie参数发起请求
+            xhr.withCredentials = true;
+            xhr.open("GET", opts.url, true);
+            xhr.send(null);
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4) {
+                    if ((xhr.status >= 200 && xhr.status < 300) || xhr.status == 304) {
+                        _Tool.executeCallback(opts.success, (opts.context || root), xhr);
+                    } else {
+                        _Tool.executeCallback(opts.fail, (opts.context || root), xhr);
+                    }
+                }
+            };
+        },
+
+        /**
+         * 抛出异常
+         * @param msg   异常信息
+         */
+        "exception": function (msg) {
+            throw msg;
+        }
+
+    };
+
+    _Event = {
+
+        /**
+         * 添加事件监听
+         * @param obj   HTMLDOMElement
+         * @param type  事件类型
+         * @param fn    回调函数
+         */
+        "addEvent": function (obj, type, fn) {
+            if (!obj || !type) {
+                _Tool.exception("the method _Event.addEvent must at last pass in an argument which typeof HTMLDOMElement and an argument which typeof String");
+            }
+            if (obj.attachEvent) {
+                obj["e" + type + fn] = fn;
+                obj[type + fn] = function (ev) {
+                    ev = ev || root.event;
+                    obj["e" + type + fn](ev);
+                    _prevDefault(ev);
+                };
+                obj.attachEvent("on" + type, function (ev) {
+                    ev = ev || root.event;
+                    obj[type + fn](ev);
+                    _prevDefault(ev);
+                });
+            } else {
+                obj.addEventListener(type, function (ev) {
+                    ev = ev || root.event;
+                    fn();
+                    _prevDefault(ev);
+                }, false);
+            }
+        },
+
+        /**
+         * 移除事件监听
+         * @param obj   HTMLDOMElement
+         * @param type  事件类型
+         * @param fn    回调函数
+         */
+        "removeEvent": function (obj, type, fn) {
+            if (!obj || !type) {
+                _Tool.exception("the method _Event.addEvent must at last pass in an argument which typeof HTMLDOMElement and an argument which typeof String");
+            }
+            if (obj.detachEvent) {
+                obj.detachEvent("on" + type, obj[type + fn]);
+                obj[type + fn] = null;
+            } else {
+                obj.removeEventListener(type, fn, false);
+            }
+        },
+
+        /**
+         * 事件代理
+         * @param type          事件类型
+         * @param condition     触发事件条件,可以是boolean或者函数(boolean类型的返回值)
+         * @param fn            回调函数
+         */
+        "delegatEvent": function (type, condition, fn) {
+            _Event.removeEvent(document, type);
+            _Event.addEvent(document, type, function (ev) {
+                ev = ev || event;
+                if ((!_Tool.isType(condition, "Function") && condition) || condition()) {
+                    _Tool.executeCallback(fn, ev);
+                }
+            });
+        }
+    };
+
+    _DOMTool = {
+        /**
+         * 判断一个对象是否为DOM节点
+         * @param el    被判断的对象
+         * @returns {*|boolean}
+         */
+        "isHTMLNode": function (el) {
+            return el && el.nodeType === 1;
+        },
+
+        /**
+         * 给元素追加class样式类
+         * @param el            目标元素
+         * @param classList     需要追加的类(String:"xxx"/"xxx yyy" | Array<String>)
+         */
+        "addClass": function (el, classList) {
+            var classEs = el.classList;
+            if (!_Tool.isType(classList, "String") && !_Tool.isType(classList, "Array")) {
+                _Tool.exception("the method _DOMTool.addClass's second argument must be String type of Array type!");
+            }
+            if (_Tool.isType(classList, "String")) {
+                if (~classList.indexOf(" ")) {
+                    classList = classList.split(" ");
+                } else {
+                    classList = [classList];
+                }
+            }
+            if (classList.length) {
+                classList.forEach(function (item) {
+                    if(classEs.contains(item)) {
+                        el.classList.add(item);
+                    }
+                    classEs = el.classList;
+                });
+            }
+        }
+    };
 
     return RouteAble;
 

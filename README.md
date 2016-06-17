@@ -159,7 +159,7 @@ RouteAble.pageParams | 取得浏览器地址栏中的参数(包含path/queryStri
             <li><a href="/detail">详情页(不带参数)</a></li>
             <li><a href="/detail/123">详情页(带url参数)</a></li>
             <li><a href="/detail?page=1">详情页(带url查询字符串)</a></li>
-            <li><a href="/detail/123?page=1&amp;location=detail">详情页(带url查询字符串)</a></li>
+            <li><a href="/detail/123?page=1&location=detail">详情页(带url查询字符串)</a></li>
         </ul>
     </div>
 
