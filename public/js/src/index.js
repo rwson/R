@@ -33,6 +33,8 @@
     var needConcatReg =                                     //  拼接成正则表达式
         new RegExp(needAddAttrs.join("|"), "g");
 
+    var watchers = {};                                      //  数据监听的map
+
     var _Tool = {};                                         //  工具类(类型操作,方法,字符串等)
     var _DOM = {};                                          //  DOM操作类
     var _Event = {};                                        //  事件系统
@@ -91,16 +93,21 @@
          * @param attribute     是否为属性
          */
         "setData": function (data, attribute) {
+            //  默认设置只更新属性
             attribute = (attribute === undefined) ? true : attribute;
             //  设置数据
             if (attribute) {
                 this.obverseer.data = data;
             } else {
                 this.obverseer.data = _Tool.merge(this.obverseer.data || {}, data, true);
+                //  数据更新完成
             }
 
             //  数据设置完成,调用模板选,更新视图
             this.container.innerHTML = _compileTemplate(this.tplStr, this.obverseer.data);
+        },
+
+        "updateData": function () {
         },
 
         /**
@@ -260,14 +267,7 @@
                 "context": _this,
                 "success": function (context, xhr) {
                     context.tplStr = xhr.responseText;
-                    //  解除之前页面的监听
-                    if (context.obverseer instanceof _Observer) {
-                        context.obverseer.unsubscribe(this.setData);
-                        context.obverseer = null;
-                    }
-                    context.events = {};
-                    context.obverseer = new _Observer();
-                    context.obverseer.subscribe(context.setData);
+                    context.reset();
                     context.container.innerHTML = context.tplStr;
                     _Tool.pushStateOrHash(cfg.pushState && _isSupportPushState, path);
                     _Tool.executeCallback(finalCallback);
@@ -302,15 +302,8 @@
                 "success": function (context, xhr) {
                     context.tplStr = xhr.responseText;
                     //  解除之前页面的监听
-                    if (context.obverseer instanceof _Observer) {
-                        context.obverseer.unsubscribe(this.setData);
-                        context.obverseer = null;
-                    }
-                    context.events = {};
-                    context.obverseer = new _Observer();
-                    context.obverseer.subscribe(context.setData);
+                    context.reset();
                     context.container.innerHTML = context.tplStr;
-                    _Tool.pushStateOrHash(cfg.pushState && _isSupportPushState, path);
                     _Tool.executeCallback(finalCallback);
                     context.bindDirectives();
                 },
@@ -318,7 +311,6 @@
                     _Tool.exception(xhr.responseText);
                 }
             });
-
         },
 
         /**
@@ -330,7 +322,7 @@
             var path;
 
             //  document代理a标签的点击事件
-            _Event.delegatEvent("click", function (ev) {
+            _Event.delegatEvent(document, "click", function (ev) {
                 ev = ev || event;
                 var target = ev.target;
                 path = target.getAttribute("href");
@@ -340,7 +332,7 @@
             });
 
             //  浏览器前进后退
-            _Event.delegatEvent("popstate", true, function (ev) {
+            _Event.delegatEvent(root, "popstate", true, function (ev) {
                 var res = _Tool.getHashOrState(cfg.default || "/");
                 var path = res.path;
                 if (!cfg.pushState) {
@@ -413,8 +405,12 @@
 
         /**
          * 检测当前数据和上一次存储的数据是否不同,不同就更新相关
+         * @param attrs         数据本次的数据(String/Array)
+         * @param attribute     是否是this.obverseer.data的部分属性
          */
-        "watchAndUpdate": function () {
+        "compareWithLast": function (attrs, attribute) {
+            //  默认只比较属性值
+            attribute = (attribute === undefined) ? true : false;
         },
 
         /**
@@ -436,6 +432,30 @@
          * 重置一些属性,变量值,防止受到之前页面的影响
          */
         "reset": function () {
+            if (this.obverseer instanceof _Observer) {
+                this.obverseer.unsubscribe(this.setData);
+                this.obverseer = null;
+            }
+            this.events = {};
+            //  解除之前页面的监听
+            this.obverseer = new _Observer();
+            this.obverseer.subscribe(this.setData);
+        },
+
+        /**
+         * 给每个DOM节点添加一个随机的rId,并且和相关的数据进行关联
+         */
+        "setLinkHandles": function () {
+            var doms = this.container.getElementsByTagName("*");
+            var data = this.getData();
+            var randomStr;
+            doms = _Tool.toArray(doms);
+            doms.forEach(function (item) {
+                randomStr = _Tool.randomStr();
+                _DOM.setAttributes(item, {
+                    "rid": randomStr
+                });
+            });
         }
 
     };
@@ -943,13 +963,14 @@
 
         /**
          * 事件代理
+         * @param target        代理目标
          * @param type          事件类型
          * @param condition     触发事件条件,可以是boolean或者函数(boolean类型的返回值)
          * @param fn            回调函数
          */
-        "delegatEvent": function (type, condition, fn) {
-            _Event.removeEvent(document, type);
-            _Event.addEvent(document, type, function (ev) {
+        "delegatEvent": function (target, type, condition, fn) {
+            _Event.removeEvent(target, type);
+            _Event.addEvent(target, type, function (ev) {
                 ev = ev || event;
                 if ((!_Tool.isType(condition, "Function") && condition) || condition()) {
                     _Tool.executeCallback(fn, ev);
@@ -983,6 +1004,19 @@
      * DOM操作模块
      * *************/
     _DOM = {
+
+        /**
+         * 根据rid属性获取相关元素
+         * @param rid   元素的rid
+         * @returns {null|HTMLDOMElement}
+         */
+        "getElementByRid": function (rid) {
+            if (!rid) {
+                return null;
+            }
+            return document.querySelector("[rid='" + rid + "']");
+        },
+
         /**
          * 判断一个对象是否为DOM节点
          * @param el    被判断的对象
