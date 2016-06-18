@@ -11,13 +11,20 @@ define(["routable"], function (routable) {
         routable.setData({
             "classTest": true,
             "showPic": 1
-        },true);
+        }, true);
 
         routable.assignEvents({
             "testFn": function () {
                 alert("我日了狗!!!");
             }
         });
+
+        setTimeout(function () {
+            routable.setData({
+                "classTest": true
+            });
+        }, 10000);
+
     }
 
     return indexCtrl;

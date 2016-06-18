@@ -26,14 +26,15 @@
     var eventModelDirectives = /event[-\S+]{1}-model{1}/;   //  事件(模型)类型的指令
     var attrDirectives = /attr-[-\S+]/;                     //  attr-xxx绑定元素属性
 
-    var elementMap = {};                                    //  元素的map对象,只更新部分对象
+    var storeMap = {};                                      //  数据存储的map对象
+    var elementMap = {};                                    //  元素的map对象,根据上一个变量数据的map对象,判断和之前的是否有变化,更新部分DOM
 
     var needAddAttrs = ["class", "style"];                  //  在attr-xxx中,有些属性是可以叠加的,现在指定class和type
     var needConcatReg =                                     //  拼接成正则表达式
         new RegExp(needAddAttrs.join("|"), "g");
 
     var _Tool = {};                                         //  工具类(类型操作,方法,字符串等)
-    var _DOMTool = {};                                      //  DOM操作类
+    var _DOM = {};                                          //  DOM操作类
     var _Event = {};                                        //  事件系统
 
     //  支持的一些指令
@@ -90,6 +91,7 @@
          * @param attribute     是否为属性
          */
         "setData": function (data, attribute) {
+            attribute = (attribute === undefined) ? true : attribute;
             //  设置数据
             if (attribute) {
                 this.obverseer.data = data;
@@ -192,7 +194,7 @@
             var output;
             //  url中存在查询字符串,将url转换成"?"前面的内容,再进行比对
             if (fPath.match(urlQueryStr)) {
-                this.pageParams.queryString = _Tool.getQueryStrng(fPath);
+                this.pageParams.queryString = _Tool.getQueryString(fPath);
                 fPath = fPath.split("?")[0];
             }
             if (_Tool.isType(route, "Object")) {
@@ -383,18 +385,19 @@
                             var execVal = fnCal.call(modelData);
                             switch (attrnName) {
                                 case "class":
-                                    _DOMTool.addClass(item, execVal);
+                                    _DOM.addClass(item, execVal);
                                     break;
                                 case "style":
                                     var arr = execVal.split(";");
                                     var styles = {};
                                     arr.forEach(function (item) {
                                         var _tmp = item.split(":");
-                                        if (_tmp) {
+                                        if (_tmp[0] && _tmp[1]) {
                                             styles[_tmp[0]] = _tmp[1];
                                         }
+                                        _tmp = null;
                                     });
-                                    _DOMTool.setStyle(item, styles);
+                                    _DOM.setStyle(item, styles);
                                     break;
                                 default :
                                     break;
@@ -406,6 +409,12 @@
                     item.setAttribute("rid", rid);
                 });
             });
+        },
+
+        /**
+         * 检测当前数据和上一次存储的数据是否不同,不同就更新相关
+         */
+        "watchAndUpdate": function () {
         },
 
         /**
@@ -421,6 +430,12 @@
             }
             this.navigate(path);
             this.initEvents();
+        },
+
+        /**
+         * 重置一些属性,变量值,防止受到之前页面的影响
+         */
+        "reset": function () {
         }
 
     };
@@ -550,6 +565,155 @@
         return new Function(code.replace(/[\r\t\n]/g, '')).apply(options);
     }
 
+    /**
+     * 深度判断两个对象是否相等(摘自underscore中的eq方法)
+     * @param a         第一个个对象
+     * @param b         第二个对象
+     * @param aStack    第一个栈
+     * @param bStack    第二个栈
+     * @returns {boolean}
+     * @private
+     */
+    function _eq(a, b, aStack, bStack) {
+
+        // 获取第一个对象原型上的类名
+        var className = _class2.toString.call(a);
+
+        /**
+         * 检查两个基本数据类型的值是否相等
+         * 对于引用数据类型,如果它们来自同一个引用(同一个对象进行比较),则认为其相等
+         * 需要注意的是0 === -0的结果为true,所以后面的1 / a 和 1  / b 是来判断0 和 -0 的情况(1 / -0 = -Infinity) != (1 / 0 = Infinity)
+         */
+        if (a === b) return a !== 0 || 1 / a == 1 / b;
+
+        /**
+         * 处理undefined 和 null的情况
+         * undefined == null 的结果为true,而undefined === null 的结果为false
+         */
+        if (a == null || b == null) return a === b;
+
+        /**
+         * 两个对象都是underscore对象
+         */
+        if (a instanceof _) a = a._wrapped;
+        if (b instanceof _) b = b._wrapped;
+
+        // 两个类名不同,直接返回false
+        if (className != _class2.toString.call(b)) return false;
+
+        switch (className) {
+            case '[object String]':
+
+                /**
+                 * 为什么一开始写成return a == String(b)没搞懂
+                 * toString.call("str") == "[object String]" -> true
+                 * toString.call(String("str")) == "[object String]" -> true
+                 * toString.call(new String("str")) == "[object String]" -> true
+                 * 所以String(b)如果只是为了把b再换成string类型的话,("" + b)性能更好
+                 */
+                return a == ("" + b);
+            case '[object Number]':
+
+                /**
+                 * +a 会把 a转换成一个数字,如果转换结果和原来不同则被认为NaN
+                 * NaN != NaN,因此当a和b同时为NaN时,无法简单地使用a == b进行匹配,用相同的方法检查b是否为NaN(即 b != +b)
+                 * 和刚进方法体一样,判断0和-0的情况
+                 */
+                return a != +a ? b != +b : (a == 0 ? 1 / a == 1 / b : a == +b);
+            case '[object Date]':
+            case '[object Boolean]':
+
+                /**
+                 * 把bool和date类型转换成对应的数字来比较
+                 * +true -> 1 / +false -> 0 / +(new Date()) -> (new Date()).getTime()
+                 */
+                return +a == +b;
+            case '[object RegExp]':
+
+                //  匹配正则表达式的相关属性是否相同(元字符串/全局匹配/多行模式/忽略大小写)
+                return a.source == b.source &&
+                    a.global == b.global &&
+                    a.multiline == b.multiline &&
+                    a.ignoreCase == b.ignoreCase;
+        }
+
+        //  处理数组类型或对象类型(typeof [] = typeof {} = "object")
+        if (typeof a != 'object' || typeof b != 'object') return false;
+
+        //  在isEqual方法中传递的是空数组
+        //  在方法体内部,判断的会再次进行传递被操作后的a堆和b堆
+        var length = aStack.length;
+
+        while (length--) {
+            // 如果堆中的某个对象与数据a匹配,则再判断另一个堆中相同位置的对象是否等于第二个对象
+            if (aStack[length] == a) return bStack[length] == b;
+        }
+
+        // 获取两个对象的构造器
+        var aCtor = a.constructor, bCtor = b.constructor;
+
+        //  判断两个对象如果不是不是同一个类的实例则认为不相等
+        if (aCtor !== bCtor && !(_.isFunction(aCtor) &&
+            (aCtor instanceof aCtor) &&
+            _.isFunction(bCtor) &&
+            (bCtor instanceof bCtor))) {
+            return false;
+        }
+
+        // 把a和b分别放到a堆和b堆中
+        aStack.push(a);
+        bStack.push(b);
+
+        //  局部变量
+        var size = 0, result = true;
+
+        // 数组类型比较
+        if (className == '[object Array]') {
+            size = a.length;
+
+            //  比较两个数组的长度是否相等
+            result = size == b.length;
+
+            //  如果长度相同,再依次比较数组的每项
+            if (result) {
+                while (size--) {
+                    if (!(result = eq(a[size], b[size], aStack, bStack))) break;
+                }
+            }
+        } else {
+
+            // 如果是对象类型,枚举第一个对象,判断b和a中的每个属性值是否相同,记录a中属性值的个数
+            for (var key in a) {
+                if (_.has(a, key)) {
+                    size++;
+                    if (!(result = _.has(b, key) && eq(a[key], b[key], aStack, bStack))) break;
+                }
+            }
+
+            /**
+             * 如果a中有的属性b中都有
+             * 再枚举b对象,判断长度,如果b中属性值的长度大于size则result为false(!1 = false / !0 = true)
+             * 个人认为下面的if判断也可以写成下面的样子
+             * if(result) {
+       *   result = result && (size == _.keys(b).length)
+       * }
+             */
+            if (result) {
+                for (key in b) {
+                    if (_.has(b, key) && !(size--)) break;
+                }
+
+                // 当对象b中的属性多于对象a, 则认为两个对象不相等
+                result = !size;
+            }
+        }
+
+        // 删除堆中的数据,防止再进行迭代,返回比较结果
+        aStack.pop();
+        bStack.pop();
+        return result;
+    };
+
     /***************
      * 工具类
      * *************/
@@ -603,7 +767,7 @@
          * @param url   被获取的字符串
          * @returns {{}||Object}
          */
-        "getQueryStrng": function (url) {
+        "getQueryString": function (url) {
             var arr = url.split("?")[1].split("&");
             var output = {};
             if (!url || url.indexOf("?") < 0) {
@@ -646,12 +810,22 @@
         },
 
         /**
-         * 判断一个对象是否为伪数组
+         * 判断两个对象是否相等
+         * @param obj1  第一个对象
+         * @param obj2  第二个对象
+         * @returns {boolean}
+         */
+        "isEqual": function (obj1, obj2) {
+            return _eq(obj1, obj2, [], []);
+        },
+
+        /**
+         * 判断一个对象是否为伪数组,摘自《javaScript高级程序设计》
          * @param list  被判断的对象
-         * @returns {*|boolean}
+         * @returns {boolean}
          */
         "isFakeArray": function (list) {
-            return list && (typeof list.length === "number") && !(list instanceof Array);
+            return list && (typeof list === "object") && isFinite(list.length) && (list.length >= 0) && (list.length === Math.floor(list.length)) && list.length < 4294967296;
         },
 
         /**
@@ -808,7 +982,7 @@
     /***************
      * DOM操作模块
      * *************/
-    _DOMTool = {
+    _DOM = {
         /**
          * 判断一个对象是否为DOM节点
          * @param el    被判断的对象
@@ -816,6 +990,23 @@
          */
         "isHTMLNode": function (el) {
             return el && el.nodeType === 1;
+        },
+
+        /**
+         * 获取目标元素
+         * @param domList       元素列表(Object,Array<Object>,HTMLDOMList)
+         * @param condition     domList
+         */
+        "getTargetDOM": function (domList, condition) {
+            var list = [];
+            if (!_Tool.isType(domList, "Array") && _Tool.isFakeArray(domList)) {
+                list = [domList];
+            } else {
+
+            }
+            if (_Tool.isFakeArray(domList)) {
+                list = _Tool.toArray(domList);
+            }
         },
 
         /**
@@ -873,7 +1064,6 @@
          * @param value     样式值[,String]
          */
         "setStyle": function (el, attr, value) {
-            console.log(attr);
             var styleObj = {};
             var styleArr = [];
             if (arguments.length === 2) {
