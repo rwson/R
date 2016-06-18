@@ -39,7 +39,103 @@
     var _DOM = {};                                          //  DOM操作类
     var _Event = {};                                        //  事件系统
 
-    //  支持的一些指令
+    //  属性指令
+    var attrDirective = [
+        "class",
+        "behavior",
+        "direction",
+        "behavior",
+        "scrollamount",
+        "scrolldelay",
+        "loop",
+        "width",
+        "height",
+        "bgcolor",
+        "size",
+        "style",
+        "color",
+        "href",
+        "target",
+        "src",
+        "aling",
+        "background",
+        "border",
+        "borderclor",
+        "borderclordark",
+        "borderclorlight",
+        "cellpadding",
+        "cellspacing",
+        "cols",
+        "rows",
+        "frame",
+        "colspan",
+        "rowspan",
+        "frameborder",
+        "framespacing",
+        "scrolling",
+        "noresize",
+        "action",
+        "name",
+        "for",
+        "method",
+        "type",
+        "maxlength",
+        "value",
+        "checked",
+        "selected",
+        "wrap",
+        "leftmargin",
+        "topmargin",
+        "start",
+        "align",
+        "dir"
+    ].map(function (item) {
+            return "attr-" + item;
+        });
+
+    //  事件指令
+    var eventDirective = [
+        "abort",
+        "blur",
+        "change",
+        "change",
+        "click",
+        "dblclick",
+        "error",
+        "focus",
+        "keydown",
+        "keypress",
+        "keyup",
+        "load",
+        "mousedown",
+        "mousemove",
+        "mouseout",
+        "mouseover",
+        "mouseup",
+        "reset",
+        "resize",
+        "select",
+        "select",
+        "select",
+        "submit"
+    ].map(function (item) {
+            return "event-" + item;
+        });
+
+    //  model绑定相关指令
+    var modelDirective = [
+        "for",
+        "if",
+        "show",
+        "hide",
+        "options",
+        "switch",
+        "model"
+    ].map(function (item) {
+            return "bind-" + item;
+    });
+
+    //  指令的实现
     var directives = {
         "event-click": function (ele) {
             var callback = ele.getAttribute("event-click");
@@ -95,19 +191,24 @@
         "setData": function (data, attribute) {
             //  默认设置只更新属性
             attribute = (attribute === undefined) ? true : attribute;
-            //  设置数据
-            if (attribute) {
+
+            //  之前的观察器中没有数据,也就是第一次调用setData
+            if (!this.obverseer.data === undefined) {
                 this.obverseer.data = data;
+                //  数据设置完成,调用模板选,更新视图
+                this.container.innerHTML = _compileTemplate(this.tplStr, this.obverseer.data);
             } else {
-                this.obverseer.data = _Tool.merge(this.obverseer.data || {}, data, true);
-                //  数据更新完成
+                if (attribute) {
+                    this.obverseer.data = _Tool.merge(this.obverseer.data || {}, data, true);
+                    //  数据更新完成
+                } else {
+                    //  强制重新更新数据
+                    this.obverseer.data = data;
+                    //  数据设置完成,调用模板选,更新视图
+                    this.container.innerHTML = _compileTemplate(this.tplStr, this.obverseer.data);
+                }
             }
-
-            //  数据设置完成,调用模板选,更新视图
-            this.container.innerHTML = _compileTemplate(this.tplStr, this.obverseer.data);
-        },
-
-        "updateData": function () {
+            this.setLinkHandles();
         },
 
         /**
@@ -450,6 +551,9 @@
             var data = this.getData();
             var randomStr;
             doms = _Tool.toArray(doms);
+            //  清空关联对象
+            storeMap = {};
+            elementMap = {};
             doms.forEach(function (item) {
                 randomStr = _Tool.randomStr();
                 _DOM.setAttributes(item, {
@@ -457,7 +561,6 @@
                 });
             });
         }
-
     };
 
     /**
@@ -1125,7 +1228,7 @@
                 attrObj["" + attr] = value;
             }
             Object.keys(attrObj).forEach(function (item) {
-                el.setAttributes(item, attrObj[item]);
+                el.setAttribute(item, attrObj[item]);
             });
         },
 
@@ -1144,7 +1247,7 @@
                 attrList = attrs;
             }
             attrList.forEach(function (item) {
-                var val = el.getAttributes(item);
+                var val = el.getAttribute(item);
                 output[item] = val ? val : "";
             });
         }
