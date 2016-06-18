@@ -48,6 +48,9 @@
             var data = RouteAble.getData();
             ele.setAttribute("value", data[attrName]);
         },
+        "attr-style": function (ele) {
+            return ele.style.cssText;
+        },
         "attr-class": function (ele) {
             var finalClass = new Function();
         }
@@ -250,22 +253,27 @@
                 target.controller.call(this);
                 _Tool.executeCallback(callback);
             };
-            _Tool.getRequest(target.tplPath, function (xhr) {
-                _this.tplStr = xhr.responseText;
-                //  解除之前页面的监听
-                if (_this.obverseer instanceof _Observer) {
-                    _this.obverseer.unsubscribe(_this.setData);
-                    _this.obverseer = null;
+            _Tool.getRequest({
+                "url": target.tplPath,
+                "context": _this,
+                "success": function (context, xhr) {
+                    context.tplStr = xhr.responseText;
+                    //  解除之前页面的监听
+                    if (context.obverseer instanceof _Observer) {
+                        context.obverseer.unsubscribe(this.setData);
+                        context.obverseer = null;
+                    }
+                    context.events = {};
+                    context.obverseer = new _Observer();
+                    context.obverseer.subscribe(context.setData);
+                    context.container.innerHTML = context.tplStr;
+                    _Tool.pushStateOrHash(cfg.pushState && _isSupportPushState, path);
+                    _Tool.executeCallback(finalCallback);
+                    context.bindDirectives();
+                },
+                "fail": function (xhr) {
+                    _Tool.exception(xhr.responseText);
                 }
-                _this.events = {};
-                _this.obverseer = new _Observer();
-                _this.obverseer.subscribe(_this.setData);
-                _this.container.innerHTML = _this.tplStr;
-                _Tool.pushStateOrHash(cfg.pushState && _isSupportPushState, path);
-                _Tool.executeCallback(finalCallback);
-                _this.bindDirectives();
-            }, function (xhr) {
-                throw xhr.responseText;
             });
         },
 
@@ -286,22 +294,29 @@
                 target.controller.call(this);
                 _Tool.executeCallback(callback);
             };
-            _Tool.getRequest(target.tplPath, function (xhr) {
-                _this.tplStr = xhr.responseText;
-                //  解除之前页面的监听
-                if (_this.obverseer instanceof _Observer) {
-                    _this.obverseer.unsubscribe(_this.setData);
-                    _this.obverseer = null;
+            _Tool.getRequest({
+                "url": target.tplPath,
+                "context": _this,
+                "success": function (context, xhr) {
+                    context.tplStr = xhr.responseText;
+                    //  解除之前页面的监听
+                    if (context.obverseer instanceof _Observer) {
+                        context.obverseer.unsubscribe(this.setData);
+                        context.obverseer = null;
+                    }
+                    context.events = {};
+                    context.obverseer = new _Observer();
+                    context.obverseer.subscribe(context.setData);
+                    context.container.innerHTML = context.tplStr;
+                    _Tool.pushStateOrHash(cfg.pushState && _isSupportPushState, path);
+                    _Tool.executeCallback(finalCallback);
+                    context.bindDirectives();
+                },
+                "fail": function (xhr) {
+                    _Tool.exception(xhr.responseText);
                 }
-                _this.events = {};
-                _this.obverseer = new _Observer();
-                _this.obverseer.subscribe(_this.setData);
-                _this.container.innerHTML = _this.tplStr;
-                _Tool.executeCallback(finalCallback);
-                _this.bindDirectives();
-            }, function (xhr) {
-                throw xhr.responseText;
             });
+
         },
 
         /**
@@ -358,16 +373,32 @@
                         if (isEvent) {
                             var evName = itemD.replace("event-", "");
                             var curEvent = modelEvents[attrVal];
-                            _removeEvent(item, evName);
-                            _addEvent(item, evName, curEvent);
+                            _Event.removeEvent(item, evName);
+                            _Event.addEvent(item, evName, curEvent);
                         } else if (isAttribute) {
                             //  元素属性指令
                             var attrnName = itemD.replace("attr-", "");
                             var fnStr = "with(this) { return (" + attrVal + ")}";
                             var fnCal = new Function(fnStr);
                             var execVal = fnCal.call(modelData);
-                            var curAttrVal = item.getAttribute(attrnName);
-                            item.setAttribute(attrnName, curAttrVal ? curAttrVal + " " + execVal : execVal);
+                            switch (attrnName) {
+                                case "class":
+                                    _DOMTool.addClass(item, execVal);
+                                    break;
+                                case "style":
+                                    var arr = execVal.split(";");
+                                    var styles = {};
+                                    arr.forEach(function (item) {
+                                        var _tmp = item.split(":");
+                                        if (_tmp) {
+                                            styles[_tmp[0]] = _tmp[1];
+                                        }
+                                    });
+                                    _DOMTool.setStyle(item, styles);
+                                    break;
+                                default :
+                                    break;
+                            }
                         }
                     }
 
@@ -705,18 +736,18 @@
                 obj[type + fn] = function (ev) {
                     ev = ev || root.event;
                     obj["e" + type + fn](ev);
-                    _prevDefault(ev);
+                    _Event.prevDefault(ev);
                 };
                 obj.attachEvent("on" + type, function (ev) {
                     ev = ev || root.event;
                     obj[type + fn](ev);
-                    _prevDefault(ev);
+                    _Event.prevDefault(ev);
                 });
             } else {
                 obj.addEventListener(type, function (ev) {
                     ev = ev || root.event;
                     fn();
-                    _prevDefault(ev);
+                    _Event.prevDefault(ev);
                 }, false);
             }
         },
@@ -750,6 +781,27 @@
                     _Tool.executeCallback(fn, ev);
                 }
             });
+        },
+
+        /**
+         * 阻止默认事件和事件冒泡
+         * @param ev    事件句柄
+         * @private
+         */
+        "prevDefault": function (ev) {
+            //  阻止冒泡
+            if (ev.stopPropagation) {
+                ev.stopPropagation();
+            } else {
+                root.event.cancelBubble = true;
+            }
+
+            //  阻止默认事件
+            if (ev.preventDefault) {
+                ev.preventDefault();
+            } else {
+                root.event.returnValue = false;
+            }
         }
     };
 
@@ -821,6 +873,7 @@
          * @param value     样式值[,String]
          */
         "setStyle": function (el, attr, value) {
+            console.log(attr);
             var styleObj = {};
             var styleArr = [];
             if (arguments.length === 2) {
