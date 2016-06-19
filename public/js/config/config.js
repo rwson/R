@@ -38,7 +38,7 @@ define(["index", "list", "detail"], function (indexCtrl, listCtrl, detailCtrl) {
         //],
         "path": {
             "/": {
-                "tplPath": "/tpl/index.html",
+                "tplPath": "/tpl/index2.html",
                 "controller": indexCtrl
             },
             "/list": {

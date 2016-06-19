@@ -10,8 +10,9 @@ define(["routable"], function (routable) {
 
         routable.setData({
             "classTest": true,
+            "className": "test-class",
             "showPic": 1
-        }, true);
+        });
 
         routable.assignEvents({
             "testFn": function () {
@@ -21,9 +22,10 @@ define(["routable"], function (routable) {
 
         setTimeout(function () {
             routable.setData({
-                "classTest": true
-            });
-        }, 10000);
+                "classTest": false,
+                "className": "test-class2"
+            }, true);
+        }, 700);
 
     }
 

@@ -42,12 +42,6 @@
     //  属性指令
     var attrDirective = [
         "class",
-        "behavior",
-        "direction",
-        "behavior",
-        "scrollamount",
-        "scrolldelay",
-        "loop",
         "width",
         "height",
         "bgcolor",
@@ -84,8 +78,6 @@
         "checked",
         "selected",
         "wrap",
-        "leftmargin",
-        "topmargin",
         "start",
         "align",
         "dir"
@@ -133,26 +125,240 @@
         "model"
     ].map(function (item) {
             return "bind-" + item;
-    });
+        });
 
     //  指令的实现
     var directives = {
+
+        //  Events
         "event-click": function (ele) {
             var callback = ele.getAttribute("event-click");
             _Tool.executeCallback(callback);
         },
-        "event-change-model": function (ele) {
+
+        //  Attributes
+        "attr-class": function (ele, oldVal, newVal) {
+            if (!newVal) {
+                newVal = oldVal;
+                _DOM.addClass(ele, newVal);
+            } else {
+                _DOM.removeClass(ele, oldVal);
+                _DOM.addClass(ele, newVal);
+            }
         },
-        "attr-value": function (ele, attrName) {
-            var data = RouteAble.getData();
-            ele.setAttribute("value", data[attrName]);
+
+        "attr-width": function (ele, oldVal, newVal) {
+            if (!newVal) {
+                newVal = oldVal;
+            }
+            _DOM.setAttributes(ele, {
+                "width": newVal
+            });
         },
-        "attr-style": function (ele) {
-            return ele.style.cssText;
+
+        "attr-height": function (ele, oldVal, newVal) {
+            if (!newVal) {
+                newVal = oldVal;
+            }
+            _DOM.setAttributes(ele, {
+                "height": newVal
+            });
         },
-        "attr-class": function (ele) {
-            var finalClass = new Function();
+
+        "attr-bgcolor": function (ele, oldVal, newVal) {
+            if (!newVal) {
+                newVal = oldVal;
+            }
+            _DOM.setAttributes(ele, {
+                "bgcolor": newVal
+            });
+        },
+
+        "attr-size": function (ele, newVal) {
+            _DOM.setAttributes(ele, {
+                "size": newVal
+            });
+        },
+
+        "attr-style": function (ele, newVal) {
+            _DOM.setStyle(ele, newVal);
+        },
+
+        "attr-color": function (ele, newVal) {
+            _DOM.setAttributes(ele, {
+                "color": newVal
+            });
+        },
+
+        "attr-href": function (ele, newVal) {
+            _DOM.setAttributes(ele, {
+                "href": newVal
+            });
+        },
+
+        "attr-target": function (ele, newVal) {
+            _DOM.setAttributes(ele, {
+                "target": newVal
+            });
+        },
+
+        "attr-src": function (ele, newVal) {
+            _DOM.setAttributes(ele, {
+                "src": newVal
+            });
+        },
+
+        "attr-aling": function (ele, newVal) {
+            _DOM.setAttributes(ele, {
+                "aling": newVal
+            });
+        },
+
+        "attr-background": function (ele, oldVal, newVal) {
+            _DOM.setAttributes(ele, {
+                "background": newVal
+            });
+        },
+
+        "attr-border": function (ele, newVal) {
+            _DOM.setAttributes(ele, {
+                "border": newVal
+            });
+        },
+
+        "attr-borderclor": function (ele, newVal) {
+            _DOM.setAttributes(ele, {
+                "borderclor": newVal
+            });
+        },
+
+        "attr-borderclordark": function (ele, newVal) {
+            _DOM.setAttributes(ele, {
+                "borderclordark": newVal
+            });
+        },
+
+        "attr-borderclorlight": function (ele, newVal) {
+            _DOM.setAttributes(ele, {
+                "borderclorlight": newVal
+            });
+        },
+
+        "attr-cellpadding": function (ele, newVal) {
+            _DOM.setAttributes(ele, {
+                "cellpadding": newVal
+            });
+        },
+
+        "attr-cellspacing": function (ele, newVal) {
+            _DOM.setAttributes(ele, {
+                "cellpadding": newVal
+            });
+        },
+
+        "attr-cols": function (ele, newVal) {
+            _DOM.setAttributes(ele, {
+                "cols": newVal
+            });
+        },
+
+        "attr-rows": function (ele, newVal) {
+            _DOM.setAttributes(ele, {
+                "rows": newVal
+            });
+        },
+
+        "attr-frame": function (ele, newVal) {
+            _DOM.setAttributes(ele, {
+                "frame": newVal
+            });
+        },
+
+        "attr-colspan": function (ele, newVal) {
+            _DOM.setAttributes(ele, {
+                "colspan": newVal
+            });
+        },
+
+        "attr-rowspan": function (ele, newVal) {
+            _DOM.setAttributes(ele, {
+                "rowspan": newVal
+            });
+        },
+
+        "attr-frameborder": function (ele, newVal) {
+            _DOM.setAttributes(ele, {
+                "frameborder": newVal
+            });
+        },
+
+        "attr-framespacing": function (ele, newVal) {
+            _DOM.setAttributes(ele, {
+                "framespacing": newVal
+            });
+        },
+
+        "attr-scrolling": function (ele, newVal) {
+            _DOM.setAttributes(ele, {
+                "scrolling": newVal
+            });
+        },
+
+        "attr-noresize": function (ele, newVal) {
+            _DOM.setAttributes(ele, {
+                "noresize": newVal
+            });
+        },
+
+        "attr-action": function (ele, newVal) {
+            _DOM.setAttributes(ele, {
+                "action": newVal
+            });
+        },
+
+        "attr-value": function (ele, oldVal, newVal) {
+            _DOM.setAttributes(ele, {
+                "value": newVal
+            });
+        },
+
+        "attr-checked": function (ele, newVal) {
+            _DOM.setAttributes(ele, {
+                "checked": newVal
+            });
+        },
+
+        "attr-selected": function (ele, newVal) {
+            _DOM.setAttributes(ele, {
+                "selected": newVal
+            });
+        },
+
+        "attr-wrap": function (ele, oldVal, newVal) {
+            _DOM.setAttributes(ele, {
+                "wrap": newVal
+            });
+        },
+
+        "attr-start": function (ele, newVal) {
+            _DOM.setAttributes(ele, {
+                "selected": newVal
+            });
+        },
+
+        "attr-align": function (ele, newVal) {
+            _DOM.setAttributes(ele, {
+                "align": newVal
+            });
+        },
+
+        "attr-dir": function (ele, oldVal, newVal) {
+            _DOM.setAttributes(ele, {
+                "dir": newVal
+            });
         }
+
+        //  Models
     };
 
     var RouteAble = {
@@ -193,17 +399,32 @@
             attribute = (attribute === undefined) ? true : attribute;
 
             //  之前的观察器中没有数据,也就是第一次调用setData
-            if (!this.obverseer.data === undefined) {
+            if (this.obverseer.data === undefined) {
                 this.obverseer.data = data;
+
                 //  数据设置完成,调用模板选,更新视图
                 this.container.innerHTML = _compileTemplate(this.tplStr, this.obverseer.data);
             } else {
                 if (attribute) {
+                    var keys = data && Object.keys(data);
+                    var oldData = _Tool.copy(this.getData(), true);
+                    var newData, compareRes;
                     this.obverseer.data = _Tool.merge(this.obverseer.data || {}, data, true);
                     //  数据更新完成
+                    newData = this.getData();
+
+                    //  调用比对方法,只比对传入的属性
+                    compareRes = this.compareWithLast(oldData, newData, keys, true);
+
+                    //  比对成功,并且存在和之前不同的数据
+                    if (Object.keys(compareRes).length) {
+                        this.updateDOM(compareRes);
+                    }
                 } else {
+
                     //  强制重新更新数据
                     this.obverseer.data = data;
+
                     //  数据设置完成,调用模板选,更新视图
                     this.container.innerHTML = _compileTemplate(this.tplStr, this.obverseer.data);
                 }
@@ -506,12 +727,47 @@
 
         /**
          * 检测当前数据和上一次存储的数据是否不同,不同就更新相关
-         * @param attrs         数据本次的数据(String/Array)
-         * @param attribute     是否是this.obverseer.data的部分属性
+         * @param oldData       上一次的老数据
+         * @param newData       本次的新数据
+         * @param attrs         属性值列表
+         * @param attribute     是否是this.obverseer.data的部分属性,默认是true
          */
-        "compareWithLast": function (attrs, attribute) {
+        "compareWithLast": function (oldData, newData, attrs, attribute) {
             //  默认只比较属性值
             attribute = (attribute === undefined) ? true : false;
+            var isEqual = true;
+            var compareRes = {};
+            //  attribute为false
+            if (!attribute) {
+                attrs = Object.keys(newData);
+            }
+            attrs.forEach(function (item) {
+                isEqual = _Tool.isEqual(oldData[item], newData[item]);
+                if (!isEqual) {
+                    for (var i in elementMap) {
+                        compareRes[item] = {
+                            "newData": newData[item],
+                            "domReference": elementMap[i]["domReference"]
+                        };
+                    }
+                }
+            });
+            return compareRes;
+        },
+
+        /**
+         * 更新数据发生变化的相关DOM元素
+         * @param compareRes    之前比对出来的结果
+         */
+        "updateDOM": function (compareRes) {
+            //  null || undefined
+            if (compareRes == null) {
+                return;
+            }
+            var res;
+            Object.keys(compareRes).forEach(function (item) {
+                res = compareRes[item];
+            });
         },
 
         /**
@@ -549,16 +805,28 @@
         "setLinkHandles": function () {
             var doms = this.container.getElementsByTagName("*");
             var data = this.getData();
-            var randomStr;
+            var rid;
             doms = _Tool.toArray(doms);
             //  清空关联对象
             storeMap = {};
             elementMap = {};
             doms.forEach(function (item) {
-                randomStr = _Tool.randomStr();
+                rid = _Tool.randomStr();
                 _DOM.setAttributes(item, {
-                    "rid": randomStr
+                    "rid": rid
                 });
+                var attrMaps = _DOM.getAttributes(item, attrDirective);
+                //  遍历取得的属性,并且做出相应关联
+                for (var i in attrMaps) {
+                    storeMap[rid] = {
+                        "link": attrMaps[i],
+                        "linkFn": attrMaps[i]
+                    };
+                    elementMap[rid] = {
+                        "domReference": item,
+                        "update": storeMap[rid]["link"]
+                    };
+                }
             });
         }
     };
@@ -715,12 +983,6 @@
          */
         if (a == null || b == null) return a === b;
 
-        /**
-         * 两个对象都是underscore对象
-         */
-        if (a instanceof _) a = a._wrapped;
-        if (b instanceof _) b = b._wrapped;
-
         // 两个类名不同,直接返回false
         if (className != _class2.toString.call(b)) return false;
 
@@ -728,11 +990,9 @@
             case '[object String]':
 
                 /**
-                 * 为什么一开始写成return a == String(b)没搞懂
                  * toString.call("str") == "[object String]" -> true
                  * toString.call(String("str")) == "[object String]" -> true
                  * toString.call(new String("str")) == "[object String]" -> true
-                 * 所以String(b)如果只是为了把b再换成string类型的话,("" + b)性能更好
                  */
                 return a == ("" + b);
             case '[object Number]':
@@ -776,9 +1036,9 @@
         var aCtor = a.constructor, bCtor = b.constructor;
 
         //  判断两个对象如果不是不是同一个类的实例则认为不相等
-        if (aCtor !== bCtor && !(_.isFunction(aCtor) &&
+        if (aCtor !== bCtor && !(_Tool.isType(bCtor, "function") &&
             (aCtor instanceof aCtor) &&
-            _.isFunction(bCtor) &&
+            _Tool.isType(bCtor, "function") &&
             (bCtor instanceof bCtor))) {
             return false;
         }
@@ -800,30 +1060,26 @@
             //  如果长度相同,再依次比较数组的每项
             if (result) {
                 while (size--) {
-                    if (!(result = eq(a[size], b[size], aStack, bStack))) break;
+                    if (!(result = _eq(a[size], b[size], aStack, bStack))) break;
                 }
             }
         } else {
 
             // 如果是对象类型,枚举第一个对象,判断b和a中的每个属性值是否相同,记录a中属性值的个数
             for (var key in a) {
-                if (_.has(a, key)) {
+                if (a.hasOwnProperty(key)) {
                     size++;
-                    if (!(result = _.has(b, key) && eq(a[key], b[key], aStack, bStack))) break;
+                    if (!(result = b.hasOwnProperty(key) && _eq(a[key], b[key], aStack, bStack))) break;
                 }
             }
 
             /**
              * 如果a中有的属性b中都有
              * 再枚举b对象,判断长度,如果b中属性值的长度大于size则result为false(!1 = false / !0 = true)
-             * 个人认为下面的if判断也可以写成下面的样子
-             * if(result) {
-       *   result = result && (size == _.keys(b).length)
-       * }
              */
             if (result) {
                 for (key in b) {
-                    if (_.has(b, key) && !(size--)) break;
+                    if (b.hasOwnProperty(key) && !(size--)) break;
                 }
 
                 // 当对象b中的属性多于对象a, 则认为两个对象不相等
@@ -943,6 +1199,31 @@
         },
 
         /**
+         * 拷贝一个对象
+         * @param obj   被拷贝的对象
+         * @param deep  是否深拷贝
+         * @returns {*}
+         */
+        "copy": function (obj, deep) {
+            //  typeof []/{} -> "object"
+            if (!deep || obj == null || typeof obj !== "object") {
+                return obj;
+            }
+            var copied;
+            if (_Tool.isType(obj, "Object")) {
+                copied = {};
+            } else if (_Tool.isType(obj, "Array")) {
+                copied = [];
+            }
+            for (var i in obj) {
+                if (obj.hasOwnProperty(i) || obj[i]) {
+                    copied[i] = obj[i];
+                }
+            }
+            return copied;
+        },
+
+        /**
          * 判断一个对象是否为伪数组,摘自《javaScript高级程序设计》
          * @param list  被判断的对象
          * @returns {boolean}
@@ -990,7 +1271,6 @@
          */
         "getRequest": function (opts) {
             var xhr = new XMLHttpRequest();
-
             //  支持带cookie参数发起请求
             xhr.withCredentials = true;
             xhr.open("GET", opts.url, true);
@@ -1229,6 +1509,10 @@
             }
             Object.keys(attrObj).forEach(function (item) {
                 el.setAttribute(item, attrObj[item]);
+                //  确保设置成功
+                if (el[item] !== attrObj[item]) {
+                    el[item] = attrObj[item];
+                }
             });
         },
 
@@ -1248,8 +1532,11 @@
             }
             attrList.forEach(function (item) {
                 var val = el.getAttribute(item);
-                output[item] = val ? val : "";
+                if (val) {
+                    output[item] = val;
+                }
             });
+            return output;
         }
     };
 
