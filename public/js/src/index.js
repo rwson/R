@@ -6,14 +6,18 @@
 
 (function (root, factory) {
     if (typeof define === "function" && define.amd) {
-        define([], function () {
-            return factory(window);
+        define([
+            "./libs/TOOL",
+            "./libs/DOM",
+            "./libs/EVENT"
+        ], function (_Tool, _Dom, _Event) {
+            return factory(window, _Tool, _Dom, _Event);
         });
     } else {
-        root.RouteAble = factory(window);
+        root.RouteAble = factory(window, Tool, Dom, Event);
     }
 
-}(window, function (root, undefined) {
+}(window, function (root, _Tool, _DOM, _Event, undefined) {
 
     var _class2 = {};                                       //  Object.prototype
     var _array2 = [];                                       //  Array.prototype
@@ -24,7 +28,7 @@
 
     var eventFnDirecives = /event[-\S+]{1}/;                //  事件(回调)类型的指令
     var eventModelDirectives = /event[-\S+]{1}-model{1}/;   //  事件(模型)类型的指令
-    var attrDirectives = /attr-[-\S+]/;                     //  attr-xxx绑定元素属性
+    var attrDirectives = /attr-\S+/;                        //  attr-xxx绑定元素属性
 
     var storeMap = {};                                      //  数据存储的map对象
     var elementMap = {};                                    //  元素的map对象,根据上一个变量数据的map对象,判断和之前的是否有变化,更新部分DOM
@@ -34,10 +38,6 @@
         new RegExp(needAddAttrs.join("|"), "g");
 
     var watchers = {};                                      //  数据监听的map
-
-    var _Tool = {};                                         //  工具类(类型操作,方法,字符串等)
-    var _DOM = {};                                          //  DOM操作类
-    var _Event = {};                                        //  事件系统
 
     //  属性指令
     var attrDirective = [
@@ -316,7 +316,13 @@
             });
         },
 
-        "attr-value": function (ele, oldVal, newVal) {
+        "attr-name": function (ele, newVal) {
+            _DOM.setAttributes(ele, {
+                "name": newVal
+            });
+        },
+
+        "attr-value": function (ele, newVal) {
             _DOM.setAttributes(ele, {
                 "value": newVal
             });
@@ -352,7 +358,7 @@
             });
         },
 
-        "attr-dir": function (ele, oldVal, newVal) {
+        "attr-dir": function (ele, newVal) {
             _DOM.setAttributes(ele, {
                 "dir": newVal
             });
@@ -675,7 +681,7 @@
             var rid;
             nodes = Array.prototype.slice.call(nodes);
             nodes.forEach(function (item) {
-                //  如果该元素在之前已经指定过rid属性,说明之前已经绑定过属性或计算过表达式了,就不再
+                //  如果该元素在之前已经指定过rid属性,说明之前已经绑定过属性或计算过表达式了,就不再进行计算
                 if (item.getAttribute("rid")) {
                     return;
                 }
@@ -683,7 +689,6 @@
                     var attrVal = item.getAttribute(itemD);                 //  标签上的取得属性值
                     var isEvent = itemD.match(eventFnDirecives);            //  判断是否为事件回调指令
                     var isAttribute = itemD.match(attrDirectives);          //  判断是否为标签属性
-
                     if (attrVal) {
                         //  当前是event事件回调指令
                         if (isEvent) {
@@ -718,7 +723,6 @@
                             }
                         }
                     }
-
                     rid = _Tool.randomStr();
                     item.setAttribute("rid", rid);
                 });
@@ -811,10 +815,7 @@
             storeMap = {};
             elementMap = {};
             doms.forEach(function (item) {
-                rid = _Tool.randomStr();
-                _DOM.setAttributes(item, {
-                    "rid": rid
-                });
+                rid = _DOM.getAttributes(item, "rid").rid;
                 var attrMaps = _DOM.getAttributes(item, attrDirective);
                 //  遍历取得的属性,并且做出相应关联
                 for (var i in attrMaps) {
@@ -1442,7 +1443,7 @@
             }
             if (classList.length) {
                 classList.forEach(function (item) {
-                    if (classEs.contains(item)) {
+                    if (!classEs.contains(item)) {
                         el.classList.add(item);
                     }
                     classEs = el.classList;
