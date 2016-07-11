@@ -6,7 +6,7 @@
 
 (function (root, factory) {
     if (typeof define === "function" && define.amd) {
-        define(["./TOOL"], function (_Tool) {
+        define(["./Tool"], function (_Tool) {
             return factory(window, _Tool);
         });
     } else {
@@ -14,9 +14,6 @@
     }
 
 }(window, function (root, _Tool, undefined) {
-
-    var directiveReg = /^bind\-|attr\-|event\-/g;       //  指令的正则表达式
-    var doc = document;                                 //  document对象
 
     var _DOM = {
 
@@ -65,25 +62,6 @@
         },
 
         /**
-         * 判断一个字符串是否为指令,如果是
-         * @param str   被判断的字符串
-         * @returns {{isDirective: boolean, type: string}}
-         */
-        "isDirective": function (str) {
-            var res = {
-                "isDirective": false,
-                "type": ""
-            };
-            if (str) {
-                res = {
-                    "isDirective": directiveReg.test(str),
-                    "type": str.match(directiveReg) ? str.match(directiveReg)[0] : ""
-                };
-            }
-            return res;
-        },
-
-        /**
          * 获取元素上的标签属性,并且转换成数组返回
          * @param el    被获取属性的元素
          * @returns {*|Array.<T>}
@@ -98,14 +76,7 @@
          * @param condition     domList
          */
         "getTargetDOM": function (domList, condition) {
-            var list = [];
-            if (!_Tool.isType(domList, "Array") && _Tool.isFakeArray(domList)) {
-                list = [domList];
-            }
-            if (_Tool.isFakeArray(domList)) {
-                list = _Tool.toArray(domList);
-            }
-            return list;
+            return _Tool.toArray(domList);
         },
 
         /**

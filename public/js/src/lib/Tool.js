@@ -21,6 +21,33 @@
     var _Tool = {
 
         /**
+         * 去字符串首尾空格
+         * @param str   字符串
+         * @returns {string}
+         */
+        "trim": function (str) {
+            str = "" + str;
+            if (str.trim) {
+                return str.trim();
+            } else {
+                return str.replace(/^\s+/, "").replace(/\s+$/, "");
+            }
+        },
+
+        /**
+         * 给目标对象定义属性和是否可枚举等
+         * @param opt   配置参数,包含{target,key,value,writable,enumerable,configurable}
+         */
+        "defineProperty": function (opt) {
+            Object.defineProperty(opt.target, opt.key, {
+                "value": opt.value,
+                "writable": !!opt.writable,
+                "enumerable": !!opt.enumerable,
+                "configurable": !!opt.configurable
+            });
+        },
+
+        /**
          * 处理state或者hash值
          * @param needState 是否支持
          * @param path      目标路由

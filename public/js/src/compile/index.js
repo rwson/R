@@ -8,37 +8,30 @@
 (function (root, factory) {
     if (typeof define === "function" && define.amd) {
         define([
-            "../libs/TOOL",
-            "../libs/DOM",
-            "../directives/index"
-        ], function (_Tool, _Dom, directiveMap) {
-            return factory(window, _Tool, _Dom, directiveMap);
+            "../lib/Tool",
+            "../lib/DOM"
+        ], function (_Tool, _Dom) {
+            return factory(window, _Tool, _Dom);
         });
     } else {
-        root.bindFor = factory(window, Tool, Dom, directiveMap);
+        root.bindFor = factory(window, Tool, Dom);
     }
 
 }(window, function (root, _Tool, _Dom, directiveMap, undefined) {
 
-    function complieTemplate(el, model) {
+    var _regMap = {
+        "regText": /\{\{(.+?)\}\}/g,            //  {{a.b}}/{{a}}
+        "regHtml": /\{\{\{(.+?)\}\}\}/g         //  {{{a.b}}}/{{{a}}}
+    };
 
-        //  判断el是否是一个有效的HTML元素
-        if (_Dom.isHTMLNode(el)) {
-            _Tool.exception("element must be a type of DOMElement!");
-        }
+    //  原型相关拓展
+    ComplieTemplate.prototype = {
 
-        //  判断model是否为一个有效的Object
-        if(_Tool.isType(model, "Object")) {
-            _Tool.exception("model must be a type of Object!");
-        }
+        "constructor": ComplieTemplate
 
-        //  缓存根节点
-        this.$el = el;
+    };
 
-
-    }
-
-    return complieTemplate;
+    return ComplieTemplate;
 
 }));
 
