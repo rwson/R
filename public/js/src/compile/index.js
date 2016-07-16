@@ -27,15 +27,44 @@
      * @param el    根元素选择器
      * @constructor
      */
-    function CompileTemplate(el) {
-        this.roomElement = document.querySelector(el) || document.body;
-        this.eleMap = {};
-        this.compile();
+    function Compile(el) {
+        this.bootstrap(el);
     }
 
     //  原型相关拓展
-    CompileTemplate.prototype = {
-        "constructor": CompileTemplate,
+    Compile.prototype = {
+        "constructor": Compile,
+
+        /**
+         * 启动
+         * @param el    根元素选择器
+         */
+        "bootstrap": function (el) {
+            this.roomElement = document.querySelector(el) || document.body;
+            this.data = {};
+            this.eleMap = {};
+            this.compile();
+        },
+
+        /**
+         * 设置vm中的数据
+         * @param data  数据
+         */
+        "set": function (data) {
+            this.data = Tool.merge(this.data, Tool.transfer(data, {
+                "beforeUpdate": this.beforeUpdate,
+                "update": this.update
+            }));
+        },
+
+        "beforeUpdate": function () {
+            console.log("我是更新之前的回调...");
+        },
+
+        "update": function () {
+            console.log("我要开始更新DOM了...");
+        },
+
         /**
          * 获取节点,过滤掉不编译的节点
          */
@@ -66,28 +95,61 @@
         },
 
         /**
-         * 获取当前节点上的指令
+         * 获取当前HTML节点上的指令
          * @param el    当前节点
          */
         "getDirectives": function (el) {
             if (!Dom.isHTMLNode(el)) {
                 return;
             }
+
             var directiveKeys = Object.keys(directive);
             var attrs = Tool.toArray(el.attributes);
-            attrs = attrs.filter(function (attr) {
-                return attr.match(/^r\-/) !== null;
-            });
+
+            //  将指令的r-xxx写法转换成rXxx写法
             attrs = attrs.map(function (attr) {
                 return attr.replace(/[^\b-]{1,90}/g, function (word) {
                     return word.substring(0, 1).toUpperCase() + word.substring(1).replace("-", "");
                 }).replace("-", "");
             });
+
+            //  过滤掉未经过声明的指令
+            attrs = attrs.filter(function (attr) {
+                return ~directiveKeys.indexOf(attr);
+            });
             return attrs;
+        },
+
+        /**
+         * 执行指令中的表达式
+         * @param exp       表达式
+         * @returns {*}
+         */
+        "exec": function (exp) {
+            var value;
+            if (Tool.isType(exp, "function")) {
+                value = exp.call(this);
+            } else if (Tool.isType(exp, "string")) {
+                try {
+                    value = new Function("return this." + exp + ";").bind(this.data)();
+                } catch (ex) {
+                    value = undefined;
+                }
+            }
+            return value;
+        },
+
+        "link": function () {
+            this.directives.forEach(function (dir) {
+                var targetDirective = directive[dir]();
+                var value = this.exec(targetDirective);
+                targetDirective.link();
+            }.bind(this));
         }
+
     };
 
-    return CompileTemplate;
+    return Compile;
 
 }));
 

@@ -41,6 +41,9 @@
             if (this.isType(target, "object")) {
                 for (var i in target) {
                     var _key = "__" + i;
+                    if(target[_key]) {
+                        continue;
+                    }
                     if (!target) {
                         if (this.isType(opt.beforeUpdate, "function")) {
                             opt.beforeUpdate();

@@ -16,5 +16,17 @@
     }
 }(window, function (root, Tool, Dom, Event, undefined) {
 
+    var R = {
+        "params": {
+            "routeParams": {},
+            "urlQueryString": {}
+        },
+        "default": {
+            "pushState": true,
+            "defaultRoute": "/"
+        }
+    };
+
+    return R;
 
 }));

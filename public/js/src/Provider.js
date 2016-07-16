@@ -173,7 +173,7 @@
             val = exp.call(this);
         } else {
             try {
-                val = new Function('return this.' + exp).call(this);
+                val = new Function('console.log(this);return this.' + exp).bind(this)();
             } catch (e) {
                 val = undefined;
             }
