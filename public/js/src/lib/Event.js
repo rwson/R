@@ -6,16 +6,14 @@
 
 (function (root, factory) {
     if (typeof define === "function" && define.amd) {
-        define(["./Tool"], function (_Tool) {
-            return factory(window, _Tool);
+        define(["./Tool"], function (Tool) {
+            return factory(window, Tool);
         });
-    } else {
-        root.Event = factory(window, Tool);
     }
 
-}(window, function (root, _Tool, undefined) {
+}(window, function (root, Tool, undefined) {
 
-    var _Event = {
+    var Event = {
 
         /**
          * 添加事件监听
@@ -29,18 +27,18 @@
                 obj[type + fn] = function (ev) {
                     ev = ev || root.event;
                     obj["e" + type + fn](ev);
-                    _Event.prevDefault(ev);
+                    Event.prevDefault(ev);
                 };
                 obj.attachEvent("on" + type, function (ev) {
                     ev = ev || root.event;
                     obj[type + fn](ev);
-                    _Event.prevDefault(ev);
+                    Event.prevDefault(ev);
                 });
             } else {
                 obj.addEventListener(type, function (ev) {
                     ev = ev || root.event;
                     fn();
-                    _Event.prevDefault(ev);
+                    Event.prevDefault(ev);
                 }, false);
             }
         },
@@ -68,11 +66,11 @@
          * @param fn            回调函数
          */
         "delegatEvent": function (target, type, condition, fn) {
-            _Event.removeEvent(target, type);
-            _Event.addEvent(target, type, function (ev) {
+            Event.removeEvent(target, type);
+            Event.addEvent(target, type, function (ev) {
                 ev = ev || event;
-                if ((!_Tool.isType(condition, "Function") && condition) || condition()) {
-                    _Tool.executeCallback(fn, ev);
+                if ((!Tool.isType(condition, "Function") && condition) || condition()) {
+                    Tool.executeCallback(fn, ev);
                 }
             });
         },
@@ -99,6 +97,6 @@
         }
     };
 
-    return _Event;
+    return Event;
 
 }));

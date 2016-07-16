@@ -7,13 +7,16 @@
 
 (function (root, undefined) {
 
+    var DIRECTIVES_SUFFIX = "Directive";
+    var CONTROLLERS_SUFFIX = "Controller";
+
     var Provider = {
         _providers: {},
         directive: function (name, fn) {
-            this._register(name + Provider.DIRECTIVES_SUFFIX, fn);
+            this._register(name + DIRECTIVES_SUFFIX, fn);
         },
         controller: function (name, fn) {
-            this._register(name + Provider.CONTROLLERS_SUFFIX, function () {
+            this._register(name + CONTROLLERS_SUFFIX, function () {
                 return fn;
             });
             DOMCompiler.bootstrap();
@@ -54,8 +57,6 @@
         },
         _cache: {$rootScope: new Scope()}
     };
-    Provider.DIRECTIVES_SUFFIX = 'Directive';
-    Provider.CONTROLLERS_SUFFIX = 'Controller';
 
     var DOMCompiler = {
         bootstrap: function (ele) {
@@ -78,7 +79,7 @@
             var dir;
             var scopeCreated;
             dirs.forEach(function (d) {
-                dir = Provider.get(d.name + Provider.DIRECTIVES_SUFFIX);
+                dir = Provider.get(d.name + DIRECTIVES_SUFFIX);
                 //dir.scope代表当前 directive是否需要生成新的scope
                 //这边的情况是只要有一个指令需要单独的scope，其他的directive也会变成具有新的scope对象，这边是不是不太好
                 if (dir.scope && !scopeCreated) {
@@ -87,7 +88,7 @@
                 }
                 dir.link(el, scope, d.value);
             });
-            Array.prototype.slice.call(el.children).forEach(function (c) {
+            [].slice.call(el.children).forEach(function (c) {
                 this.compile(c, scope);
             }, this);
         },
@@ -95,7 +96,7 @@
             var attrs = el.attributes;
             var result = [];
             for (var i = 0; i < attrs.length; i += 1) {
-                if (Provider.get(attrs[i].name + Provider.DIRECTIVES_SUFFIX)) {
+                if (Provider.get(attrs[i].name + DIRECTIVES_SUFFIX)) {
                     result.push({
                         name: attrs[i].name,
                         value: attrs[i].value
@@ -210,7 +211,7 @@
         return {
             scope: true,
             link: function (el, scope, exp) {
-                var ctrl = Provider.get(exp + Provider.CONTROLLERS_SUFFIX);
+                var ctrl = Provider.get(exp + CONTROLLERS_SUFFIX);
                 Provider.invoke(ctrl, {$scope: scope});
             }
         };

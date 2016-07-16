@@ -9,8 +9,6 @@
         define([], function () {
             return factory(window);
         });
-    } else {
-        root.Tool = factory(window);
     }
 
 }(window, function (root, undefined) {
@@ -18,7 +16,7 @@
     var _class2 = {};                                       //  Object.prototype
     var _array2 = [];                                       //  Array.prototype
 
-    var _Tool = {
+    var Tool = {
 
         /**
          * 去字符串首尾空格
@@ -35,16 +33,43 @@
         },
 
         /**
-         * 给目标对象定义属性和是否可枚举等
-         * @param opt   配置参数,包含{target,key,value,writable,enumerable,configurable}
+         * 转换成Object.defineProperty模式,实现数据变化后执行相关回调
+         * @param target    目标对象
+         * @param opt       配置参数
          */
-        "defineProperty": function (opt) {
-            Object.defineProperty(opt.target, opt.key, {
-                "value": opt.value,
-                "writable": !!opt.writable,
-                "enumerable": !!opt.enumerable,
-                "configurable": !!opt.configurable
-            });
+        "transfer": function (target, opt) {
+            if (this.isType(target, "object")) {
+                for (var i in target) {
+                    var _key = "__" + i;
+                    if (!target) {
+                        if (this.isType(opt.beforeUpdate, "function")) {
+                            opt.beforeUpdate();
+                        }
+                        if (this.isType(opt.update, "function")) {
+                            opt.update(target[i]);
+                        }
+                        target[_key] = target[i];
+                    }
+                    Object.defineProperty(target, i, {
+                        "get": function () {
+                            return target[i];
+                        },
+                        "set": function (val) {
+                            var changeFlag = false;
+                            if (!this.isEqual(val, target[_key])) {
+                                changeFlag = true;
+                                if (this.isType(opt.beforeUpdate, "function")) {
+                                    opt.beforeUpdate();
+                                }
+                            }
+                            target[_key] = val;
+                            if (changeFlag && this.isType(opt.update, "function")) {
+                                opt.update(val);
+                            }
+                        }
+                    });
+                }
+            }
         },
 
         /**
@@ -69,7 +94,7 @@
          * @returns {hash: "", path: ""}
          */
         "getHashOrState": function (rootPath) {
-            var path = decodeURIComponent(location.pathname + _Tool.getSearch());
+            var path = decodeURIComponent(location.pathname + Tool.getSearch());
             var hash = location.href.match(/#(.*)$/);
             var output = {};
             hash = hash ? hash[0].replace(/\#/g, "") : "";
@@ -159,9 +184,9 @@
                 return obj;
             }
             var copied;
-            if (_Tool.isType(obj, "Object")) {
+            if (Tool.isType(obj, "Object")) {
                 copied = {};
-            } else if (_Tool.isType(obj, "Array")) {
+            } else if (Tool.isType(obj, "Array")) {
                 copied = [];
             }
             for (var i in obj) {
@@ -188,7 +213,7 @@
          */
         "toArray": function (fakeArray) {
             var res = [];
-            if (_Tool.isFakeArray(fakeArray)) {
+            if (Tool.isFakeArray(fakeArray)) {
                 res = _array2.slice.call(fakeArray);
             }
             return res;
@@ -209,7 +234,7 @@
         "executeCallback": function () {
             var fn = arguments[0];
             var args = _array2.slice.call(arguments, 1);
-            if (_Tool.isType(fn, "Function")) {
+            if (Tool.isType(fn, "Function")) {
                 return fn.apply(root, args);
             }
         },
@@ -220,16 +245,16 @@
          */
         "getRequest": function (opts) {
             var xhr = new XMLHttpRequest();
-            //  支持带cookie参数发起请求
+            //  支持带cookie发起请求
             xhr.withCredentials = true;
             xhr.open("GET", opts.url, true);
             xhr.send(null);
             xhr.onreadystatechange = function () {
                 if (xhr.readyState === 4) {
                     if ((xhr.status >= 200 && xhr.status < 300) || xhr.status == 304) {
-                        _Tool.executeCallback(opts.success, (opts.context || root), xhr);
+                        Tool.executeCallback(opts.success, (opts.context || root), xhr);
                     } else {
-                        _Tool.executeCallback(opts.fail, (opts.context || root), xhr);
+                        Tool.executeCallback(opts.fail, (opts.context || root), xhr);
                     }
                 }
             };
@@ -245,6 +270,143 @@
 
     };
 
-    return _Tool;
+    /**
+     * 深度判断两个对象是否相等(摘自underscore中的eq方法)
+     * @param a         第一个个对象
+     * @param b         第二个对象
+     * @param aStack    第一个栈
+     * @param bStack    第二个栈
+     * @returns {boolean}
+     * @private
+     */
+    function _eq(a, b, aStack, bStack) {
+
+        // 获取第一个对象原型上的类名
+        var className = _class2.toString.call(a);
+
+        /**
+         * 检查两个基本数据类型的值是否相等
+         * 对于引用数据类型,如果它们来自同一个引用(同一个对象进行比较),则认为其相等
+         * 需要注意的是0 === -0的结果为true,所以后面的1 / a 和 1  / b 是来判断0 和 -0 的情况(1 / -0 = -Infinity) != (1 / 0 = Infinity)
+         */
+        if (a === b) return a !== 0 || 1 / a == 1 / b;
+
+        /**
+         * 处理undefined 和 null的情况
+         * undefined == null 的结果为true,而undefined === null 的结果为false
+         */
+        if (a == null || b == null) return a === b;
+
+        // 两个类名不同,直接返回false
+        if (className != _class2.toString.call(b)) return false;
+
+        switch (className) {
+            case '[object String]':
+
+                /**
+                 * toString.call("str") == "[object String]" -> true
+                 * toString.call(String("str")) == "[object String]" -> true
+                 * toString.call(new String("str")) == "[object String]" -> true
+                 */
+                return a == ("" + b);
+            case '[object Number]':
+
+                /**
+                 * +a 会把 a转换成一个数字,如果转换结果和原来不同则被认为NaN
+                 * NaN != NaN,因此当a和b同时为NaN时,无法简单地使用a == b进行匹配,用相同的方法检查b是否为NaN(即 b != +b)
+                 * 和刚进方法体一样,判断0和-0的情况
+                 */
+                return a != +a ? b != +b : (a == 0 ? 1 / a == 1 / b : a == +b);
+            case '[object Date]':
+            case '[object Boolean]':
+
+                /**
+                 * 把bool和date类型转换成对应的数字来比较
+                 * +true -> 1 / +false -> 0 / +(new Date()) -> (new Date()).getTime()
+                 */
+                return +a == +b;
+            case '[object RegExp]':
+
+                //  匹配正则表达式的相关属性是否相同(元字符串/全局匹配/多行模式/忽略大小写)
+                return a.source == b.source &&
+                    a.global == b.global &&
+                    a.multiline == b.multiline &&
+                    a.ignoreCase == b.ignoreCase;
+        }
+
+        //  处理数组类型或对象类型(typeof [] = typeof {} = "object")
+        if (typeof a != 'object' || typeof b != 'object') return false;
+
+        //  在isEqual方法中传递的是空数组
+        //  在方法体内部,判断的会再次进行传递被操作后的a堆和b堆
+        var length = aStack.length;
+
+        while (length--) {
+            // 如果堆中的某个对象与数据a匹配,则再判断另一个堆中相同位置的对象是否等于第二个对象
+            if (aStack[length] == a) return bStack[length] == b;
+        }
+
+        // 获取两个对象的构造器
+        var aCtor = a.constructor, bCtor = b.constructor;
+
+        //  判断两个对象如果不是不是同一个类的实例则认为不相等
+        if (aCtor !== bCtor && !(Tool.isType(bCtor, "function") &&
+            (aCtor instanceof aCtor) &&
+            Tool.isType(bCtor, "function") &&
+            (bCtor instanceof bCtor))) {
+            return false;
+        }
+
+        // 把a和b分别放到a堆和b堆中
+        aStack.push(a);
+        bStack.push(b);
+
+        //  局部变量
+        var size = 0, result = true;
+
+        // 数组类型比较
+        if (className == '[object Array]') {
+            size = a.length;
+
+            //  比较两个数组的长度是否相等
+            result = size == b.length;
+
+            //  如果长度相同,再依次比较数组的每项
+            if (result) {
+                while (size--) {
+                    if (!(result = _eq(a[size], b[size], aStack, bStack))) break;
+                }
+            }
+        } else {
+
+            // 如果是对象类型,枚举第一个对象,判断b和a中的每个属性值是否相同,记录a中属性值的个数
+            for (var key in a) {
+                if (a.hasOwnProperty(key)) {
+                    size++;
+                    if (!(result = b.hasOwnProperty(key) && _eq(a[key], b[key], aStack, bStack))) break;
+                }
+            }
+
+            /**
+             * 如果a中有的属性b中都有
+             * 再枚举b对象,判断长度,如果b中属性值的长度大于size则result为false(!1 = false / !0 = true)
+             */
+            if (result) {
+                for (key in b) {
+                    if (b.hasOwnProperty(key) && !(size--)) break;
+                }
+
+                // 当对象b中的属性多于对象a, 则认为两个对象不相等
+                result = !size;
+            }
+        }
+
+        // 删除堆中的数据,防止再进行迭代,返回比较结果
+        aStack.pop();
+        bStack.pop();
+        return result;
+    }
+
+    return Tool;
 
 }));

@@ -6,16 +6,23 @@
 
 (function (root, factory) {
     if (typeof define === "function" && define.amd) {
-        define(["./Tool"], function (_Tool) {
-            return factory(window, _Tool);
+        define(["./Tool"], function (Tool) {
+            return factory(window, Tool);
         });
-    } else {
-        root.Dom = factory(window, Tool);
     }
 
-}(window, function (root, _Tool, undefined) {
+}(window, function (root, Tool, undefined) {
 
-    var _DOM = {
+    var Dom = {
+
+        /**
+         * 获取指定元素下所有的DOM元素
+         * @param context   指定的元素
+         * @returns {*|Array.<T>}
+         */
+        "getAllElements": function(context) {
+            return Tool.toArray((context || doc).getElementsByTagName("*"));
+        },
 
         /**
          * 根据rid属性获取相关元素
@@ -67,16 +74,7 @@
          * @returns {*|Array.<T>}
          */
         "getDOMAttrs": function (el) {
-            return _Tool.toArray(el.attributes);
-        },
-
-        /**
-         * 获取目标元素
-         * @param domList       元素列表(Object,Array<Object>,HTMLDOMList)
-         * @param condition     domList
-         */
-        "getTargetDOM": function (domList, condition) {
-            return _Tool.toArray(domList);
+            return Tool.toArray(el.attributes);
         },
 
         /**
@@ -86,7 +84,7 @@
          */
         "addClass": function (el, classList) {
             var classEs = el.classList;
-            if (_Tool.isType(classList, "String")) {
+            if (Tool.isType(classList, "String")) {
                 if (~classList.indexOf(" ")) {
                     classList = classList.split(" ");
                 } else {
@@ -110,7 +108,7 @@
          */
         "removeClass": function (el, classList) {
             var classEs = el.classList;
-            if (_Tool.isType(classList, "String")) {
+            if (Tool.isType(classList, "String")) {
                 if (~classList.indexOf(" ")) {
                     classList = classList.split(" ");
                 } else {
@@ -178,9 +176,9 @@
         "getAttributes": function (el, attrs) {
             var attrList = [];
             var output = {};
-            if (_Tool.isType(attrs, "String")) {
+            if (Tool.isType(attrs, "String")) {
                 attrList = [attrs];
-            } else if (_Tool.isType(attrs, "Array")) {
+            } else if (Tool.isType(attrs, "Array")) {
                 attrList = attrs;
             }
             attrList.forEach(function (item) {
@@ -193,6 +191,6 @@
         }
     };
 
-    return _DOM;
+    return Dom;
 
 }));
