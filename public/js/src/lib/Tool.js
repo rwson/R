@@ -40,6 +40,7 @@
         "transfer": function (target, opt) {
             if (this.isType(target, "object")) {
                 Object.keys(target).forEach(function (key) {
+                    //  过滤掉"_xxx"这种key,可减少最多一倍的遍历次数
                     if (!(/^\_/).test(key)) {
                         var _key = "_" + key;
                         Object.defineProperty(target, key, {
@@ -47,10 +48,13 @@
                                 return this[_key];
                             },
                             "set": function (val) {
-                                if (!Tool.isEqual(this[_key], val)) {
+                                //  this[_key] && !Tool.isEqual(this[_key], val)代表是通过update更新的数据,而不是set新增的
+                                if (this[_key] && !Tool.isEqual(this[_key], val)) {
                                     Tool.isType(opt.beforeUpdate, "function") && opt.beforeUpdate.call((opt.context || this), key, val);
                                     this[_key] = val;
                                     Tool.isType(opt.update, "function") && opt.update.call((opt.context || this), key, val);
+                                } else {
+                                    this[_key] = val;
                                 }
                             }
                         });

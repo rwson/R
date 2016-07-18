@@ -18,6 +18,7 @@
     var exportObj = {},
         argu = [].slice.call(arguments);
 
+    //  配置暴露对象
     argu.forEach(function (item) {
         exportObj[item["name"]] = item["constructor"];
     });
