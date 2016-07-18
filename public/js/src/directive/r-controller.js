@@ -9,13 +9,14 @@
         define(["tool"], function (Tool) {
             return factory(root, Tool);
         });
-    } else {
-        root.RClick = RClick;
     }
 
 }(window, function (root, Tool, undefined) {
 
-    function RController() {
+    function RController(dirCfg) {
+        this.el = dirCfg.el;
+        this.scope = dirCfg.scope;
+        this.exp = dirCfg.directives[0].exp;
         return this;
     }
 

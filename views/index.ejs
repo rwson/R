@@ -7,7 +7,13 @@
 <body>
     <div id="app">
         <p r-bind="text"></p>
+        <p r-bind="text"></p>
+        <hr/>
         <button r-click="clickCallback" type="button">点我啊</button>
+        <hr/>
+        <input type="text" r-model="name" />
+        <p r-bind="name"></p>
+        <p r-bind="name"></p>
     </div>
     <script src="/js/lib/require.min.js"></script>
     <script src="/js/config/requireConfig.js"></script>

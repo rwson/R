@@ -40,8 +40,9 @@
          * @param el    根元素选择器
          */
         "bootstrap": function (el) {
-            this.roomElement = document.querySelector(el) || document.body;
-            this.eleMap = {};
+            this.roomElement = document.querySelector(el) || document.body;         //  根元素,后面缓存绑定r-controller的元素,并且指定相关作用域
+            this.eleMap = {};                                                       //  元素map,每个元素作为el属性值存放在单独id的对象中
+            this.directiveMap = {};                                                 //  指令map,调用map的时候,根据指令绑定属性值,遍历相关对象,减少循环次数
             this.compile();
         },
 
@@ -59,7 +60,9 @@
          * @param val   数据值
          */
         "update": function (key, val) {
-
+            this.directiveMap[key].map(function(dir) {
+                dir.directiveIns.link(dir.el, val, dir.scope);
+            });
         },
 
         /**
@@ -129,13 +132,24 @@
             var ele = this.eleMap;
             Object.keys(ele).forEach(function (key) {
                 var cEle = ele[key];
-                if(!cEle.compiled) {
+                if (!cEle.compiled) {
                     cEle.directives.forEach(function (dir) {
-                        var directive = new dir.directive();
+                        var directiveIns = new dir.directive(cEle);
                         var exp = scope.exec(dir.exp);
-                        directive.link(cEle.el, exp, scope);
-                    });
-                    this.eleMap.compiled = true;
+                        directiveIns.link(cEle.el, exp, scope);
+
+                        //  判断是否已经存在该指令对应的数组对象,没有就新建一个
+                        if (!this.directiveMap.hasOwnProperty(dir.exp)) {
+                            this.directiveMap[dir.exp] = [];
+                        }
+                        this.directiveMap[dir.exp].push({
+                            "scope": scope,
+                            "directiveIns": directiveIns,
+                            "el": cEle.el
+                        });
+                    }.bind(this));
+                    this.eleMap[key].compiled = true;
+                    this.eleMap[key].scope = scope;
                 }
             }.bind(this));
         }

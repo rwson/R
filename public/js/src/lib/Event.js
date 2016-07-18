@@ -22,40 +22,52 @@
          * @param fn    回调函数
          */
         "addEvent": function (obj, type, fn) {
-            if (obj.attachEvent) {
-                obj["e" + type + fn] = fn;
-                obj[type + fn] = function (ev) {
-                    ev = ev || root.event;
-                    obj["e" + type + fn](ev);
-                    Event.prevDefault(ev);
-                };
-                obj.attachEvent("on" + type, function (ev) {
-                    ev = ev || root.event;
-                    obj[type + fn](ev);
-                    Event.prevDefault(ev);
-                });
-            } else {
-                obj.addEventListener(type, function (ev) {
-                    ev = ev || root.event;
-                    fn();
-                    Event.prevDefault(ev);
-                }, false);
+            var types = type;
+            if (Tool.isType(types, "string")) {
+                types = [type];
             }
+            types.forEach(function (type) {
+                if (obj.attachEvent) {
+                    obj["e" + type + fn] = fn;
+                    obj[type + fn] = function (ev) {
+                        ev = ev || root.event;
+                        obj["e" + type + fn](ev);
+                        Event.prevDefault(ev);
+                    };
+                    obj.attachEvent("on" + type, function (ev) {
+                        ev = ev || root.event;
+                        obj[type + fn](ev);
+                        Event.prevDefault(ev);
+                    });
+                } else {
+                    obj.addEventListener(type, function (ev) {
+                        ev = ev || root.event;
+                        fn(ev);
+                        Event.prevDefault(ev);
+                    }, false);
+                }
+            });
         },
 
         /**
          * 移除事件监听
          * @param obj   HTMLDOMElement
-         * @param type  事件类型
+         * @param type  事件类型(String/Array)
          * @param fn    回调函数
          */
         "removeEvent": function (obj, type, fn) {
-            if (obj.detachEvent) {
-                obj.detachEvent("on" + type, obj[type + fn]);
-                obj[type + fn] = null;
-            } else {
-                obj.removeEventListener(type, fn, false);
+            var types = type;
+            if (Tool.isType(types, "string")) {
+                types = [type];
             }
+            types.forEach(function (type) {
+                if (obj.detachEvent) {
+                    obj.detachEvent("on" + type, obj[type + fn]);
+                    obj[type + fn] = null;
+                } else {
+                    obj.removeEventListener(type, fn, false);
+                }
+            });
         },
 
         /**

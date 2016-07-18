@@ -9,13 +9,14 @@
         define(["tool"], function (Tool) {
             return factory(root, Tool);
         });
-    } else {
-        root.RBind = RBind;
     }
 
 }(window, function (root, Tool, undefined) {
 
-    function RBind() {
+    function RBind(dirCfg) {
+        this.el = dirCfg.el;
+        this.scope = dirCfg.scope;
+        this.exp = dirCfg.directives[0].exp;
         return this;
     }
 
@@ -24,6 +25,8 @@
         "constructor": RBind,
 
         "link": function (el, exp, scope) {
+            //  修正scope
+            this.scope = this.scope || scope;
             el.innerHTML = exp;
         }
 

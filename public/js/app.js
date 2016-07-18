@@ -9,7 +9,8 @@ define("app", ["r"], function (R) {
     R.controller("app", function (scope) {
 
         scope.set({
-            "text": "我是文本",
+            "text": "" + ((+new Date()) + Math.random()),
+            "name": "test",
             "list": [
                 {
                     "title": "title",
@@ -32,9 +33,8 @@ define("app", ["r"], function (R) {
 
         scope.defineEvents({
             "clickCallback":function() {
-                alert("点我干啥");
                 scope.update({
-                    "text": "我是改变后的文本"
+                    "text": "" + ((+new Date()) + Math.random())
                 });
             }
         });

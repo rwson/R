@@ -45,8 +45,12 @@
             });
 
             //  给数据进行第一次赋值
-            Object.keys(this.data).forEach(function (key) {
-                this.data[key] = obj[key];
+            Object.keys(obj).forEach(function (key) {
+                var val = obj[key];
+                if(!("" + val).length && Tool.isType(val, "string")) {
+                    val = "";
+                }
+                this.data[key] = val;
             }.bind(this));
         },
 

@@ -14,6 +14,7 @@ require.config({
         "rClick": "src/directive/r-click",
         "rBind": "src/directive/r-bind",
         "rFor": "src/directive/r-for",
+        "rModel": "src/directive/r-model",
         "directive": "src/directive/index",
         "scope": "src/scope/index",
         "compile": "src/compile/index",

@@ -7,7 +7,7 @@
 
 (function (root, factory) {
     if (typeof define === "function" && define.amd) {
-        define(["rBind", "rClick", "rFor"], function () {
+        define(["rBind", "rClick", "rFor", "rModel"], function () {
             var argus = [].slice.call(arguments);
             return factory.apply(root, argus);
         });
