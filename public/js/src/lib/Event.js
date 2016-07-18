@@ -6,7 +6,7 @@
 
 (function (root, factory) {
     if (typeof define === "function" && define.amd) {
-        define(["./Tool"], function (Tool) {
+        define(["tool"], function (Tool) {
             return factory(window, Tool);
         });
     }
@@ -94,6 +94,45 @@
             } else {
                 root.event.returnValue = false;
             }
+        },
+
+        /**
+         * 在一个对象上指定监听事件
+         * @param target        事件绑定的目标对象
+         * @param evName        事件名
+         * @param callback      回调
+         */
+        "subscribeEvent": function (target, evName, callback) {
+            if (!target._listeners) {
+                target._listeners = []
+            }
+            target._listeners.push({
+                "evName": evName,
+                "callback": callback
+            });
+        },
+
+        /**
+         * 触发之前绑定的事件
+         * @param target    事件绑定的目标对象
+         * @param evName    事件名
+         * @param opt       配置参数(context/argus[Array.<T>])
+         */
+        "triggerEvent": function (target, evName, opt) {
+            var _listeners = target._listeners;
+            _listeners.forEach(function (listener) {
+                if (listener.evName === evName && Tool.isType(listener[callback], "function")) {
+                    listener[evName].apply((opt.context || root), opt.argus);
+                }
+            });
+        },
+
+        /**
+         * 移除事件
+         * @param target    事件绑定的目标对象
+         */
+        "removeEvents": function (target) {
+            target._listeners = null;
         }
     };
 

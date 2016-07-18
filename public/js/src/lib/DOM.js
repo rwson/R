@@ -6,7 +6,7 @@
 
 (function (root, factory) {
     if (typeof define === "function" && define.amd) {
-        define(["./Tool"], function (Tool) {
+        define(["tool"], function (Tool) {
             return factory(window, Tool);
         });
     }

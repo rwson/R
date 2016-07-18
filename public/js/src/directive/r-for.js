@@ -6,7 +6,7 @@
 
 (function (root, factory) {
     if (typeof define === "function" && define.amd) {
-        define(["../lib/Tool"], function (Tool) {
+        define(["tool"], function (Tool) {
             return factory(root, Tool);
         });
     } else {
@@ -16,6 +16,7 @@
 }(window, function (root, Tool, undefined) {
 
     function RFor() {
+        return this;
     }
 
     return {

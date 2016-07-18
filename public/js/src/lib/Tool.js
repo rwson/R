@@ -39,39 +39,24 @@
          */
         "transfer": function (target, opt) {
             if (this.isType(target, "object")) {
-                for (var i in target) {
-                    var _key = "__" + i;
-                    if(target[_key]) {
-                        continue;
-                    }
-                    if (!target) {
-                        if (this.isType(opt.beforeUpdate, "function")) {
-                            opt.beforeUpdate();
-                        }
-                        if (this.isType(opt.update, "function")) {
-                            opt.update(target[i]);
-                        }
-                        target[_key] = target[i];
-                    }
-                    Object.defineProperty(target, i, {
-                        "get": function () {
-                            return target[i];
-                        },
-                        "set": function (val) {
-                            var changeFlag = false;
-                            if (!this.isEqual(val, target[_key])) {
-                                changeFlag = true;
-                                if (this.isType(opt.beforeUpdate, "function")) {
-                                    opt.beforeUpdate();
+                Object.keys(target).forEach(function (key) {
+                    if (!(/^\_/).test(key)) {
+                        var _key = "_" + key;
+                        Object.defineProperty(target, key, {
+                            "get": function () {
+                                return this[_key];
+                            },
+                            "set": function (val) {
+                                if (!Tool.isEqual(this[_key], val)) {
+                                    Tool.isType(opt.beforeUpdate, "function") && opt.beforeUpdate.call((opt.context || this), key, val);
+                                    this[_key] = val;
+                                    Tool.isType(opt.update, "function") && opt.update.call((opt.context || this), key, val);
                                 }
                             }
-                            target[_key] = val;
-                            if (changeFlag && this.isType(opt.update, "function")) {
-                                opt.update(val);
-                            }
-                        }
-                    });
-                }
+                        });
+                    }
+                });
+                return target;
             }
         },
 
@@ -198,6 +183,19 @@
                 }
             }
             return copied;
+        },
+
+        /**
+         * 拷贝一个对象的属性,值作为空字符串
+         * @param target
+         * @returns {{}}
+         */
+        "copyAsEmpty": function (target) {
+            var res = {};
+            Object.keys(target).forEach(function (key) {
+                res[key] = "";
+            });
+            return res;
         },
 
         /**

@@ -1,6 +1,6 @@
 /**
  * index.js
- * 编译模板
+ * 编译模板(View:事件绑定/指定数据)
  */
 
 "use strict";
@@ -8,12 +8,12 @@
 (function (root, factory) {
     if (typeof define === "function" && define.amd) {
         define([
-            "../lib/Tool",
-            "../lib/DOM",
-            "../lib/Event",
-            "../directive/index"
-        ], function (Tool, Dom, Event, Directive) {
-            return factory(window, Tool, Event, Dom, Directive);
+            "tool",
+            "dom",
+            "event",
+            "directive"
+        ], function (Tool, Dom, Event, directive) {
+            return factory(window, Tool, Dom, Event, directive);
         });
     }
 
@@ -41,28 +41,25 @@
          */
         "bootstrap": function (el) {
             this.roomElement = document.querySelector(el) || document.body;
-            this.data = {};
             this.eleMap = {};
             this.compile();
         },
 
         /**
-         * 设置vm中的数据
-         * @param data  数据
+         * 数据发送变化,更新DOM之前的回调
+         * @param key   数据对应的key
+         * @param val   数据值
          */
-        "set": function (data) {
-            this.data = Tool.merge(this.data, Tool.transfer(data, {
-                "beforeUpdate": this.beforeUpdate,
-                "update": this.update
-            }));
+        "beforeUpdate": function (key, val) {
         },
 
-        "beforeUpdate": function () {
-            console.log("我是更新之前的回调...");
-        },
+        /**
+         * 数据发送变化,更新DOM
+         * @param key   数据对应的key
+         * @param val   数据值
+         */
+        "update": function (key, val) {
 
-        "update": function () {
-            console.log("我要开始更新DOM了...");
         },
 
         /**
@@ -71,25 +68,23 @@
         "compile": function () {
             var eles = Tool.toArray(this.roomElement.getElementsByTagName("*"));
 
-            //  过滤掉不编译的子元素
-            eles = eles.filter(function (el) {
-                return !~(unCompileElems.indexOf(el.tagName.toLowerCase()))
-            });
-
             //  便于过滤后的节点列表
-            eles = eles.map(function (el) {
-                var rid = Tool.randomStr();
-                var attrRid = Dom.getAttributes("rid").rid;
-                var directives = this.getDirectives(el);
-                if (!attrRid) {
-                    Dom.setAttributes({
-                        "rid": rid
-                    });
+            eles.forEach(function (el) {
+                if (!~(unCompileElems.indexOf(el.tagName.toLowerCase()))) {
+                    var rid = Tool.randomStr();
+                    var attrRid = Dom.getAttributes(el, "rid").rid;
+                    var directives = this.getDirectives(el);
 
-                    this.eleMap[rid] = {
-                        "el": el,
-                        "directives": directives
-                    };
+                    if (!attrRid) {
+                        Dom.setAttributes({
+                            "rid": rid
+                        });
+
+                        this.eleMap[rid] = {
+                            "el": el,
+                            "directives": directives
+                        };
+                    }
                 }
             }.bind(this));
         },
@@ -103,47 +98,45 @@
                 return;
             }
 
-            var directiveKeys = Object.keys(directive);
             var attrs = Tool.toArray(el.attributes);
+            var res = [];
 
             //  将指令的r-xxx写法转换成rXxx写法
-            attrs = attrs.map(function (attr) {
-                return attr.replace(/[^\b-]{1,90}/g, function (word) {
+            attrs.forEach(function (attr) {
+                var name = attr.name;
+                var exp = attr.value;
+
+                name = name.replace(/[^\b-]{1,90}/g, function (word) {
                     return word.substring(0, 1).toUpperCase() + word.substring(1).replace("-", "");
                 }).replace("-", "");
-            });
 
-            //  过滤掉未经过声明的指令
-            attrs = attrs.filter(function (attr) {
-                return ~directiveKeys.indexOf(attr);
-            });
-            return attrs;
+                if (directive.hasOwnProperty(name)) {
+                    res.push({
+                        "directive": directive[name],
+                        "exp": exp
+                    });
+                }
+            }.bind(this));
+
+            return res;
         },
 
         /**
-         * 执行指令中的表达式
-         * @param exp       表达式
-         * @returns {*}
+         * 绑定指令
+         * @param scope Scope类的实例
          */
-        "exec": function (exp) {
-            var value;
-            if (Tool.isType(exp, "function")) {
-                value = exp.call(this);
-            } else if (Tool.isType(exp, "string")) {
-                try {
-                    value = new Function("return this." + exp + ";").bind(this.data)();
-                } catch (ex) {
-                    value = undefined;
+        "link": function (scope) {
+            var ele = this.eleMap;
+            Object.keys(ele).forEach(function (key) {
+                var cEle = ele[key];
+                if(!cEle.compiled) {
+                    cEle.directives.forEach(function (dir) {
+                        var directive = new dir.directive();
+                        var exp = scope.exec(dir.exp);
+                        directive.link(cEle.el, exp, scope);
+                    });
+                    this.eleMap.compiled = true;
                 }
-            }
-            return value;
-        },
-
-        "link": function () {
-            this.directives.forEach(function (dir) {
-                var targetDirective = directive[dir]();
-                var value = this.exec(targetDirective);
-                targetDirective.link();
             }.bind(this));
         }
 

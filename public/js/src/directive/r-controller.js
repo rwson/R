@@ -1,5 +1,5 @@
 /**
- * r-bind指令
+ * r-controller获取
  */
 
 "use strict";
@@ -10,30 +10,18 @@
             return factory(root, Tool);
         });
     } else {
-        root.RBind = RBind;
+        root.RClick = RClick;
     }
 
 }(window, function (root, Tool, undefined) {
 
-    function RBind() {
+    function RController() {
         return this;
     }
 
-    RBind.prototype = {
-
-        "constructor": RBind,
-
-        "link": function (el, exp, scope) {
-            el.innerHTML = exp;
-        }
-
-    };
-
     return {
-        "name": "RBind",
-        "constructor": RBind
+        "name": "RController",
+        "constructor": RController
     };
 
 }));
-
-

@@ -1,15 +1,18 @@
 <!DOCTYPE html>
 <html>
-  <head>
+<head>
     <title>routeable</title>
-    <link rel='stylesheet' href='/css/style.css' />
-  </head>
-  <body>
-    <div id="route-app"></div>
+    <link rel='stylesheet' href='/css/style.css'/>
+</head>
+<body>
+    <div id="app">
+        <p r-bind="text"></p>
+        <button r-click="clickCallback" type="button">点我啊</button>
+    </div>
     <script src="/js/lib/require.min.js"></script>
     <script src="/js/config/requireConfig.js"></script>
     <script>
-      require(["app"]);
+        require(["app"]);
     </script>
-  </body>
+</body>
 </html>
