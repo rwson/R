@@ -13,30 +13,30 @@
 
 }(window, function (root, Tool, Event, undefined) {
 
-    function RClick(dirCfg) {
-        this.priority = 1;
+    function RKeyUp(dirCfg) {
+        this.priority = 2;
         this.el = dirCfg.el;
         this.scope = dirCfg.scope;
         this.exp = dirCfg.directives[0].exp;
         return this;
     }
 
-    RClick.prototype = {
+    RKeyUp.prototype = {
 
-        "constructor": RClick,
+        "constructor": RKeyUp,
 
         "link": function (el, exp, scope) {
             //  修正scope
             this.scope = this.scope || scope;
-            Event.removeEvent(el, "click", exp);
-            Event.addEvent(el, "click", exp);
+            Event.removeEvent(el, "keyup", exp);
+            Event.addEvent(el, "keyup", exp);
         }
     };
 
     return {
-        "name": "RClick",
+        "name": "RKeyUp",
         "priority": 2,
-        "constructor": RClick
+        "constructor": RKeyUp
     };
 
 }));

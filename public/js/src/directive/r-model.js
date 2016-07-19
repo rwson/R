@@ -43,6 +43,7 @@
 
     return {
         "name": "RModel",
+        "priority": 2,
         "constructor": RModel
     };
 

@@ -172,7 +172,7 @@
          */
         "copy": function (obj, deep) {
             //  typeof []/{} -> "object"
-            if (!deep || obj == null || typeof obj !== "object") {
+            if (!deep || obj === null || typeof obj !== "object") {
                 return obj;
             }
             var copied;

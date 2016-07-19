@@ -22,6 +22,7 @@
 
     return {
         "name": "RController",
+        "priority": 0,
         "constructor": RController
     };
 

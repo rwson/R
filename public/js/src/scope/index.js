@@ -18,7 +18,7 @@
 
     /**
      * Controller对应的scope对象
-     * @param compile   编译方法
+     * @param compile   Compile类的实例
      * @constructor
      */
     function Scope(compile) {
@@ -47,11 +47,11 @@
             //  给数据进行第一次赋值
             Object.keys(obj).forEach(function (key) {
                 var val = obj[key];
-                if(!("" + val).length && Tool.isType(val, "string")) {
+                if (!("" + val).length && Tool.isType(val, "string")) {
                     val = "";
                 }
                 this.data[key] = val;
-            }.bind(this));
+            }, this);
         },
 
         /**
@@ -60,7 +60,8 @@
          * @returns {*}
          */
         "get": function (key) {
-            return this.data[key];
+            //  就返回一个深拷贝对象出去,而不是返回对该对象的引用,防止在调用update方法之前已经对数据进行更新
+            return Tool.copy(this.data[key], true);
         },
 
         /**
@@ -70,7 +71,7 @@
         "update": function (obj) {
             Object.keys(obj).forEach(function (key) {
                 this.data[key] = obj[key];
-            }.bind(this));
+            }, this);
         },
 
         /**
@@ -95,6 +96,21 @@
          */
         "exec": function (exp) {
             return this.get(exp) || this.events[exp];
+        },
+
+        /**
+         * 获取深层对象下的相关属性值(a["b"]["c"]["d"][,...])
+         * @param context   被获取属性的对象
+         * @param expArr    属性值的嵌套(String/Array)
+         * @returns {*}
+         */
+        "execDeep": function (context, expArr) {
+            var exp = expArr;
+            if (!Tool.isType(exp, "array")) {
+                exp = [exp];
+            }
+            exp = exp.join(".");
+            return (new Function("return this." + exp + ";").call(context));
         },
 
         /**

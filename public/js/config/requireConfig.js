@@ -15,6 +15,7 @@ require.config({
         "rBind": "src/directive/r-bind",
         "rFor": "src/directive/r-for",
         "rModel": "src/directive/r-model",
+        "rKeyUp": "src/directive/r-keyup",
         "directive": "src/directive/index",
         "scope": "src/scope/index",
         "compile": "src/compile/index",

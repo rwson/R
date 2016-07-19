@@ -13,6 +13,8 @@
 
 }(window, function (root, Tool, undefined) {
 
+    var doc = document;
+
     var Dom = {
 
         /**
@@ -20,7 +22,7 @@
          * @param context   指定的元素
          * @returns {*|Array.<T>}
          */
-        "getAllElements": function(context) {
+        "getAllElements": function (context) {
             return Tool.toArray((context || doc).getElementsByTagName("*"));
         },
 
@@ -41,7 +43,7 @@
          * 创建一个dom片段
          * @returns {DocumentFragment}
          */
-        "createFragment": function() {
+        "createFragment": function () {
             return doc.createDocumentFragment();
         },
 
@@ -50,7 +52,7 @@
          * @param el    被转换的元素
          * @returns {*|DocumentFragment}
          */
-        "nodeToFragement": function(el) {
+        "nodeToFragement": function (el) {
             var child;
             var fragment = this.createFragment();
             while (child = el.firstChild) {
@@ -60,12 +62,28 @@
         },
 
         /**
-         * 判断一个对象是否为DOM节点
+         * 判断一个节点对象是否为DOM节点
          * @param el    被判断的对象
          * @returns {*|boolean}
          */
         "isHTMLNode": function (el) {
             return el && el.nodeType === 1;
+        },
+
+        /**
+         * 递归获取当前节点的父节点,直到body标签或者指定了r-controller的远古三
+         * @param el            被获取父节点的元素
+         * @param callback      获取成功对应的回调函数
+         */
+        "getParent": function (el, callback) {
+            if(!el || this.getAttributes(el, "r-controller")["r-controller"]) {
+                return;
+            }
+            var parent = el.parentNode;
+            callback(parent);
+            if(this.isHTMLNode(el) && el.nodeName.toLowerCase() !== "body") {
+                this.getParent(parent, callback);
+            }
         },
 
         /**

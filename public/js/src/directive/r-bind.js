@@ -34,6 +34,7 @@
 
     return {
         "name": "RBind",
+        "priority": 2,
         "constructor": RBind
     };
 

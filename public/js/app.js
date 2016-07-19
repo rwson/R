@@ -13,29 +13,36 @@ define("app", ["r"], function (R) {
             "name": "test",
             "list": [
                 {
-                    "title": "title",
-                    "link": "http://xxx.com"
-                },
-                {
-                    "title": "title2",
-                    "link": "http://xxx.com"
-                },
-                {
-                    "title": "title3",
-                    "link": "http://xxx.com"
-                },
-                {
-                    "title": "title4",
-                    "link": "http://xxx.com"
+                    "title": "todo1",
+                    "id": "" + ((+new Date()) + Math.random())
                 }
             ]
         });
 
         scope.defineEvents({
-            "clickCallback":function() {
+            "clickCallback": function () {
                 scope.update({
                     "text": "" + ((+new Date()) + Math.random())
                 });
+            },
+            "addTodo": function (ev) {
+                var keyCode = ev.keyCode;
+                var title = ev.target.value.trim();
+                var list = scope.get("list");
+                if (keyCode === 13) {
+                    if (!title) {
+                        alert("请先填写标题!");
+                        return;
+                    }
+                    list.push({
+                        "title": title,
+                        "id": "" + ((+new Date()) + Math.random())
+                    });
+                    scope.update({
+                        "list": list
+                    });
+                    ev.target.value = "";
+                }
             }
         });
 

@@ -65,7 +65,7 @@
                 var Scope = new CtrlObj.scope(this._compile);
                 CtrlObj.fn(Scope);
                 Scope.link();
-            }.bind(this));
+            }, this);
         },
 
         "_get": function (name) {

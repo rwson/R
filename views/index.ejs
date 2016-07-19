@@ -7,13 +7,19 @@
 <body>
     <div id="app">
         <p r-bind="text"></p>
-        <p r-bind="text"></p>
         <hr/>
         <button r-click="clickCallback" type="button">点我啊</button>
         <hr/>
         <input type="text" r-model="name" />
         <p r-bind="name"></p>
-        <p r-bind="name"></p>
+        <hr/>
+        <p>TODOList:</p>
+        <input type="text" r-key-up="addTodo" placeholder="请输入待办事项的标题" />
+        <ul>
+            <li r-for="item in list">
+                <span r-bind="item.title"></span>
+            </li>
+        </ul>
     </div>
     <script src="/js/lib/require.min.js"></script>
     <script src="/js/config/requireConfig.js"></script>
