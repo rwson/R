@@ -137,7 +137,7 @@
             Object.keys(obj2).forEach(function (i) {
                 if (obj1[i] && override) {
                     obj1[i] = obj2[i];
-                } else if (!obj1[i] && obj2[i]) {
+                } else {
                     obj1[i] = obj2[i];
                 }
             });
@@ -200,6 +200,21 @@
                 res[key] = "";
             });
             return res;
+        },
+
+        /**
+         * 将"xx-yy-zz"转换成驼峰写法
+         * @param str
+         * @returns {*}
+         */
+        "toCamelCase": function (str) {
+            str = ("" + str);
+            if (!("" + str)) {
+                return "";
+            }
+            return str.replace(/[^\b-]{1,90}/g, function (word) {
+                return word.substring(0, 1).toUpperCase() + word.substring(1);
+            }).replace(/\-/g, "");
         },
 
         /**

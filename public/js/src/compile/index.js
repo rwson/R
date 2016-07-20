@@ -48,7 +48,7 @@
         "bootstrap": function (el) {
             this.roomElement = document.querySelector(el) || document.body;         //  根元素,后面缓存绑定r-controller的元素,并且指定相关作用域
             this.eleMap = {};                                                       //  元素map,每个元素作为el属性值存放在单独id的对象中
-            this.directiveMap = {};                                                 //  指令map,调用map的时候,根据指令绑定属性值,遍历相关对象,减少循环次数
+            this.directiveMap = {};                                                 //  指令map,调用map的时候,根据指令绑定属性值,遍历相关对象(根据key值定位),减少循环次数
             this.compile();
         },
 
@@ -66,9 +66,19 @@
          * @param val   数据值
          */
         "update": function (key, val) {
-            this.directiveMap[key].map(function (dir) {
-                //dir.directiveIns.link(dir.el, val, dir.scope);
+            var dirMap = this.directiveMap[key];
+
+            console.group();
+            console.log("elements length:" + val.length);
+            console.time("update dom");
+
+            dirMap.forEach(function (dir) {
+                dir.directiveIns.update(val);
             });
+
+            console.timeEnd("update dom");
+            console.groupEnd();
+
         },
 
         /**
@@ -85,7 +95,8 @@
          * @returns {Array}
          */
         "getAllDirectives": function (elList) {
-            var rootEle = this.roomElement,tagName, rid, pRid, attrRid, mapInfo, directives, pEleMap, pDirectives;
+            var rootEle = this.roomElement,
+                tagName, rid, pRid, attrRid, mapInfo, directives, pEleMap, pDirectives;
             if (!elList || !elList.length) {
                 return [];
             }
@@ -106,6 +117,7 @@
                         if (directives.length) {
                             mapInfo = {
                                 "el": el,
+                                "firstLink": true,
                                 "directives": directives
                             };
                             this.eleMap[rid] = mapInfo;
@@ -133,11 +145,11 @@
                                         pEleMap.childDir.push(mapInfo);
 
                                         //  配置该指令不需要第一次进行link
-                                        this.eleMap[rid].config = {
+                                        this.eleMap[rid] = Tool.merge(mapInfo, {
                                             "parent": parent,
                                             "type": "RForAttr",
                                             "firstLink": false
-                                        };
+                                        }, true);
                                     }
                                 }.bind(this));
                             }
@@ -158,8 +170,7 @@
 
             var tagAttrs = Tool.toArray(el.attributes),
                 res = [],
-                name,
-                exp;
+                name, exp;
 
             //  遍历所有的标签属性
             tagAttrs.forEach(function (attr) {
@@ -197,75 +208,50 @@
          * @param scope Scope类的实例
          */
         "link": function (scope) {
-            var ele = this.eleMap;
-            var depPare = false;
-            var cEle, directives, dir, finalExp, directiveIns, exp, children, cDir, childDirMap;
-            Object.keys(ele).forEach(function (key) {
+            var ele = this.eleMap, mapKeys = Object.keys(ele),
+                cEle, directives, dir, finalExp, directiveIns, exp, execEd, childDirMap;
+
+            mapKeys.forEach(function (key) {
                 childDirMap = [];
                 cEle = ele[key];
+
+                //  过滤掉已经编译过的元素
                 if (!cEle.compiled) {
                     directives = cEle.directives;
 
                     //  ES5中Array.prototype.forEach不支持break,所以直接for循环,在遇到r-for的时候break该次循环
                     for (var i = 0, len = directives.length; i < len; i++) {
-                        depPare = false;
                         dir = directives[i];
                         finalExp = dir.exp;
 
                         //  r-for指令
-                        if (loopDirReg.test(dir.exp)) {
-                            var execEd = loopDirReg.exec(dir.exp);
+                        if (loopDirReg.test(finalExp)) {
+                            execEd = loopDirReg.exec(finalExp);
                             finalExp = execEd[2];
                         }
 
-                        children = Tool.toArray(cEle.el.children);
-                        if (children && children.length) {
-                            children.forEach(function (child) {
-                                var childDir = this.getDirectives(child);
-                                if (childDir && childDir.length) {
-                                    childDir.forEach(function (cDir) {
-                                        childDirMap.push(Tool.merge(Tool.copy(cEle, true), {
-                                            "el": child,
-                                            "directives": [cDir]
-                                        }, true));
-                                    });
-                                    cEle.childDirMap = childDirMap;
-                                }
-                            }.bind(this));
-                        }
-
                         directiveIns = new dir.directive(cEle);
-                        exp = scope.exec(finalExp);
-                        directiveIns.link(cEle.el, exp, scope);
 
-                        //  判断是否已经存在该指令对应的数组对象,没有就新建一个
-                        if (!loopDirReg.test(dir.exp) && !depPare) {
-                            if (!this.directiveMap.hasOwnProperty(dir.exp)) {
-                                this.directiveMap[dir.exp] = [];
-                            }
+                        //  cEle中的firstLink是true,说明没有嵌套在r-for中
+                        if(cEle.firstLink) {
 
-                            this.directiveMap[dir.exp].push({
-                                "scope": scope,
-                                "directiveIns": directiveIns,
-                                "el": cEle.el
-                            });
+                            exp = scope.exec(finalExp);
+                            directiveIns.link(cEle.el, exp, scope);
 
-                        } else {
+                            //  判断是否已经存在该指令对应的数组对象,没有就新建一个
                             if (!this.directiveMap.hasOwnProperty(finalExp)) {
                                 this.directiveMap[finalExp] = [];
                             }
+
+                            //  缓存到相关key的数组中,便于update的时候调用
                             this.directiveMap[finalExp].push({
                                 "scope": scope,
                                 "directiveIns": directiveIns,
                                 "el": cEle.el
                             });
                         }
-
-                        //  r-for指令
-                        if (loopDirReg.test(dir.exp)) {
-                            break;
-                        }
                     }
+
                     this.eleMap[key].compiled = true;
                     this.eleMap[key].scope = scope;
                 }

@@ -16,6 +16,7 @@ require.config({
         "rFor": "src/directive/r-for",
         "rModel": "src/directive/r-model",
         "rKeyUp": "src/directive/r-keyup",
+        "dirBase": "src/directive/direcrive-base",
         "directive": "src/directive/index",
         "scope": "src/scope/index",
         "compile": "src/compile/index",
@@ -25,5 +26,5 @@ require.config({
 });
 
 requirejs.onError = function (err) {
-    console.log(err);
+    throw err;
 };

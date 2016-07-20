@@ -18,11 +18,11 @@
     var Dom = {
 
         /**
-         * 获取指定元素下所有的DOM元素
+         * 获取指定元素下所有的子元素并且转换成数组
          * @param context   指定的元素
          * @returns {*|Array.<T>}
          */
-        "getAllElements": function (context) {
+        "getAllChildElements": function (context) {
             return Tool.toArray((context || doc).getElementsByTagName("*"));
         },
 
@@ -71,18 +71,19 @@
         },
 
         /**
-         * 递归获取当前节点的父节点,直到body标签或者指定了r-controller的远古三
+         * 递归获取当前节点的父节点,直到指定的元素
          * @param el            被获取父节点的元素
+         * @param top           限制最顶层的元素
          * @param callback      获取成功对应的回调函数
          */
-        "getParent": function (el, callback) {
-            if(!el || this.getAttributes(el, "r-controller")["r-controller"]) {
+        "getParent": function (el, top, callback) {
+            if(!el) {
                 return;
             }
             var parent = el.parentNode;
             callback(parent);
-            if(this.isHTMLNode(el) && el.nodeName.toLowerCase() !== "body") {
-                this.getParent(parent, callback);
+            if(this.isHTMLNode(el) && el !== top) {
+                this.getParent(parent, top, callback);
             }
         },
 
@@ -155,7 +156,7 @@
             if (arguments.length === 2) {
                 styleObj = attr;
             } else if (arguments.length === 3) {
-                styleObj["" + attr] = value;
+                styleObj[attr] = value;
             }
             styleArr = Object.keys(styleObj).map(function (item) {
                 return item + ":" + styleObj[item];
@@ -174,7 +175,7 @@
             if (arguments.length === 2) {
                 attrObj = attr;
             } else if (arguments.length === 3) {
-                attrObj["" + attr] = value;
+                attrObj[attr] = value;
             }
             Object.keys(attrObj).forEach(function (item) {
                 el.setAttribute(item, attrObj[item]);

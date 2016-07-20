@@ -6,21 +6,18 @@
 
 (function (root, factory) {
     if (typeof define === "function" && define.amd) {
-        define(["tool", "dom"], function (Tool, Dom) {
-            return factory(root, Tool, Dom);
+        define(["tool", "dom", "dirBase"], function (Tool, Dom, dirBase) {
+            return factory(root, Tool, Dom, dirBase);
         });
     }
 
-}(window, function (root, Tool, Dom, undefined) {
+}(window, function (root, Tool, Dom, dirBase, undefined) {
 
     function RFor(dirCfg) {
-        this.dirCfg = dirCfg;
-        this.el = dirCfg.el;
+        dirBase.call(this, dirCfg);
+        this.priority = 1;
         this.parent = this.el.parentNode;
-        this.scope = dirCfg.scope;
-        this.exp = dirCfg.directives[0].exp;
-        this.directives = dirCfg.directives;
-        this.childDirMap = dirCfg.childDirMap;
+        this.childDir = dirCfg.childDir;
         return this;
     }
 
@@ -29,53 +26,44 @@
         "constructor": RFor,
 
         "link": function (el, exp, scope) {
-            this.parent.innerHTML = "";
             this.scope = this.scope || scope;
-            this.dirCfg.scope = this.scope;
-            var fragement = Dom.createFragment();
-            var directives = this.directives;
-            var children, childrenDirective, dirCfg, tDir, expArr, value;
+            this.parent.innerHTML = "";
+            if (exp && exp.length) {
+                var fragement = Dom.createFragment();
+                var directives = this.directives;
+                var el, rid, children, childEl, childDir, childDirs, tDir, expArr, value;
 
-            dirCfg = Tool.copy(this.dirCfg, true);
-
-            if (exp.length) {
+                //  遍历list
                 exp.forEach(function (inExp) {
-
-                    //  克隆当前节点
                     el = this.el.cloneNode(true);
-                    children = this.childDirMap;
-                    if (children.length) {
-                        children.forEach(function (child) {
-                            childrenDirective = child.directives;
-                            if (childrenDirective && childrenDirective.length) {
-                                childrenDirective.forEach(function (cDir) {
+                    rid = Tool.randomStr();
+                    Dom.setAttributes(el ,{
+                        "rid": rid
+                    });
+                    childDir = this.childDir;
 
-                                    console.log(cDir);
+                    if (childDir && childDir.length) {
+                        children = el.children;
 
-                                    dirCfg.exp = cDir.exp;
-                                    tDir = new cDir.directive(dirCfg);
+                        //console.log(children);
+
+                        childDir.forEach(function (dir) {
+                            childDirs = dir.directives;
+                            if (childDirs && childDir.length) {
+                                childDirs.forEach(function (cDir) {
+                                    tDir = new cDir.directive(dir);
                                     expArr = cDir.exp.split(".").slice(1);
-                                    value = dirCfg.scope.execDeep(inExp, expArr);
-
-                                    //console.log(child);
-
-                                    tDir.link(child.el, value, dirCfg.scope);
-                                });
+                                    value = scope.execDeep(inExp, expArr);
+                                    rid = Tool.randomStr();
+                                    Dom.setAttributes(tDir.el ,{
+                                        "rid": rid
+                                    });
+                                    tDir.link(tDir.el, value, this.scope);
+                                    el.appendChild(tDir.el);
+                                }, this);
                             }
-                        });
-                    } else {
-                        if (directives.length) {
-                            directives.forEach(function (dir) {
-                                //  directive中有多个,执行其他的
-                                if (dir.directive !== this.constructor) {
-                                    dirCfg.exp = dir.exp;
-                                    tDir = new dir.directive(dirCfg);
-                                    expArr = dir.exp.split(".").slice(1);
-                                    value = dirCfg.scope.execDeep(inExp, expArr);
-                                    tDir.link(el, value, dirCfg.scope);
-                                }
-                            }, this);
-                        }
+                        }, this);
+
                     }
                     fragement.appendChild(el);
                 }, this);
@@ -83,8 +71,8 @@
             }
         },
 
-        "update": function (el, exp, scope) {
-
+        "update": function (val) {
+            this.link(this.el, val, this.scope);
         }
 
     };

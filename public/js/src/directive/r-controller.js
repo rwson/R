@@ -6,17 +6,15 @@
 
 (function (root, factory) {
     if (typeof define === "function" && define.amd) {
-        define(["tool"], function (Tool) {
-            return factory(root, Tool);
+        define(["tool"], function (Tool, dirBase) {
+            return factory(root, Tool, dirBase);
         });
     }
 
-}(window, function (root, Tool, undefined) {
+}(window, function (root, Tool, dirBase, undefined) {
 
     function RController(dirCfg) {
-        this.el = dirCfg.el;
-        this.scope = dirCfg.scope;
-        this.exp = dirCfg.directives[0].exp;
+        dirBase.call(this, dirCfg);
         return this;
     }
 
