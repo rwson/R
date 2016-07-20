@@ -22,8 +22,11 @@
     //  无需编译的节点
     var unCompileElems = ["html", "head", "meta", "link", "title", "object", "embed", "script"];
 
-    //  ngFor的"xxx in yyy"类型指令值
-    var loopDir = /^\s*(.+)\s+in{1}\s+(.*?)\s*(\s+track\s+by\s+(.+)\s*)?$/;
+    //  rFor的"xxx in yyy"类型指令值
+    var loopDirReg = /^\s*(.+)\s+in{1}\s+(.*?)\s*(\s+track\s+by\s+(.+)\s*)?$/;
+
+    //  指令类型的正则
+    var dirReg = /^r\-/;
 
     /**
      * 编译模块
@@ -64,7 +67,7 @@
          */
         "update": function (key, val) {
             this.directiveMap[key].map(function (dir) {
-                dir.directiveIns.link(dir.el, val, dir.scope);
+                //dir.directiveIns.link(dir.el, val, dir.scope);
             });
         },
 
@@ -72,32 +75,80 @@
          * 获取节点,过滤掉不编译的节点
          */
         "compile": function () {
-            var eles = Tool.toArray(this.roomElement.getElementsByTagName("*"));
+            var childEles = Dom.getAllChildElements(this.roomElement);
+            this.getAllDirectives(childEles);
+        },
 
-            //  便于过滤后的节点列表
-            eles.forEach(function (el) {
-                if (!~(unCompileElems.indexOf(el.tagName.toLowerCase()))) {
-                    var rid = Tool.randomStr();
-                    var attrRid = Dom.getAttributes(el, "rid").rid;
-                    var directives = this.getDirectives(el);
-                    if (directives && directives.length) {
-                        if (!attrRid) {
-                            Dom.setAttributes({
-                                "rid": rid
-                            });
+        /**
+         * 获取所有标签上的指令
+         * @param elList    DOMList
+         * @returns {Array}
+         */
+        "getAllDirectives": function (elList) {
+            var rootEle = this.roomElement,tagName, rid, pRid, attrRid, mapInfo, directives, pEleMap, pDirectives;
+            if (!elList || !elList.length) {
+                return [];
+            }
+            elList.forEach(function (el) {
+                tagName = el.tagName.toLowerCase();
+                if (!~(unCompileElems.indexOf(tagName))) {
+                    rid = Tool.randomStr();
+                    attrRid = Dom.getAttributes(el, "rid")["rid"];
 
-                            this.eleMap[rid] = {
+                    //  之前没被编译过的元素
+                    if (!attrRid) {
+                        Dom.setAttributes(el, "rid", rid);
+
+                        //  获取标签上的指令
+                        directives = this.getDirectives(el);
+
+                        //  存储到elMap中
+                        if (directives.length) {
+                            mapInfo = {
                                 "el": el,
                                 "directives": directives
                             };
+                            this.eleMap[rid] = mapInfo;
                         }
                     }
+
+                    //  遍历当前元素所有父元素
+                    Dom.getParent(el, rootEle, function (parent) {
+                        //  获取当前元素的父元素的rid属性,再根据它获取父元素在eleMap中的指令信息
+                        pRid = Dom.getAttributes(parent, "rid")["rid"];
+                        pEleMap = this.eleMap[pRid];
+
+                        //  如果父元素上绑定了
+                        if (pEleMap) {
+                            pDirectives = pEleMap.directives;
+                            if (pDirectives && pDirectives.length) {
+                                pDirectives.forEach(function (dir) {
+                                    //  当前父元素的指令中包含"r-for='xxx in yyy[.zzz]'"这种指令
+                                    if (dir.directiveName === "RFor" && loopDirReg.test(dir.exp)) {
+
+                                        //  放到父元素的子指令中去
+                                        if (!pEleMap.childDir) {
+                                            pEleMap.childDir = [];
+                                        }
+                                        pEleMap.childDir.push(mapInfo);
+
+                                        //  配置该指令不需要第一次进行link
+                                        this.eleMap[rid].config = {
+                                            "parent": parent,
+                                            "type": "RForAttr",
+                                            "firstLink": false
+                                        };
+                                    }
+                                }.bind(this));
+                            }
+                        }
+                    }.bind(this));
                 }
             }, this);
         },
 
         /**
-         * 获取当前HTML节点上的指令
+         * 获取当前节点上的指令
          * @param el    当前节点
          */
         "getDirectives": function (el) {
@@ -105,23 +156,29 @@
                 return;
             }
 
-            var attrs = Tool.toArray(el.attributes);
-            var res = [];
-            //  将指令的r-xxx写法转换成rXxx写法
-            attrs.forEach(function (attr) {
-                var name = attr.name;
-                var exp = attr.value;
+            var tagAttrs = Tool.toArray(el.attributes),
+                res = [],
+                name,
+                exp;
 
-                name = name.replace(/[^\b-]{1,90}/g, function (word) {
-                    return word.substring(0, 1).toUpperCase() + word.substring(1).replace("-", "");
-                }).replace(/\-/g, "");
+            //  遍历所有的标签属性
+            tagAttrs.forEach(function (attr) {
 
-                if (directive.hasOwnProperty(name)) {
-                    res.push({
-                        "directive": directive[name],
-                        "priority": directive[name].priority,
-                        "exp": Tool.trim(exp)
-                    });
+                name = attr.name;
+                exp = attr.value;
+
+                //  过滤掉非"r-xxx[-yyy]"这种指令
+                if (dirReg.test(name)) {
+                    name = Tool.toCamelCase(name);
+
+                    if (directive.hasOwnProperty(name)) {
+                        res.push({
+                            "directive": directive[name],
+                            "directiveName": name,
+                            "priority": directive[name].priority,
+                            "exp": Tool.trim(exp)
+                        });
+                    }
                 }
             }, this);
 
@@ -156,17 +213,17 @@
                         finalExp = dir.exp;
 
                         //  r-for指令
-                        if (loopDir.test(dir.exp)) {
-                            var execEd = loopDir.exec(dir.exp);
+                        if (loopDirReg.test(dir.exp)) {
+                            var execEd = loopDirReg.exec(dir.exp);
                             finalExp = execEd[2];
                         }
 
                         children = Tool.toArray(cEle.el.children);
-                        if(children && children.length) {
-                            children.forEach(function(child) {
+                        if (children && children.length) {
+                            children.forEach(function (child) {
                                 var childDir = this.getDirectives(child);
-                                if(childDir && childDir.length) {
-                                    childDir.forEach(function(cDir) {
+                                if (childDir && childDir.length) {
+                                    childDir.forEach(function (cDir) {
                                         childDirMap.push(Tool.merge(Tool.copy(cEle, true), {
                                             "el": child,
                                             "directives": [cDir]
@@ -182,7 +239,7 @@
                         directiveIns.link(cEle.el, exp, scope);
 
                         //  判断是否已经存在该指令对应的数组对象,没有就新建一个
-                        if (!loopDir.test(dir.exp) && !depPare) {
+                        if (!loopDirReg.test(dir.exp) && !depPare) {
                             if (!this.directiveMap.hasOwnProperty(dir.exp)) {
                                 this.directiveMap[dir.exp] = [];
                             }
@@ -205,7 +262,7 @@
                         }
 
                         //  r-for指令
-                        if (loopDir.test(dir.exp)) {
+                        if (loopDirReg.test(dir.exp)) {
                             break;
                         }
                     }
