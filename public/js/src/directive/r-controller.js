@@ -20,6 +20,7 @@
 
     return {
         "name": "RController",
+        "type": "dom",
         "priority": 0,
         "constructor": RController
     };

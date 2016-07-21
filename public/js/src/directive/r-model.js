@@ -26,7 +26,10 @@
         "link": function (el, exp, scope) {
             //  修正scope
             this.scope = this.scope || scope;
-            el.value = exp;
+            el.value = "";
+            if(exp) {
+                el.value = exp;
+            }
             if (el.tagName.toLowerCase() === "input" && el.type === "text") {
                 Event.removeEvent(el, ["keydown", "keyup", "change"]);
                 Event.addEvent(el, "keyup", function (ev) {
@@ -46,6 +49,7 @@
 
     return {
         "name": "RModel",
+        "type": "dom",
         "priority": 2,
         "constructor": RModel
     };

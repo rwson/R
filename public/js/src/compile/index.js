@@ -72,9 +72,11 @@
             console.log("elements length:" + val.length);
             console.time("update dom");
 
-            dirMap.forEach(function (dir) {
-                dir.directiveIns.update(val);
-            });
+            if (dirMap && dirMap.length) {
+                dirMap.forEach(function (dir) {
+                    dir.directiveIns.update(val);
+                });
+            }
 
             console.timeEnd("update dom");
             console.groupEnd();
@@ -168,7 +170,7 @@
                 return;
             }
 
-            var tagAttrs = Tool.toArray(el.attributes),
+            var tagAttrs = Dom.getDOMAttrs(el),
                 res = [],
                 name, exp;
 
@@ -187,6 +189,7 @@
                             "directive": directive[name],
                             "directiveName": name,
                             "priority": directive[name].priority,
+                            "dirType": directive[name].dirType,
                             "exp": Tool.trim(exp)
                         });
                     }
@@ -233,7 +236,7 @@
                         directiveIns = new dir.directive(cEle);
 
                         //  cEle中的firstLink是true,说明没有嵌套在r-for中
-                        if(cEle.firstLink) {
+                        if (cEle.firstLink) {
 
                             exp = scope.exec(finalExp);
                             directiveIns.link(cEle.el, exp, scope);

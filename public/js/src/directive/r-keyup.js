@@ -16,6 +16,7 @@
     function RKeyUp(dirCfg) {
         dirBase.call(this, dirCfg);
         this.priority = 2;
+        this.context = root;
         return this;
     }
 
@@ -23,7 +24,7 @@
 
         "constructor": RKeyUp,
 
-        "link": function (el, exp, scope) {
+        "link": function (el, exp, scope, context) {
             //  修正scope
             this.scope = this.scope || scope;
             Event.removeEvent(el, "keyup", exp);
@@ -34,6 +35,7 @@
 
     return {
         "name": "RKeyUp",
+        "type": "event",
         "priority": 2,
         "constructor": RKeyUp
     };

@@ -40,6 +40,29 @@
         },
 
         /**
+         *
+         * 比对两个HTML节点是否相等
+         * @param node1     第一个节点
+         * @param node2     第二个节点
+         * @returns {boolean}
+         */
+        "compareNodes": function (node1, node2) {
+            var node1Clone, node2Clone;
+            if (arguments.length < 2) {
+                return false;
+            }
+            //  对两个节点的副本进行比较
+            node1Clone = node1.cloneNode(true);
+            node2Clone = node2.cloneNode(true);
+
+            //  不比较rid属性
+            this.setAttributes(node1Clone, "rid", "");
+            this.setAttributes(node2Clone, "rid", "");
+
+            return node1Clone.outerHTML === node2Clone.outerHTML;
+        },
+
+        /**
          * 创建一个dom片段
          * @returns {DocumentFragment}
          */
@@ -77,12 +100,12 @@
          * @param callback      获取成功对应的回调函数
          */
         "getParent": function (el, top, callback) {
-            if(!el) {
+            if (!el) {
                 return;
             }
             var parent = el.parentNode;
             callback(parent);
-            if(this.isHTMLNode(el) && el !== top) {
+            if (this.isHTMLNode(el) && el !== top) {
                 this.getParent(parent, top, callback);
             }
         },

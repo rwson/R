@@ -17,10 +17,13 @@
         <input type="text" r-key-up="addTodo" placeholder="请输入待办事项的标题" />
         <ul>
             <li r-for="item in list">
-                <span r-bind="item.title"></span>
-                <span r-bind="item.id"></span>
+                Todo项的标题:<span r-bind="item.title"></span>
+                ====
+                Todo项的id:<span r-bind="item.id"></span>
+                <a class="del-btn" r-click="deleteTodo">删除</a>
             </li>
         </ul>
+        <hr/>
     </div>
     <script src="/js/lib/require.min.js"></script>
     <script src="/js/config/requireConfig.js"></script>

@@ -23,16 +23,17 @@
 
         "constructor": RClick,
 
-        "link": function (el, exp, scope) {
+        "link": function (el, exp, scope, context) {
             //  修正scope
             this.scope = this.scope || scope;
             Event.removeEvent(el, "click", exp);
-            Event.addEvent(el, "click", exp);
+            Event.addEvent(el, "click", exp.bind(context));
         }
     };
 
     return {
         "name": "RClick",
+        "type": "event",
         "priority": 2,
         "constructor": RClick
     };

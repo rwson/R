@@ -10,13 +10,8 @@ define("app", ["r"], function (R) {
 
         scope.set({
             "text": "" + ((+new Date()) + Math.random()),
-            "name": "test",
-            "list": [
-                {
-                    "title": "todo1",
-                    "id": "" + ((+new Date()) + Math.random())
-                }
-            ]
+            "name": "",
+            "list": []
         });
 
         scope.defineEvents({
@@ -25,6 +20,10 @@ define("app", ["r"], function (R) {
                     "text": "" + ((+new Date()) + Math.random())
                 });
             },
+            /**
+             * 添加todo
+             * @param ev
+             */
             "addTodo": function (ev) {
                 var keyCode = ev.keyCode;
                 var title = ev.target.value.trim();
@@ -43,12 +42,22 @@ define("app", ["r"], function (R) {
                     });
                     ev.target.value = "";
                 }
+            },
+            /**
+             * 删除指定id
+             */
+            "deleteTodo": function () {
+                var id = this.id;
+                var list = scope.get("list");
+                scope.update({
+                    "list": list.filter(function (item) {
+                        return item.id !== id;
+                    })
+                });
             }
         });
 
     });
-
-    R.inject("app", ["timeout"]);
 
     R.bootstrap("#app");
 

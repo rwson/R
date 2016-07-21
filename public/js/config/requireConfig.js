@@ -24,7 +24,3 @@ require.config({
         "app": "app"
     }
 });
-
-requirejs.onError = function (err) {
-    throw err;
-};

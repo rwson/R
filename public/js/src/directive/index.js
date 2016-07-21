@@ -22,6 +22,7 @@
     argu.forEach(function (item) {
         exportObj[item["name"]] = item["constructor"];
         exportObj[item["name"]]["priority"] = item["priority"];
+        exportObj[item["name"]]["dirType"] = item["type"];
     });
 
     return exportObj;

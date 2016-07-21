@@ -26,7 +26,9 @@
         "link": function (el, exp, scope) {
             //  修正scope
             this.scope = this.scope || scope;
-            el.innerHTML = exp;
+            if(exp) {
+                el.innerHTML = exp;
+            }
         },
 
         "update": function(exp) {
@@ -37,6 +39,7 @@
 
     return {
         "name": "RBind",
+        "type": "content",
         "priority": 2,
         "constructor": RBind
     };

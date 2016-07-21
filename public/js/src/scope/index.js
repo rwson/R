@@ -60,8 +60,13 @@
          * @returns {*}
          */
         "get": function (key) {
-            //  就返回一个深拷贝对象出去,而不是返回对该对象的引用,防止在调用update方法之前已经对数据进行更新
-            return Tool.copy(this.data[key], true);
+            var target = this.data[key];
+
+            console.log("key:" + key + "  val:" + target);
+
+            //  判断是否是引用类型,引用类型就返回当前值的副本(防止在操作该值的时候提交更新值,没有调用setter)
+            //  基本类型直接返回值
+            return Tool.isReferenceType(target) ? Tool.copy(target, true) : target;
         },
 
         /**
@@ -110,7 +115,9 @@
                 exp = [exp];
             }
             exp = exp.join(".");
-            return (new Function("return this." + exp + ";").call(context));
+            if (!!exp) {
+                return (new Function("return this." + exp + ";").call(context));
+            }
         },
 
         /**
