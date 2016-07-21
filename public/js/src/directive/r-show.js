@@ -1,5 +1,5 @@
 /**
- * r-click指令
+ * r-if指令
  */
 
 "use strict";
@@ -13,29 +13,33 @@
 
 }(window, function (root, Tool, Event, dirBase, undefined) {
 
-    function RClick(dirCfg) {
+    function RShow(dirCfg) {
         dirBase.call(this, dirCfg);
-        this.priority = 3;
-        return this;
+        this.priority = 1;
     }
 
-    RClick.prototype = {
+    RShow.prototype = {
 
-        "constructor": RClick,
+        "constructor": RShow,
 
-        "link": function (el, exp, scope, context) {
-            //  修正scope
+        "link": function (el, exp, scope) {
             this.scope = this.scope || scope;
-            Event.removeEvent(el, "click", exp);
-            Event.addEvent(el, "click", exp.bind(context));
+
+        },
+
+        "update": function (exp) {
+
         }
+
     };
 
     return {
-        "name": "RClick",
-        "type": "event",
-        "priority": 3,
-        "constructor": RClick
+        "name": "RShow",
+        "type": "control",
+        "priority": 1,
+        "constructor": RShow
     };
 
 }));
+
+

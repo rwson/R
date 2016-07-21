@@ -5,30 +5,62 @@
     <link rel='stylesheet' href='/css/style.css'/>
 </head>
 <body>
-    <div id="app">
-        <p r-bind="text"></p>
+
+<div id="app">
+
+    <div r-controller="app">
+
+        <div class="component-area">
+            <p r-bind="text"></p>
+            <button r-click="clickCallback" type="button">点我啊</button>
+        </div>
+
+        <div class="component-area">
+            <input type="text" r-model="name"/>
+
+            <p r-bind="name"></p>
+
+            <input type="checkbox" r-model="checked"/>
+
+            <p>是否选中<span r-bind="checked"></span></p>
+        </div>
+
+        <div class="component-area">
+            <p>TODOList:</p>
+            <input type="text" r-key-up="addTodo" placeholder="请输入待办事项的标题"/>
+            <ul>
+                <li r-for="item in list">
+                    Todo项的标题:<span r-bind="item.title"></span>
+                    ====
+                    Todo项的id:<span r-bind="item.id"></span>
+                    <a class="del-btn" r-click="deleteTodo">删除</a>
+                </li>
+            </ul>
+        </div>
+
         <hr/>
-        <button r-click="clickCallback" type="button">点我啊</button>
-        <hr/>
-        <input type="text" r-model="name" />
-        <p r-bind="name"></p>
-        <hr/>
-        <p>TODOList:</p>
-        <input type="text" r-key-up="addTodo" placeholder="请输入待办事项的标题" />
-        <ul>
-            <li r-for="item in list">
-                Todo项的标题:<span r-bind="item.title"></span>
-                ====
-                Todo项的id:<span r-bind="item.id"></span>
-                <a class="del-btn" r-click="deleteTodo">删除</a>
-            </li>
-        </ul>
-        <hr/>
+
+        <div r-controller="app2">
+
+            <div class="component-area">
+                <p r-bind="text"></p>
+                <button r-click="clickCallback" type="button">点我啊</button>
+            </div>
+            <div class="component-area">
+                <input type="text" r-model="name"/>
+                <p r-bind="name"></p>
+            </div>
+
+        </div>
+
     </div>
-    <script src="/js/lib/require.min.js"></script>
-    <script src="/js/config/requireConfig.js"></script>
-    <script>
-        require(["app"]);
-    </script>
+</div>
+
+
+<script src="/js/lib/require.min.js"></script>
+<script src="/js/config/requireConfig.js"></script>
+<script>
+    require(["app"]);
+</script>
 </body>
 </html>

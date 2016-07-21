@@ -40,6 +40,22 @@
         },
 
         /**
+         * 根据相关controller的名称获取元素
+         * @param ctrlName  controller的名称
+         * @param context   查找的上下文对象
+         * @returns {null|HTMLDOMElement}
+         */
+        "getCtrlElement": function (ctrlName, context) {
+            if (!ctrlName) {
+                return null;
+            }
+            if(this.getAttributes(context, "r-controller")["r-controller"]) {
+                return context;
+            }
+            return (context || doc).querySelector("[r-controller='" + ctrlName + "']");
+        },
+
+        /**
          *
          * 比对两个HTML节点是否相等
          * @param node1     第一个节点
@@ -230,6 +246,24 @@
                 }
             });
             return output;
+        },
+
+        /**
+         * 判断元素是否隐藏
+         * @param el    元素
+         * @returns {boolean}
+         */
+        "isHide": function(el) {
+            return el.style.display === "none";
+        },
+
+        /**
+         * 判断一个元素是否存在
+         * @param rid   元素rid
+         * @returns {boolean}
+         */
+        "isExist": function(rid) {
+            return this.getElementByRid(rid) !== null;
         }
     };
 

@@ -62,8 +62,6 @@
         "get": function (key) {
             var target = this.data[key];
 
-            console.log("key:" + key + "  val:" + target);
-
             //  判断是否是引用类型,引用类型就返回当前值的副本(防止在操作该值的时候提交更新值,没有调用setter)
             //  基本类型直接返回值
             return Tool.isReferenceType(target) ? Tool.copy(target, true) : target;

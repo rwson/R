@@ -46,10 +46,10 @@
          * @param el    根元素选择器
          */
         "bootstrap": function (el) {
-            this.roomElement = document.querySelector(el) || document.body;         //  根元素,后面缓存绑定r-controller的元素,并且指定相关作用域
-            this.eleMap = {};                                                       //  元素map,每个元素作为el属性值存放在单独id的对象中
-            this.directiveMap = {};                                                 //  指令map,调用map的时候,根据指令绑定属性值,遍历相关对象(根据key值定位),减少循环次数
-            this.compile();
+            this.rootElement = el || document.body;     //  根元素,后面缓存绑定r-controller的元素,并且指定相关作用域
+            this.ctrlName = Dom.getAttributes(el, "r-controller")["r-controller"];
+            this.eleMap = {};                           //  元素map,每个元素作为el属性值存放在单独id的对象中
+            this.directiveMap = {};                     //  指令map,调用map的时候,根据指令绑定属性值,遍历相关对象(根据key值定位),减少循环次数
         },
 
         /**
@@ -67,27 +67,18 @@
          */
         "update": function (key, val) {
             var dirMap = this.directiveMap[key];
-
-            console.group();
-            console.log("elements length:" + val.length);
-            console.time("update dom");
-
             if (dirMap && dirMap.length) {
                 dirMap.forEach(function (dir) {
                     dir.directiveIns.update(val);
                 });
             }
-
-            console.timeEnd("update dom");
-            console.groupEnd();
-
         },
 
         /**
          * 获取节点,过滤掉不编译的节点
          */
         "compile": function () {
-            var childEles = Dom.getAllChildElements(this.roomElement);
+            var childEles = Dom.getAllChildElements(this.rootElement);
             this.getAllDirectives(childEles);
         },
 
@@ -97,7 +88,7 @@
          * @returns {Array}
          */
         "getAllDirectives": function (elList) {
-            var rootEle = this.roomElement,
+            var rootEle = this.rootElement,
                 tagName, rid, pRid, attrRid, mapInfo, directives, pEleMap, pDirectives;
             if (!elList || !elList.length) {
                 return [];
@@ -118,6 +109,7 @@
                         //  存储到elMap中
                         if (directives.length) {
                             mapInfo = {
+                                "ctrlName": this.ctrlName,
                                 "el": el,
                                 "firstLink": true,
                                 "directives": directives
@@ -211,6 +203,8 @@
          * @param scope Scope类的实例
          */
         "link": function (scope) {
+            this.compile();
+
             var ele = this.eleMap, mapKeys = Object.keys(ele),
                 cEle, directives, dir, finalExp, directiveIns, exp, execEd, childDirMap;
 

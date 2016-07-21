@@ -18,10 +18,11 @@
         /**
          * 添加事件监听
          * @param obj   HTMLDOMElement
-         * @param type  事件类型
-         * @param fn    回调函数
+         * @param type      事件类型
+         * @param fn        回调函数
+         * @param prevDef   阻止默认事件
          */
-        "addEvent": function (obj, type, fn) {
+        "addEvent": function (obj, type, fn, prevDef) {
             var types = type;
             if (Tool.isType(types, "string")) {
                 types = [type];
@@ -32,18 +33,24 @@
                     obj[type + fn] = function (ev) {
                         ev = ev || root.event;
                         obj["e" + type + fn](ev);
-                        Event.prevDefault(ev);
+                        if(prevDef) {
+                            Event.prevDefault(ev);
+                        }
                     };
                     obj.attachEvent("on" + type, function (ev) {
                         ev = ev || root.event;
                         obj[type + fn](ev);
-                        Event.prevDefault(ev);
+                        if(prevDef) {
+                            Event.prevDefault(ev);
+                        }
                     });
                 } else {
                     obj.addEventListener(type, function (ev) {
                         ev = ev || root.event;
                         fn(ev);
-                        Event.prevDefault(ev);
+                        if(prevDef) {
+                            Event.prevDefault(ev);
+                        }
                     }, false);
                 }
             });

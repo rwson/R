@@ -59,12 +59,19 @@
         },
 
         "bootstrap": function (el) {
-            this._compile = new Compile(el);
+            var ctrlName,
+                context = document.querySelector(el),
+                ctrlEle = null;
             Object.keys(_store.controllers).forEach(function (key) {
-                var CtrlObj = _store.controllers[key];
-                var Scope = new CtrlObj.scope(this._compile);
-                CtrlObj.fn(Scope);
-                Scope.link();
+                ctrlName = key.replace(_controllerSuffix, "");
+                ctrlEle = Dom.getCtrlElement(ctrlName, context);
+                if(ctrlEle) {
+                    this._compile = new Compile(ctrlEle);
+                    var CtrlObj = _store.controllers[key];
+                    var Scope = new CtrlObj.scope(this._compile);
+                    CtrlObj.fn(Scope);
+                    Scope.link(ctrlEle);
+                }
             }, this);
         },
 

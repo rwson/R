@@ -26,7 +26,7 @@
         "link": function (el, exp, scope) {
             //  修正scope
             this.scope = this.scope || scope;
-            if(exp) {
+            if(!Tool.isUndefined(exp)) {
                 el.innerHTML = exp;
             }
         },
@@ -40,7 +40,7 @@
     return {
         "name": "RBind",
         "type": "content",
-        "priority": 2,
+        "priority": 4,
         "constructor": RBind
     };
 

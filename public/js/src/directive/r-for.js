@@ -15,7 +15,7 @@
 
     function RFor(dirCfg) {
         dirBase.call(this, dirCfg);
-        this.priority = 1;
+        this.priority = 2;
         this.parent = this.el.parentNode;
         this.childDir = dirCfg.childDir;
         return this;
@@ -127,7 +127,7 @@
     return {
         "name": "RFor",
         "type": "dom",
-        "priority": 1,
+        "priority": 2,
         "constructor": RFor
     };
 

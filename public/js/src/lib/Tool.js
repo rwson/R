@@ -49,8 +49,8 @@
                                 return this[_key];
                             },
                             "set": function (val) {
-                                //  this[_key] && !Tool.isEqual(this[_key], val)代表是通过update更新的数据,而不是set新增的
-                                if ((this[_key] && !Tool.isEqual(this[_key], val))) {
+                                //  this[_key] !== undefined && !Tool.isEqual(this[_key], val)代表是通过update更新的数据,而不是set新增的
+                                if ((!Tool.isUndefined(this[_key]) && !Tool.isEqual(this[_key], val))) {
                                     Tool.isType(opt.beforeUpdate, "function") && opt.beforeUpdate.call((opt.context || this), key, val);
                                     this[_key] = val;
                                     Tool.isType(opt.update, "function") && opt.update.call((opt.context || this), key, val);
@@ -153,6 +153,15 @@
          */
         "isType": function (obj, typeStr) {
             return _class2.toString.call(obj).toLowerCase() === ("[object " + typeStr + "]").toLowerCase();
+        },
+
+        /**
+         * 判断一对象是否为undefined
+         * @param obj   被判断的对象
+         * @returns {boolean}
+         */
+        "isUndefined": function(obj) {
+            return obj === undefined;
         },
 
         /**

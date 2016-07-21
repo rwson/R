@@ -11,6 +11,7 @@ define("app", ["r"], function (R) {
         scope.set({
             "text": "" + ((+new Date()) + Math.random()),
             "name": "",
+            "checked": true,
             "list": []
         });
 
@@ -53,6 +54,22 @@ define("app", ["r"], function (R) {
                     "list": list.filter(function (item) {
                         return item.id !== id;
                     })
+                });
+            }
+        });
+
+    });
+
+    R.controller("app2", function (scope) {
+        scope.set({
+            "text": "" + ((+new Date()) + Math.random()),
+            "name": ""
+        });
+
+        scope.defineEvents({
+            "clickCallback": function () {
+                scope.update({
+                    "text": "" + ((+new Date()) + Math.random())
                 });
             }
         });

@@ -13,31 +13,31 @@
 
 }(window, function (root, Tool, Event, dirBase, undefined) {
 
-    function RKeyUp(dirCfg) {
+    function RKeyDown(dirCfg) {
         dirBase.call(this, dirCfg);
         this.priority = 3;
         this.context = root;
         return this;
     }
 
-    RKeyUp.prototype = {
+    RKeyDown.prototype = {
 
-        "constructor": RKeyUp,
+        "constructor": RKeyDown,
 
         "link": function (el, exp, scope, context) {
             //  修正scope
             this.scope = this.scope || scope;
-            Event.removeEvent(el, "keyup", exp);
-            Event.addEvent(el, "keyup", exp);
+            Event.removeEvent(el, "keydown", exp);
+            Event.addEvent(el, "keydown", exp);
         }
 
     };
 
     return {
-        "name": "RKeyUp",
+        "name": "RKeyDown",
         "type": "event",
         "priority": 3,
-        "constructor": RKeyUp
+        "constructor": RKeyDown
     };
 
 }));

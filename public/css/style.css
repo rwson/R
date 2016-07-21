@@ -7,17 +7,6 @@ a {
     color: #00B7FF;
 }
 
-.old-class {
-    border: 5px solid #ccc;
-    margin: 10px;
-}
-
-.red {
-    background: red;
-    height: 50px;
-    margin: 10px 0 0 0;
-}
-
-.green {
-    background: green;
+input {
+    width: 100%;
 }

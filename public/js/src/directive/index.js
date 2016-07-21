@@ -7,7 +7,18 @@
 
 (function (root, factory) {
     if (typeof define === "function" && define.amd) {
-        define(["rBind", "rClick", "rFor", "rModel", "rKeyUp"], function () {
+        define([
+            "rBind",
+            "rClick",
+            "rFor",
+            "rModel",
+            "rKeyUp",
+            "rKeyDown",
+            "rIf",
+            "rElse",
+            "rShow",
+            "rHide"
+        ], function () {
             var argus = [].slice.call(arguments);
             return factory.apply(root, argus);
         });
@@ -28,42 +39,4 @@
     return exportObj;
 
 }));
-
-/***
-
- priorityMap, the execute query order of directives
-
- 其中,控制
-
- this.priority = 0;
- {
-    {
-        "r-controller": {
-            "priority": 0
-        },
-        "r-for": {
-            "priority": 1
-        },
-        "r-if": {
-            "priority": 1
-        },
-        "r-show": {
-            "priority": 1
-        },
-        "r-hide": {
-            "priority": 1
-        },
-        "r-show": {
-            "priority": 1
-        },
-        "r-keyup": {
-            "priority": 2
-        },
-        "r-click": {
-            "priority": 2
-        }
-    }
- }
-
- */
 
