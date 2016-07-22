@@ -47,7 +47,6 @@
          */
         "bootstrap": function (el) {
             this.rootElement = el || document.body;     //  根元素,后面缓存绑定r-controller的元素,并且指定相关作用域
-            this.ctrlName = Dom.getAttributes(el, "r-controller")["r-controller"];
             this.eleMap = {};                           //  元素map,每个元素作为el属性值存放在单独id的对象中
             this.directiveMap = {};                     //  指令map,调用map的时候,根据指令绑定属性值,遍历相关对象(根据key值定位),减少循环次数
         },
@@ -88,20 +87,26 @@
          * @returns {Array}
          */
         "getAllDirectives": function (elList) {
+
             var rootEle = this.rootElement,
+                ctrlName = Dom.getAttributes(rootEle, "r-controller")["r-controller"],
                 tagName, rid, pRid, attrRid, mapInfo, directives, pEleMap, pDirectives;
             if (!elList || !elList.length) {
                 return [];
             }
+
             elList.forEach(function (el) {
                 tagName = el.tagName.toLowerCase();
                 if (!~(unCompileElems.indexOf(tagName))) {
+
                     rid = Tool.randomStr();
                     attrRid = Dom.getAttributes(el, "rid")["rid"];
 
                     //  之前没被编译过的元素
                     if (!attrRid) {
-                        Dom.setAttributes(el, "rid", rid);
+                        Dom.setAttributes(el, {
+                            "rid": rid
+                        });
 
                         //  获取标签上的指令
                         directives = this.getDirectives(el);

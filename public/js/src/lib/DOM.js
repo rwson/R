@@ -121,7 +121,7 @@
             }
             var parent = el.parentNode;
             callback(parent);
-            if (this.isHTMLNode(el) && el !== top) {
+            if (this.isHTMLNode(el) && this.compareNodes(top, parent)) {
                 this.getParent(parent, top, callback);
             }
         },
