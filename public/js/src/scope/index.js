@@ -23,7 +23,7 @@
      */
     function Scope(compile) {
         this.uId = Tool.randomStr();        //  单独的id
-        this.compile = compile;             //  存储compile实例,在数据set后,调用link方法
+        this.compile = compile;             //  存储compile实例
         this.data = {};                     //  数据对象
         this.events = {};                   //  事件对象
     }
@@ -62,8 +62,6 @@
         "get": function (key) {
             var target = this.data[key];
 
-            //  判断是否是引用类型,引用类型就返回当前值的副本(防止在操作该值的时候提交更新值,没有调用setter)
-            //  基本类型直接返回值
             return Tool.isReferenceType(target) ? Tool.copy(target, true) : target;
         },
 

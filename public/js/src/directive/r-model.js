@@ -57,7 +57,6 @@
                         el.checked = exp;
                     }
 
-
                     Event.removeEvent(el, "click");
                     Event.addEvent(el, "click", function () {
                         _doUpdate.call(this, el.checked, scope);
