@@ -49,7 +49,7 @@
             if (!ctrlName) {
                 return null;
             }
-            if(this.getAttributes(context, "r-controller")["r-controller"]) {
+            if (this.getAttributes(context, "r-controller")["r-controller"]) {
                 return context;
             }
             return (context || doc).querySelector("[r-controller='" + ctrlName + "']");
@@ -253,18 +253,56 @@
          * @param el    元素
          * @returns {boolean}
          */
-        "isHide": function(el) {
+        "isHide": function (el) {
             return el.style.display === "none";
         },
 
         /**
          * 判断一个元素是否存在
-         * @param rid   元素rid
+         * @param el    元素
          * @returns {boolean}
          */
-        "isExist": function(rid) {
+        "isExist": function (el) {
+            var rid;
+            if (!el) {
+                return false;
+            }
+            rid = this.getAttributes(el, ["rid"])["rid"];
             return this.getElementByRid(rid) !== null;
+        },
+
+        /**
+         * 获取当前元素在其父元素中的位置
+         * @param parent    父元素
+         * @param child     子元素
+         * @returns {number}
+         */
+        "getChildIndex": function (parent, child) {
+            var childList = Tool.toArray(parent.children);
+            var res = -1;
+            childList.forEach(function (el, index) {
+                if (this.compareNodes(el, child)) {
+                    res = index;
+                }
+            }, this);
+            return res;
+        },
+
+        /**
+         * insertAfter方法
+         * @param parent    父节点
+         * @param el        要插入的子节点
+         * @param index     插入的位置
+         */
+        "insertAfter": function (parent, el, index) {
+            var childList = parent.children;
+            if(index >= childList) {
+                parent.appendChild(el);
+            } else {
+                parent.insertBefore(el, childList.item(index));
+            }
         }
+
     };
 
     return Dom;

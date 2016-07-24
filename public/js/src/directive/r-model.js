@@ -6,17 +6,17 @@
 
 (function (root, factory) {
     if (typeof define === "function" && define.amd) {
-        define(["tool", "event", "dirBase"], function (Tool, Event, dirBase) {
-            return factory(root, Tool, Event, dirBase);
+        define(["tool", "event", "dom", "dirBase"], function (Tool, Event, Dom, dirBase) {
+            return factory(root, Tool, Event, Dom, dirBase);
         });
     }
 
-}(window, function (root, Tool, Event, dirBase, undefined) {
+}(window, function (root, Tool, Event, Dom, dirBase, undefined) {
 
     var textTypeReg = /text|password|number|tel|email|url/gi,           //  可以输入的几种文本类型
         checkTypeReg = /radio|checkbox/gi,                              //  单复选
         changeTypeReg = /^[date|month|time|week|range]/,                //  change以后的几种
-        tagName, elType, disabled;
+        tagName, elType, disabled, rid, isAvailable;
 
     function RModel(dirCfg) {
         dirBase.call(this, dirCfg);
@@ -37,8 +37,9 @@
             tagName = el.tagName.toLowerCase();
             elType = el.type;
             disabled = el.disabled;
+            isAvailable = Dom.isHide(el) || Dom.isExist(el);
 
-            if (!disabled) {
+            if (isAvailable && !disabled) {
                 if ((Tool.isEqual(tagName, "input") && (!elType || textTypeReg.test(elType)))
                     || Tool.isEqual(tagName, "textarea")) {
 

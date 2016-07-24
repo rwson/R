@@ -27,6 +27,17 @@
         </div>
 
         <div class="component-area">
+            <p>showFlag的结果为: <span r-bind="showFlag"></span></p>
+            <p r-show="showFlag">测试r-show指令(简单)</p>
+            <p r-show="showFlag == true">测试r-show指令(==)</p>
+            <p r-show="showFlag === true">测试r-show指令(===)</p>
+            <p r-show="2 === 1" r-hide="2 === 1">测试r-show(2 === 1)指令和r-hide(2 === 1)</p>
+            <p r-hide="2 <= 1">测试r-show指令(<=)</p>
+            <p r-else="showFlag">测试r-else指令(简单)</p>
+            <p r-if="2 <= 1">测试r-else指令(<=)</p>
+        </div>
+
+        <div class="component-area">
             <p>TODOList:</p>
             <input type="text" r-key-up="addTodo" placeholder="请输入待办事项的标题"/>
             <ul>

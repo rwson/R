@@ -1,5 +1,5 @@
 /**
- * r-show指令
+ * r-if指令
  */
 
 "use strict";
@@ -24,20 +24,11 @@
 
         "link": function (el, exp, scope) {
             this.scope = this.scope || scope;
-
-            if(exp) {
-                el.style.display = "block";
-            } else {
-                el.style.display = "none";
-            }
+            
         },
 
         "update": function (exp) {
-            if(exp) {
-                this.el.style.display = "block";
-            } else {
-                this.el.style.display = "none";
-            }
+
         }
 
     };

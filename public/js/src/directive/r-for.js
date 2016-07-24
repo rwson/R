@@ -114,12 +114,6 @@
 
         "update": function (val) {
             this.link(this.el, val, this.scope);
-        },
-
-        "addItem": function () {
-        },
-
-        "removeItem": function () {
         }
 
     };

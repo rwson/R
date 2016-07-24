@@ -23,9 +23,21 @@
         "constructor": RHide,
 
         "link": function(el, exp, scope) {
+
+            if(exp) {
+                el.style.display = "none";
+            } else {
+                el.style.display = "block";
+            }
         },
 
         "update": function(exp) {
+
+            if(exp) {
+                this.el.style.display = "none";
+            } else {
+                this.el.style.display = "block";
+            }
         }
 
     };

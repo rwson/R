@@ -12,12 +12,14 @@ define("app", ["r"], function (R) {
             "text": "" + ((+new Date()) + Math.random()),
             "name": "",
             "checked": true,
+            "showFlag": true,
             "list": []
         });
 
         scope.defineEvents({
             "clickCallback": function () {
                 scope.update({
+                    "showFlag": !scope.get("showFlag"),
                     "text": "" + ((+new Date()) + Math.random())
                 });
             },

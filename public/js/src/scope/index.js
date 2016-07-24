@@ -106,13 +106,11 @@
          * @returns {*}
          */
         "execDeep": function (context, expArr) {
-            var exp = expArr;
-            if (!Tool.isType(exp, "array")) {
-                exp = [exp];
+            if (!Tool.isType(expArr, "array")) {
+                expArr = [expArr];
             }
-            exp = exp.join(".");
-            if (!!exp) {
-                return (new Function("return this." + exp + ";").call(context));
+            if (!!expArr) {
+                return Tool.buildFunction("return this." + expArr.join(".") + ";", context);
             }
         },
 

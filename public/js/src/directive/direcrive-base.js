@@ -1,17 +1,17 @@
 /**
- * 指令基类,提供属性(方法)给各指令继承/重写
+ * 指令基类,子类只继承构造函数
  */
 
 "use strict";
 
 (function (root, factory) {
     if (typeof define === "function" && define.amd) {
-        define([], function () {
-            return factory(root);
+        define(["dom"], function (Dom) {
+            return factory(root, Dom);
         });
     }
 
-}(window, function (root, undefined) {
+}(window, function (root, Dom, undefined) {
 
     /**
      * 指令基类
@@ -21,9 +21,12 @@
     function DirectiveBase(dir) {
         this.priority = dir.priority;
         this.el = dir.el;
+        this.parentNode = this.el.parentNode;
         this.directives = dir.directives;
         this.scope = dir.scope;
         this.exp = dir.directives[0].exp;
+        this.rid = Dom.getAttributes(this.el, ["rid"])["rid"];
+        this.pPid = Dom.getAttributes(this.parentNode, ["rid"])["rid"];
     }
 
     return DirectiveBase;

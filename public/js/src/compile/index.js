@@ -25,6 +25,12 @@
     //  rFor的"xxx in yyy"类型指令值
     var loopDirReg = /^\s*(.+)\s+in{1}\s+(.*?)\s*(\s+track\s+by\s+(.+)\s*)?$/;
 
+    //  常用的条件语句类型
+    var equalDirReg = /\s+(==|===|>|>=|<|<=|!=|!==)\s+/;
+
+    //  提取条件语句中的条件
+    var equalReg = /(==|===|>|>=|<|<=|!=|!==)/;
+
     //  指令类型的正则
     var dirReg = /^r\-/;
 
@@ -163,13 +169,13 @@
          * @param el    当前节点
          */
         "getDirectives": function (el) {
-            if (!Dom.isHTMLNode(el)) {
-                return;
-            }
-
             var tagAttrs = Dom.getDOMAttrs(el),
                 res = [],
                 name, exp;
+
+            if (!Dom.isHTMLNode(el)) {
+                return;
+            }
 
             //  遍历所有的标签属性
             tagAttrs.forEach(function (attr) {
@@ -211,7 +217,7 @@
             this.compile();
 
             var ele = this.eleMap, mapKeys = Object.keys(ele),
-                cEle, directives, dir, finalExp, directiveIns, exp, execEd, childDirMap;
+                cEle, directives, dir, finalExp, directiveIns, exp, execEd, childDirMap, splitDir, equalType;
 
             mapKeys.forEach(function (key) {
                 childDirMap = [];
@@ -232,12 +238,26 @@
                             finalExp = execEd[2];
                         }
 
+                        //  表达式的值为判断
+                        if (equalDirReg.test(finalExp)) {
+                            equalType = equalDirReg.exec(finalExp)[0];
+                            splitDir = finalExp.split(equalReg);
+                            finalExp = Tool.trim(splitDir[0]);
+                        }
+
                         directiveIns = new dir.directive(cEle);
+
+                        exp = scope.exec(finalExp);
 
                         //  cEle中的firstLink是true,说明没有嵌套在r-for中
                         if (cEle.firstLink) {
 
-                            exp = scope.exec(finalExp);
+                            //  表达式的值为判断
+                            if (equalDirReg.test(dir.exp)) {
+                                splitDir[0] = exp ? "" + exp : finalExp;
+                                exp = Tool.buildFunction("return " + splitDir.join("") + ";");
+                            }
+
                             directiveIns.link(cEle.el, exp, scope);
 
                             //  判断是否已经存在该指令对应的数组对象,没有就新建一个

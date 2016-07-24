@@ -160,7 +160,7 @@
          * @param obj   被判断的对象
          * @returns {boolean}
          */
-        "isUndefined": function(obj) {
+        "isUndefined": function (obj) {
             return obj === undefined;
         },
 
@@ -169,7 +169,7 @@
          * @param obj   被判断的对象
          * @returns {boolean}
          */
-        "isReferenceType": function(obj) {
+        "isReferenceType": function (obj) {
             return this.isType(obj, "Object") || this.isType(obj, "Array");
         },
 
@@ -276,6 +276,23 @@
             if (Tool.isType(fn, "Function")) {
                 return fn.apply(root, args);
             }
+        },
+
+        /**
+         * 返回一个函数执行的后的结果
+         * @param body      函数体
+         * @param context   作用域
+         * @param argus     参数列表
+         * @returns {*}
+         */
+        "buildFunction": function (body, context, argus) {
+            if(!arguments.length) {
+                return false;
+            }
+            if (arguments.length > 3) {
+                argus = [].slice.call(arguments, 2);
+            }
+            return new Function(body).apply(context, argus);
         },
 
         /**

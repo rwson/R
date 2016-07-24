@@ -3,10 +3,37 @@ body {
     font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
 }
 
+* {
+    padding: 0;
+    margin: 0;
+}
+
 a {
     color: #00B7FF;
 }
 
 input {
     width: 100%;
+}
+
+.page-info {
+    border-bottom: 1px solid #ddd;
+    padding: 0 0 5px 0;
+    margin: 0 0 15px 0;
+}
+
+.component-area {
+    border: 1px solid #ddd;
+    padding: 5px;
+    margin: 10px 0;
+}
+
+.component-area * {
+    width: auto;
+    margin: 5px 0;
+}
+
+.controller-name {
+    font-size: 16px;
+    font-weight: normal;
 }
