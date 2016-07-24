@@ -6,7 +6,7 @@
 
 (function (root, factory) {
     if (typeof define === "function" && define.amd) {
-        define(["tool", "dirBase"], function (Tool, dirBase) {
+        define(["tool"], function (Tool, dirBase) {
             return factory(root, Tool, dirBase);
         });
     }

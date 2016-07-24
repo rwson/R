@@ -27,14 +27,15 @@
         </div>
 
         <div class="component-area">
+            <p r-else="showFlag">r-else指令顺序(r-else="showFlag")</p>
             <p>showFlag的结果为: <span r-bind="showFlag"></span></p>
-            <p r-show="showFlag">测试r-show指令(简单)</p>
-            <p r-show="showFlag == true">测试r-show指令(==)</p>
-            <p r-show="showFlag === true">测试r-show指令(===)</p>
-            <p r-show="2 === 1" r-hide="2 === 1">测试r-show(2 === 1)指令和r-hide(2 === 1)</p>
-            <p r-hide="2 <= 1">测试r-show指令(<=)</p>
-            <p r-else="showFlag">测试r-else指令(简单)</p>
-            <p r-if="2 <= 1">测试r-else指令(<=)</p>
+            <p r-show="showFlag">r-show指令(r-show="showFlag")</p>
+            <p r-show="showFlag == true">r-show指令(r-show="showFlag == true")</p>
+            <p r-show="showFlag === true">r-show指令( r-show="showFlag === true")</p>
+            <p r-show="2 === 1" r-hide="2 === 1">r-show(r-show="2 === 1")指令和r-hide(r-hide="2 === 1")</p>
+            <p r-hide="2 <= 1">r-show指令(r-hide="2 <= 1")</p>
+            <p r-else="showFlag">r-else指令(r-else="showFlag")</p>
+            <p r-if="2 >= 1">r-if指令(r-if="2 >= 1")</p>
         </div>
 
         <div class="component-area">

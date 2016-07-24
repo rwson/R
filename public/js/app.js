@@ -78,6 +78,46 @@ define("app", ["r"], function (R) {
 
     });
 
+    R.controller("indexCtrl", function (scope) {
+        alert("indexCtrl");
+    });
+
+    R.controller("listCtrl", function (scope) {
+        alert("listCtrl");
+    });
+
+    R.controller("detailCtrl", function (scope) {
+        alert("detailCtrl");
+    });
+
+    var routeConfig = {
+        "path": {
+            "/": {
+                "tplPath": "/tpl/index2.html",
+                "controller": "indexCtrl"
+            },
+            "/list": {
+                "tplPath": "/tpl/list.html",
+                "controller": "listCtrl"
+            },
+            "/list/:page": {
+                "tplPath": "/tpl/list.html",
+                "controller": "listCtrl"
+            },
+            "/detail": {
+                "tplPath": "/tpl/detail.html",
+                "controller": "detailCtrl"
+            },
+            "/detail/:id": {
+                "tplPath": "/tpl/detail.html",
+                "controller": "detailCtrl"
+            }
+        },
+        "pushState": true
+    };
+
+    R.config(routeConfig);
+
     R.bootstrap("#app");
 
 });

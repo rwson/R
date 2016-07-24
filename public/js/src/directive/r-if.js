@@ -16,6 +16,7 @@
     function RIf(dirCfg) {
         dirBase.call(this, dirCfg);
         this.priority = 1;
+        this.index = Dom.getChildIndex(this.parentNode, this.el);
     }
 
     RIf.prototype = {
@@ -24,7 +25,7 @@
 
         "link": function (el, exp, scope) {
             this.parentNode.removeChild(el);
-            if (!exp) {
+            if (exp) {
                 var node = this.el.cloneNode(true);
                 Dom.insertAfter(this.parentNode, node, this.index);
                 this.rid = Dom.getAttributes(node, ["rid"])["rid"];
@@ -38,7 +39,7 @@
             if (node && Dom.getChildIndex(this.parentNode, node) !== -1) {
                 this.parentNode.removeChild(node);
             }
-            if (!exp) {
+            if (exp) {
                 Dom.insertAfter(this.parentNode, nodeClone, this.index);
                 this.rid = Dom.getAttributes(nodeClone, ["rid"])["rid"];
                 this.el = nodeClone;

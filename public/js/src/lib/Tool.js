@@ -87,6 +87,7 @@
          * @returns {hash: "", path: ""}
          */
         "getHashOrState": function (rootPath) {
+            rootPath = rootPath || "/";
             var path = decodeURIComponent(location.pathname + Tool.getSearch());
             var hash = location.href.match(/#(.*)$/);
             var output = {};
