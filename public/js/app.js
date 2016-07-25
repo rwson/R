@@ -6,7 +6,17 @@
 
 define("app", ["r"], function (R) {
 
-    R.controller("app", function (scope) {
+    R.provider("testProvider", function () {
+        return {
+            "name": "小宋",
+            "age": 24
+        };
+    });
+
+    //  首页控制器
+    R.controller("indexCtrl", function (scope, pageParams, testProvider) {
+
+        console.log(testProvider);
 
         scope.set({
             "text": "" + ((+new Date()) + Math.random()),
@@ -59,41 +69,48 @@ define("app", ["r"], function (R) {
                 });
             }
         });
-
     });
+    R.inject("indexCtrl", ["pageParams", "testProvider"]);
 
-    R.controller("app2", function (scope) {
+    //  列表页控制器
+    R.controller("listCtrl", function (scope, pageParams) {
         scope.set({
-            "text": "" + ((+new Date()) + Math.random()),
-            "name": ""
+            "list": []
         });
-
-        scope.defineEvents({
-            "clickCallback": function () {
+        _request("/list/articles", function (res) {
+            if (res.status) {
                 scope.update({
-                    "text": "" + ((+new Date()) + Math.random())
+                    "list": res.data
                 });
             }
+        }, function (ex) {
+
         });
-
     });
+    R.inject("listCtrl", ["pageParams"]);
 
-    R.controller("indexCtrl", function (scope) {
-        alert("indexCtrl");
-    });
+    //  详情页控制器
+    R.controller("detailCtrl", function (scope, pageParams) {
 
-    R.controller("listCtrl", function (scope) {
-        alert("listCtrl");
-    });
+        console.log(pageParams);
 
-    R.controller("detailCtrl", function (scope) {
-        alert("detailCtrl");
+        scope.set({
+            "title": "",
+            "content": ""
+        });
+        _request("/detail/content", function (res) {
+            if (res.status) {
+                scope.update(res.data);
+            }
+        }, function (ex) {
+        });
     });
+    R.inject("detailCtrl", ["pageParams"]);
 
     var routeConfig = {
         "path": {
             "/": {
-                "tplPath": "/tpl/index2.html",
+                "tplPath": "/tpl/index.html",
                 "controller": "indexCtrl"
             },
             "/list": {
@@ -119,5 +136,38 @@ define("app", ["r"], function (R) {
     R.config(routeConfig);
 
     R.bootstrap("#app");
+
+    /**
+     * 发起get请求
+     * @param url       请求路径
+     * @param success   成功回调
+     * @param error     失败回调
+     * @private
+     */
+    function _request(url, success, error) {
+        var xhr = new XMLHttpRequest(),
+            res;
+
+        xhr.withCredentials = true;
+        xhr.open("GET", url, true);
+        xhr.setRequestHeader("Content-type", "application/json");
+        xhr.send(null);
+        xhr.onreadystatechange = function () {
+
+            try {
+                res = JSON.parse(xhr.response);
+            } catch (ex) {
+                res = eval(xhr.response);
+            }
+
+            if (xhr.readyState === 4) {
+                if ((xhr.status >= 200 && xhr.status < 300) || xhr.status == 304) {
+                    success(res);
+                } else {
+                    error(xhr);
+                }
+            }
+        };
+    }
 
 });

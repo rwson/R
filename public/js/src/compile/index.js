@@ -129,8 +129,16 @@
                         }
                     }
 
+                    //console.group("递归获取元素的父元素");
+                    //console.log("当前元素");
+                    //console.log(el);
+
                     //  遍历当前元素所有父元素
                     Dom.getParent(el, rootEle, function (parent) {
+
+                        //console.log("取到一个父元素...");
+                        //console.log(parent);
+
                         //  获取当前元素的父元素的rid属性,再根据它获取父元素在eleMap中的指令信息
                         pRid = Dom.getAttributes(parent, "rid")["rid"];
                         pEleMap = this.eleMap[pRid];
@@ -160,6 +168,8 @@
                             }
                         }
                     }.bind(this));
+
+                    //console.groupEnd();
                 }
             }, this);
         },
@@ -193,7 +203,8 @@
                             "directiveName": name,
                             "priority": directive[name].priority,
                             "dirType": directive[name].dirType,
-                            "exp": Tool.trim(exp)
+                            "exp": Tool.trim(exp),
+                            "el": el
                         });
                     }
                 }

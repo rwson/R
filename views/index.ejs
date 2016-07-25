@@ -8,65 +8,6 @@
 
 <div id="app">
 
-    <h1>app controller</h1>
-    <div r-controller="app">
-
-        <div class="component-area">
-            <p r-bind="text"></p>
-            <button r-click="clickCallback" type="button">点我啊</button>
-        </div>
-
-        <div class="component-area">
-            <input type="text" r-model="name"/>
-
-            <p r-bind="name"></p>
-
-            <input type="checkbox" r-model="checked"/>
-
-            <p>是否选中<span r-bind="checked"></span></p>
-        </div>
-
-        <div class="component-area">
-            <p r-else="showFlag">r-else指令顺序(r-else="showFlag")</p>
-            <p>showFlag的结果为: <span r-bind="showFlag"></span></p>
-            <p r-show="showFlag">r-show指令(r-show="showFlag")</p>
-            <p r-show="showFlag == true">r-show指令(r-show="showFlag == true")</p>
-            <p r-show="showFlag === true">r-show指令( r-show="showFlag === true")</p>
-            <p r-show="2 === 1" r-hide="2 === 1">r-show(r-show="2 === 1")指令和r-hide(r-hide="2 === 1")</p>
-            <p r-hide="2 <= 1">r-show指令(r-hide="2 <= 1")</p>
-            <p r-else="showFlag">r-else指令(r-else="showFlag")</p>
-            <p r-if="2 >= 1">r-if指令(r-if="2 >= 1")</p>
-        </div>
-
-        <div class="component-area">
-            <p>TODOList:</p>
-            <input type="text" r-key-up="addTodo" placeholder="请输入待办事项的标题"/>
-            <ul>
-                <li r-for="item in list">
-                    Todo项的标题:<span r-bind="item.title"></span>
-                    ====
-                    Todo项的id:<span r-bind="item.id"></span>
-                    <a class="del-btn" r-click="deleteTodo">删除</a>
-                </li>
-            </ul>
-        </div>
-    </div>
-
-    <hr/>
-
-    <h1>app2 controller</h1>
-    <div r-controller="app2">
-        <div class="component-area">
-            <p r-bind="text"></p>
-            <button r-click="clickCallback" type="button">点我啊</button>
-        </div>
-        <div class="component-area">
-            <input type="text" r-model="name"/>
-            <p r-bind="name"></p>
-        </div>
-
-    </div>
-
 </div>
 
 

@@ -31,7 +31,7 @@
             if (exp && exp.length) {
                 var fragement = Dom.createFragment();
                 var directives = this.directives;
-                var elCloned, rid, children, childEl, dirChildEl, childDir, childDirs, tDir, expArr, value, loopI, loopLen, loopChild;
+                var elCloned, rid, children, childEl, childDir, childDirs, tDir, expArr, value, loopParent;
 
                 //  遍历list数据
                 exp.forEach(function (inExp) {
@@ -44,9 +44,6 @@
                     });
                     children = elCloned.children;
 
-                    //  子元素长度,可以不用修改
-                    loopLen = children.length;
-
                     //  子集元素指令
                     childDir = this.childDir;
 
@@ -58,27 +55,26 @@
 
                             //  当前子元素的指令
                             childDirs = dir.directives;
+
                             if (childDirs && childDir.length) {
 
                                 //  遍历当前子元素的指令
                                 childDirs.forEach(function (cDir) {
 
-                                    //  循环索引
-                                    loopI = 0;
-
                                     //  同样保存当前子元素的一个副本
                                     childEl = dir.el.cloneNode(true);
 
-                                    //  再遍历一次子元素
-                                    for (; loopI < loopLen; loopI++) {
-                                        loopChild = children[loopI];
-
-                                        //  逐个比对
-                                        if (Dom.compareNodes(loopChild, childEl)) {
+                                    //  遍历子节点
+                                    Dom.loopChild(elCloned, function (child, lowest) {
+                                        if (Dom.compareNodes(child, childEl)) {
                                             rid = Tool.randomStr();
-                                            Dom.setAttributes(childEl, {
+
+                                            //  重新给相关子元素设置rid属性
+                                            Dom.setAttributes(child, {
                                                 "rid": rid
                                             });
+
+                                            loopParent = child.parentNode;
 
                                             //  实例化指令
                                             tDir = new cDir.directive(dir);
@@ -89,16 +85,44 @@
 
                                             //  判断当前指令类型,事件类型就修改回调函数里面this指向
                                             if (cDir.dirType === "event") {
-                                                tDir.link(childEl, value, this.scope, inExp);
+                                                tDir.link(child, value, this.scope, inExp);
                                             } else {
-                                                tDir.link(childEl, value, this.scope);
+                                                tDir.link(child, value, this.scope);
                                             }
-
-                                            //  替换循环标签中相关
-                                            elCloned.replaceChild(childEl, children.item(loopI));
-                                            break;
+                                            loopParent.replaceChild(child, child);
                                         }
-                                    }
+                                    }, this);
+
+                                    //  再遍历一次子元素
+                                    //for (; loopI < loopLen; loopI++) {
+                                    //    loopChild = children[loopI];
+                                    //
+                                    //  逐个比对
+                                    //if (Dom.compareNodes(loopChild, childEl)) {
+                                    //    rid = Tool.randomStr();
+                                    //    Dom.setAttributes(childEl, {
+                                    //        "rid": rid
+                                    //    });
+                                    //
+                                    //    //  实例化指令
+                                    //    tDir = new cDir.directive(dir);
+                                    //
+                                    //    //  取得指令绑定是属性值
+                                    //    expArr = cDir.exp.split(".").slice(1);
+                                    //    value = scope.exec(cDir.exp) || scope.execDeep(inExp, expArr);
+                                    //
+                                    //    //  判断当前指令类型,事件类型就修改回调函数里面this指向
+                                    //    if (cDir.dirType === "event") {
+                                    //        tDir.link(childEl, value, this.scope, inExp);
+                                    //    } else {
+                                    //        tDir.link(childEl, value, this.scope);
+                                    //    }
+
+                                    //  替换循环标签中相关
+                                    //elCloned.replaceChild(childEl, children.item(loopI));
+                                    //        break;
+                                    //    }
+                                    //}
                                 }, this);
                             }
                         }, this);
@@ -115,7 +139,6 @@
         "update": function (val) {
             this.link(this.el, val, this.scope);
         }
-
     };
 
     return {

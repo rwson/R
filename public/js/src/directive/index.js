@@ -9,6 +9,7 @@
     if (typeof define === "function" && define.amd) {
         define([
             "rBind",
+            "RHref",
             "rClick",
             "rFor",
             "rModel",

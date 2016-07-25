@@ -121,8 +121,31 @@
             }
             var parent = el.parentNode;
             callback(parent);
-            if (this.isHTMLNode(el) && this.compareNodes(top, parent)) {
+            if (this.isHTMLNode(el) && !this.compareNodes(top, parent)) {
                 this.getParent(parent, top, callback);
+            }
+        },
+
+        /**
+         * 递归遍历一个树子元素
+         * @param node      根节点
+         * @param callback  回调函数
+         * @param context   回调函数里面this指向
+         */
+        "loopChild": function (node, callback, context) {
+            context = context || root;
+            var child = node.children, isLowest, grandChild, loopI, loopLen;
+            if (child.length) {
+                loopI = 0;
+                loopLen = child.length;
+                for (; loopI < loopLen; loopI++) {
+                    grandChild = child.item(loopI).children;
+                    isLowest = grandChild.length === 0;
+                    callback.call(context, child.item(loopI), isLowest);
+                    if (!isLowest) {
+                        this.loopChild(child.item(loopI), callback, context);
+                    }
+                }
             }
         },
 
@@ -296,7 +319,7 @@
          */
         "insertAfter": function (parent, el, index) {
             var childList = parent.children;
-            if(index >= childList) {
+            if (index >= childList) {
                 parent.appendChild(el);
             } else {
                 parent.insertBefore(el, childList.item(index));

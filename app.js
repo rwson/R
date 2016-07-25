@@ -15,7 +15,39 @@ app.use(bodyParser.urlencoded({extended: false}));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-//  分管个页面路由
+
+//  模拟文章列表请求
+app.get("/list/articles", function (req, res, next) {
+    res.json({
+        "status": 1,
+        "data": [
+            {
+                "title": "详情链接",
+                "link": "/detail"
+            },
+            {
+                "title": "详情链接带path参数",
+                "link": "/detail/12345"
+            },
+            {
+                "title": "详情链接带urlQueryString",
+                "link": "/detail?id=12345"
+            }
+        ]
+    });
+});
+
+//  模拟文章详情请求
+app.get("/detail/content", function (req, res, next) {
+    res.json({
+        "status": 1,
+        "data": {
+            "title": "我是详情标题",
+            "content": "我是详情内容!"
+        }
+    });
+});
+
 app.use("/", function (req, res, next) {
     res.render("index");
 });

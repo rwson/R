@@ -287,7 +287,7 @@
          * @returns {*}
          */
         "buildFunction": function (body, context, argus) {
-            if(!arguments.length) {
+            if (!arguments.length) {
                 return false;
             }
             if (arguments.length > 3) {
@@ -311,7 +311,7 @@
                     if ((xhr.status >= 200 && xhr.status < 300) || xhr.status == 304) {
                         Tool.executeCallback(opts.success, (opts.context || root), xhr);
                     } else {
-                        Tool.executeCallback(opts.fail, (opts.context || root), xhr);
+                        Tool.executeCallback(opts.error, (opts.context || root), xhr);
                     }
                 }
             };

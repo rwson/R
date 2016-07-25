@@ -14,6 +14,7 @@ require.config({
 
         "rClick": "src/directive/r-click",
         "rBind": "src/directive/r-bind",
+        "RHref": "src/directive/r-href",
         "rFor": "src/directive/r-for",
         "rModel": "src/directive/r-model",
         "rKeyUp": "src/directive/r-keyup",
