@@ -128,13 +128,14 @@
 
             //  请求模板路径
             this.requestTemplate(curCfgObj.tplPath, function (ctx, res) {
-
                 cfg.root.innerHTML = "";
 
                 //  创建fragement
                 framement = Dom.createFragment();
                 divNode = document.createElement("div");
-                divNode.innerHTML = res.responseText;
+                divNode.classList.add("ctrl-ele");
+
+                divNode.innerHTML = Tool.trim(res.response);
 
                 //  依次作为子节点添加
                 framement.appendChild(divNode);
@@ -219,7 +220,7 @@
 
                 for (; loopI < loopLen; loopI++) {
                     child = pathEs[loopI];
-                    if(Dom.isHTMLNode(child)) {
+                    if (Dom.isHTMLNode(child)) {
                         path = Dom.getAttributes(child, ["href"]).href;
                         tagName = child.tagName.toLowerCase();
 
@@ -321,11 +322,8 @@
             _route.finalCfg.root = context;
 
             _route.navigate(function (ctrlEle, cfgObj) {
-
                 this.initScope(ctrlEle, cfgObj);
-
                 _route.initEvents(this.initScope.bind(this));
-
             }.bind(this));
 
         },
