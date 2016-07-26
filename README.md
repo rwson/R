@@ -25,7 +25,11 @@ Demo是一个极简SPA应用
         
     });
     
-通过R.controller(name, fn);声明一个Controller
+通过
+
+    R.controller(name, fn);
+    
+声明一个Controller
         
 在Controller中通过
 
@@ -82,7 +86,7 @@ Controller添加依赖注入(添加provider)
 
 通过
         
-            R.inject(controllerName, dependens);
+    R.inject(controllerName, dependens);
             
 将已经声明的Provider添加到对应的Controller中
 
