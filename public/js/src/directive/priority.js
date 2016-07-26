@@ -14,15 +14,7 @@
 }(window, function (root, Tool, dirBase, undefined) {
 
     return {
-        "RClick": {
-            "priority": 3
-        },
-        "RElse": {
-            "priority": 1
-        },
-        "RBind": {
-            "priority": 4
-        }
+
     };
 
 }));

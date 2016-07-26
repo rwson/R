@@ -20,7 +20,6 @@
 
     function RModel(dirCfg) {
         dirBase.call(this, dirCfg);
-        this.priority = 4;
         return this;
     }
 
@@ -97,7 +96,6 @@
     return {
         "name": "RModel",
         "type": "dom",
-        "priority": 4,
         "constructor": RModel
     };
 

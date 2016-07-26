@@ -45,8 +45,9 @@
         //  默认配置
         "cfg": {
             "path": {},         //  Object,由path("/","/list"...)做key,value对应一个Object,包含tplPath,controller两个属性
-            "pushState": true,      //  是否支持HTML5的pushState,传入false,即采用hash解决方案
-            "default": "/"          //  首页
+            "pushState": true,  //  是否支持HTML5的pushState,传入false,即采用hash解决方案
+            "default": "/",     //  首页
+            "root": null        //  根元素
         },
 
         //  最后的配置参数
@@ -64,8 +65,11 @@
          */
         "getCurrent": function (path) {
             var route = this.finalCfg.path,
+                keys = Object.keys(route),
                 fPath = path,
-                tPath, output;
+                loopI = 0,
+                loopLen = keys.length,
+                loopKey, cfgObj, output, urlSplits, cfgSplits;
 
             this.pageParams = {};
 
@@ -75,43 +79,89 @@
                 fPath = fPath.split("?")[0];
             }
 
-            if (Tool.isType(route, "Object")) {
-                Object.keys(route).forEach(function (item) {
-                    tPath = route[item]["path"];
-                    if (Tool.isType(tPath, "String") && fPath === item) {
-                        output = route[item];
-                    } else if (Tool.isType(tPath, "Regexp") && tPath.test(fPath)) {
-                        output = Tool.merge(route[item], {
-                            "path": fPath
-                        }, true);
-                    }
-                });
+            for (; loopI < loopLen; loopI++) {
+                loopKey = keys[loopI];
+                cfgObj = route[loopKey];
+
+                if (Tool.isType(cfgObj.path, "String") && Tool.isUndefined(cfgObj.regex) && Tool.isEqual(cfgObj.path, fPath)) {
+                    output = route[loopKey];
+                    loopI = 0;
+                    break;
+                } else if (Tool.isType(cfgObj.path, "Regexp") && cfgObj.regex.test(fPath)) {
+                    output = route[loopKey];
+                    loopI = 0;
+                    break;
+                }
             }
+
             //  url中带参数配置项
             if (output && output.regex) {
-                var urlSplits = fPath.split("/");
-                var cfgSplits = output.config.split("/");
+                urlSplits = fPath.split("/");
+                cfgSplits = output.config.split("/");
+
                 cfgSplits.forEach(function (item, index) {
                     if (("" + item).indexOf(":") > -1) {
                         if (!this.pageParams.path) {
                             this.pageParams.path = {};
                         }
-                        this.pageParams.path[("" + item).replace(":", "")] = urlSplits[index];
+                        this.pageParams.path[item.replace(":", "")] = urlSplits[index];
                     }
                 }, this);
             }
             return output;
         },
 
-        "navigate": function () {
-            var cfg = this.finalCfg;
-            var path = cfg.default;
-            var cPath = Tool.getHashOrState(cfg.default || "/").path;
-            if (cPath) {
-                path = cPath;
+        /**
+         * 点击有效a标签或者pushState后的回调
+         * @param callback  成功后的回调
+         */
+        "navigate": function (callback) {
+            var cfg = this.finalCfg,
+                cPath = Tool.getHashOrState(cfg.default || "/"),
+                path = cfg.pushState ? cPath.path : cPath.hash,
+                curCfgObj = this.getCurrent(path),
+                framement, divNode;
+
+            if (!curCfgObj) {
+                return;
             }
-            this.navigate(path);
-            this.initEvents();
+
+            //  请求模板路径
+            this.requestTemplate(curCfgObj.tplPath, function (ctx, res) {
+
+                cfg.root.innerHTML = "";
+
+                //  创建fragement
+                framement = Dom.createFragment();
+                divNode = document.createElement("div");
+                divNode.innerHTML = res.responseText;
+
+                //  依次作为子节点添加
+                framement.appendChild(divNode);
+                cfg.root.appendChild(framement);
+
+                callback(divNode, curCfgObj);
+            }, function (ctx, ex) {
+                if (ex.status === 404) {
+                    Tool.exception("the template path '" + curCfgObj.tplPath + "' could not be load!");
+                }
+            });
+        },
+
+        /**
+         * 根据配置的路径获取模板
+         * @param url       模板路径
+         * @param success   成功回调
+         * @param error     失败回调
+         * @param context   回调函数里的this指向
+         */
+        "requestTemplate": function (url, success, error, context) {
+            Tool.getRequest({
+                "url": url,
+                "context": (context || this),
+                "success": success,
+                "error": error
+            });
         },
 
         /**
@@ -119,7 +169,6 @@
          * @param opt   配置
          */
         "config": function (opt) {
-
             var finalCfg = Tool.merge(_route.cfg, opt, true),       //  合并传入的参数和原来的默认配置                                           //
                 cfgObj = {},                                        //  用来缓存Object方式配置路由的数据
                 toMerge = {},                                       //  原来的正则表达式对象和新的属性合并
@@ -153,33 +202,51 @@
         /**
          * 初始化事件(有效a标签的click事件,浏览器的前进后退)
          */
-        "initEvents": function () {
-            var cfg = this.finalCfg, path;
+        "initEvents": function (callback) {
+            var cfg = this.finalCfg,
+                path, target, tagName, pathEs, loopI, loopLen, child;
 
-            //  document代理a标签的点击事件
+            //  所有a标签的点击事件
+
             Event.delegatEvent(document, ["click"], function (ev) {
                 ev = ev || event;
-                var target = ev.target;
-                path = target.getAttribute("href");
-                return target.tagName.toLowerCase() === "a" && path;
-            }, function () {
-                this.navigate(path);
+                target = ev.target;
+
+                pathEs = ev.path;
+
+                loopI = 0;
+                loopLen = pathEs.length;
+
+                for (; loopI < loopLen; loopI++) {
+                    child = pathEs[loopI];
+                    if(Dom.isHTMLNode(child)) {
+                        path = Dom.getAttributes(child, ["href"]).href;
+                        tagName = child.tagName.toLowerCase();
+
+                        if (tagName === "a" && path) {
+                            history.pushState({}, "", path);
+                            this.navigate(callback);
+                            break;
+                        }
+                    }
+                }
+
+                Event.prevDefault(ev);
             }.bind(this));
 
             //  浏览器前进后退
             Event.delegatEvent(root, ["popstate"], true, function (ev) {
-                var res = Tool.getHashOrState(cfg.default || "/");
-                var path = res.path;
-                if (!cfg.pushState) {
-                    path = res.hash;
-                }
-                this.prevOrBack(path);
+                this.navigate(callback);
+                Event.prevDefault(ev);
             }.bind(this));
         }
     };
 
     var R = {
 
+        /**
+         * 代理执行路由模块的config方法
+         */
         "config": _route.config,
 
         /**
@@ -249,65 +316,57 @@
          * @param el    根元素
          */
         "bootstrap": function (el) {
-            var hashOrState = Tool.getHashOrState("/"),
-                path = hashOrState.path || hashOrState.hash,
-                cfgCtrlObj = _route.getCurrent(path),
-                context = document.querySelector(el),
-                ctrlEle = null,
-                cfgCtrlName = cfgCtrlObj.controller,
-                tplPath = cfgCtrlObj.tplPath,
-                deps = [],
-                finalCtrl, fragement, divNode;
+            var context = document.querySelector(el);
 
-            //  获取页面模板
-            Tool.getRequest({
-                "url": tplPath,
-                "context": this,
-                "success": function (cxt, res) {
+            _route.finalCfg.root = context;
 
-                    //  创建一个fragement对象
-                    fragement = Dom.createFragment();
+            _route.navigate(function (ctrlEle, cfgObj) {
 
-                    //  创建一个临时div
-                    divNode = document.createElement("div");
-                    divNode.innerHTML = res.responseText;
+                this.initScope(ctrlEle, cfgObj);
 
-                    //  设置r-controller
-                    Dom.setAttributes(divNode, {
-                        "r-controller": cfgCtrlName
-                    });
-                    fragement.appendChild(divNode);
-                    context.appendChild(fragement);
+                _route.initEvents(this.initScope.bind(this));
 
-                    //  修改ctrlEle的指向
-                    ctrlEle = divNode;
-                    finalCtrl = _store.controllers[_controllerSuffix + cfgCtrlName];
+            }.bind(this));
 
-                    //  存在依赖的情况,执行依赖对应的回调函数
-                    //  如果是函数就执行函数,否则直接返回
-                    if (finalCtrl.deps) {
-                        deps = finalCtrl.deps.map(function (dep) {
-                            return Tool.isType(dep, "function") ? dep() : dep;
-                        });
-                    }
+        },
 
-                    //  实例化Compile和scope
-                    this._compile = new Compile(ctrlEle);
-                    var Scope = new finalCtrl.scope(this._compile);
+        /**
+         * 初始化作用域
+         * @param ctrlEle   根元素
+         * @param cfgObj    配置中保存的信息
+         */
+        "initScope": function (ctrlEle, cfgObj) {
 
-                    //  scope永远在依赖数组第一个
-                    deps.unshift(Scope);
+            var deps = [],
+                cfgCtrlName, finalCtrl;
 
-                    //  依赖数组作为参数,传入相关controller
-                    finalCtrl.fn.apply(root, deps);
+            cfgCtrlName = cfgObj.controller;
+            finalCtrl = _store.controllers[_controllerSuffix + cfgCtrlName];
 
-                    //  开始编译
-                    Scope.link(ctrlEle);
-                },
-                "error": function (cxt, ex) {
-                }
+            Dom.setAttributes(ctrlEle, {
+                "r-controller": cfgCtrlName
             });
 
+            //  存在依赖的情况,执行依赖对应的回调函数
+            //  如果是函数就执行函数,否则直接返回
+            if (finalCtrl.deps) {
+                deps = finalCtrl.deps.map(function (dep) {
+                    return Tool.isType(dep, "function") ? dep() : dep;
+                });
+            }
+
+            //  实例化Compile和scope
+            this._compile = new Compile(ctrlEle);
+            var Scope = new finalCtrl.scope(this._compile);
+
+            //  scope永远在依赖数组第一个
+            deps.unshift(Scope);
+
+            //  依赖数组作为参数,传入相关controller
+            finalCtrl.fn.apply(root, deps);
+
+            //  开始编译
+            Scope.link(ctrlEle);
         },
 
         /**

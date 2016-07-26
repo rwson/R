@@ -16,7 +16,7 @@
     function RFor(dirCfg) {
         dirBase.call(this, dirCfg);
         this.priority = 2;
-        this.parent = this.el.parentNode;
+        this.parentNode = this.el.parentNode;
         this.childDir = dirCfg.childDir;
         return this;
     }
@@ -27,7 +27,7 @@
 
         "link": function (el, exp, scope) {
             this.scope = this.scope || scope;
-            this.parent.innerHTML = "";
+            this.parentNode.innerHTML = "";
             if (exp && exp.length) {
                 var fragement = Dom.createFragment();
                 var directives = this.directives;
@@ -92,37 +92,6 @@
                                             loopParent.replaceChild(child, child);
                                         }
                                     }, this);
-
-                                    //  再遍历一次子元素
-                                    //for (; loopI < loopLen; loopI++) {
-                                    //    loopChild = children[loopI];
-                                    //
-                                    //  逐个比对
-                                    //if (Dom.compareNodes(loopChild, childEl)) {
-                                    //    rid = Tool.randomStr();
-                                    //    Dom.setAttributes(childEl, {
-                                    //        "rid": rid
-                                    //    });
-                                    //
-                                    //    //  实例化指令
-                                    //    tDir = new cDir.directive(dir);
-                                    //
-                                    //    //  取得指令绑定是属性值
-                                    //    expArr = cDir.exp.split(".").slice(1);
-                                    //    value = scope.exec(cDir.exp) || scope.execDeep(inExp, expArr);
-                                    //
-                                    //    //  判断当前指令类型,事件类型就修改回调函数里面this指向
-                                    //    if (cDir.dirType === "event") {
-                                    //        tDir.link(childEl, value, this.scope, inExp);
-                                    //    } else {
-                                    //        tDir.link(childEl, value, this.scope);
-                                    //    }
-
-                                    //  替换循环标签中相关
-                                    //elCloned.replaceChild(childEl, children.item(loopI));
-                                    //        break;
-                                    //    }
-                                    //}
                                 }, this);
                             }
                         }, this);
@@ -132,7 +101,7 @@
                     fragement.appendChild(elCloned);
                 }, this);
                 //  将文档片段添加到父元素
-                this.parent.appendChild(fragement);
+                this.parentNode.appendChild(fragement);
             }
         },
 
@@ -144,7 +113,6 @@
     return {
         "name": "RFor",
         "type": "dom",
-        "priority": 2,
         "constructor": RFor
     };
 

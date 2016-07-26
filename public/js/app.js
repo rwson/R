@@ -74,13 +74,16 @@ define("app", ["r"], function (R) {
 
     //  列表页控制器
     R.controller("listCtrl", function (scope, pageParams) {
+        console.log(pageParams);
         scope.set({
-            "list": []
+            "list": [],
+            "showFlag": false
         });
         _request("/list/articles", function (res) {
             if (res.status) {
                 scope.update({
-                    "list": res.data
+                    "list": res.data,
+                    "showFlag": true
                 });
             }
         }, function (ex) {

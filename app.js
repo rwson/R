@@ -48,6 +48,7 @@ app.get("/detail/content", function (req, res, next) {
     });
 });
 
+//  404
 app.use("/", function (req, res, next) {
     res.render("index");
 });

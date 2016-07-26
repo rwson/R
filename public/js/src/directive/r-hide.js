@@ -15,7 +15,6 @@
 
     function RHide(dirCfg) {
         dirBase.call(this,dirCfg);
-        this.priority = 1;
     }
 
     RHide.prototype = {
@@ -45,7 +44,6 @@
     return {
         "name": "RHide",
         "type": "control",
-        "priority": 1,
         "constructor": RHide
     };
 

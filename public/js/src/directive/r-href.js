@@ -15,7 +15,6 @@
 
     function RHref(dirCfg) {
         dirBase.call(this, dirCfg);
-        this.priority = 2;
         return this;
     }
 
@@ -44,7 +43,6 @@
     return {
         "name": "RHref",
         "type": "content",
-        "priority": 3,
         "constructor": RHref
     };
 

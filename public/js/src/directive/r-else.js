@@ -50,7 +50,6 @@
     return {
         "name": "RElse",
         "type": "control",
-        "priority": 1,
         "constructor": RElse
     };
 

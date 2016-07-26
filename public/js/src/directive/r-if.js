@@ -15,7 +15,6 @@
 
     function RIf(dirCfg) {
         dirBase.call(this, dirCfg);
-        this.priority = 1;
         this.index = Dom.getChildIndex(this.parentNode, this.el);
     }
 
@@ -51,7 +50,6 @@
     return {
         "name": "RIf",
         "type": "control",
-        "priority": 1,
         "constructor": RIf
     };
 

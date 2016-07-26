@@ -15,7 +15,6 @@
 
     function RKeyDown(dirCfg) {
         dirBase.call(this, dirCfg);
-        this.priority = 3;
         this.context = root;
         return this;
     }
@@ -36,7 +35,6 @@
     return {
         "name": "RKeyDown",
         "type": "event",
-        "priority": 3,
         "constructor": RKeyDown
     };
 

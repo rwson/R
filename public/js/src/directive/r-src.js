@@ -15,7 +15,6 @@
 
     function RShow(dirCfg) {
         dirBase.call(this, dirCfg);
-        this.priority = 1;
     }
 
     RShow.prototype = {
@@ -36,7 +35,6 @@
     return {
         "name": "RShow",
         "type": "control",
-        "priority": 1,
         "constructor": RShow
     };
 

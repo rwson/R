@@ -72,6 +72,7 @@
             node2Clone = node2.cloneNode(true);
 
             //  不比较rid属性
+
             this.setAttributes(node1Clone, "rid", "");
             this.setAttributes(node2Clone, "rid", "");
 
@@ -121,7 +122,8 @@
             }
             var parent = el.parentNode;
             callback(parent);
-            if (this.isHTMLNode(el) && !this.compareNodes(top, parent)) {
+
+            if (this.isHTMLNode(el) && this.isHTMLNode(parent) && !this.compareNodes(top, parent)) {
                 this.getParent(parent, top, callback);
             }
         },
@@ -240,10 +242,17 @@
                 attrObj[attr] = value;
             }
             Object.keys(attrObj).forEach(function (item) {
-                el.setAttribute(item, attrObj[item]);
-                //  确保设置成功
-                if (el[item] !== attrObj[item]) {
-                    el[item] = attrObj[item];
+                if (el) {
+                    try {
+                        el.setAttribute(item, attrObj[item]);
+                        //  确保设置成功
+                        if (el[item] !== attrObj[item]) {
+                            el[item] = attrObj[item];
+                        }
+                    } catch (ex) {
+                        console.log(ex);
+                        console.log(el);
+                    }
                 }
             });
         },
@@ -257,15 +266,18 @@
         "getAttributes": function (el, attrs) {
             var attrList = [];
             var output = {};
+            var tagName = el.tagName && el.tagName.toLowerCase();
             if (Tool.isType(attrs, "String")) {
                 attrList = [attrs];
             } else if (Tool.isType(attrs, "Array")) {
                 attrList = attrs;
             }
             attrList.forEach(function (item) {
-                var val = el.getAttribute(item);
-                if (val) {
-                    output[item] = val;
+                if(!Tool.isUndefined(tagName)) {
+                    var val = el.getAttribute(item);
+                    if (val) {
+                        output[item] = val;
+                    }
                 }
             });
             return output;
@@ -324,6 +336,15 @@
             } else {
                 parent.insertBefore(el, childList.item(index));
             }
+        },
+
+        /**
+         * 判断是否是一个有效的DOM元素
+         * @param el    被判断的元素
+         * @returns {*|boolean}
+         */
+        "isAvailableDom": function (el) {
+            return this.isHTMLNode(el) && !this.isHide(el) && !this.isExist(el);
         }
 
     };

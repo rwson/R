@@ -19,7 +19,6 @@
      * @constructor
      */
     function DirectiveBase(dir) {
-        this.priority = dir.priority;
         this.el = dir.el;
         this.parentNode = this.el.parentNode;
         this.directives = dir.directives;

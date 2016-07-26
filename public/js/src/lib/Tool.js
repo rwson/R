@@ -88,7 +88,7 @@
          */
         "getHashOrState": function (rootPath) {
             rootPath = rootPath || "/";
-            var path = decodeURIComponent(location.pathname + Tool.getSearch());
+            var path = decodeURIComponent(location.pathname + this.getSearch());
             var hash = location.href.match(/#(.*)$/);
             var output = {};
             hash = hash ? hash[0].replace(/\#/g, "") : "";
@@ -105,7 +105,8 @@
          * @returns {String || ""}
          * */
         "getSearch": function () {
-            var match = location.href.replace(/#.*/, "").match(/\?.+/);
+            var match;
+            match = location.href.replace(/#.*/, "").match(/\?.+/);
             return match ? match[0] : "";
         },
 
