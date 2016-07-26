@@ -1,8 +1,7 @@
 <div>
     <ul r-show="showFlag">
         <li r-for="item in list">
-            <a r-href="item.link">
-                <span r-bind="item.title"></span>
+            <a r-href="item.link" r-bind="item.title">
             </a>
         </li>
     </ul>
