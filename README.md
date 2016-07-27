@@ -218,4 +218,4 @@ r-key-up | r-key-up="keyDownFn" | 和r-key-down类型,事件类型变成keyup,�
 
 ----
 
-此框架可以无侵入的和其他jQuery类库搭配使用
+R可以无侵入的和其他**类库(如jQuery)**搭配使用
