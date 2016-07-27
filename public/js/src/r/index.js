@@ -11,12 +11,13 @@
             "dom",
             "event",
             "compile",
-            "scope"
-        ], function (Tool, Dom, Event, Compile, Scope) {
-            return factory(window, Tool, Dom, Event, Compile, Scope);
+            "scope",
+            "watcher"
+        ], function (Tool, Dom, Event, Compile, Scope, Watcher) {
+            return factory(window, Tool, Dom, Event, Compile, Scope, Watcher);
         });
     }
-}(window, function (root, Tool, Dom, Event, Compile, Scope, undefined) {
+}(window, function (root, Tool, Dom, Event, Compile, Scope, Watcher, undefined) {
 
     var _controllerSuffix = "CONTROLLER_";      //  Controller前缀
     var _directiveSuffix = "DIRECTIVE_";        //  Directive前缀
@@ -377,11 +378,12 @@
         "initScope": function (ctrlEle, cfgObj) {
             var deps = [],
                 dataShare = [],
-                Scope, listenKeys, depCallback, cfgCtrlName, finalCtrl;
+                listenKeys, Scope, depCallback, cfgCtrlName, finalCtrl;
 
             cfgCtrlName = cfgObj.controller;
             finalCtrl = _store.controllers[_controllerSuffix + cfgCtrlName];
 
+            //  controller对象不存在,就不继续往下
             if (!finalCtrl) {
                 return;
             }
@@ -414,11 +416,17 @@
                 listenKeys = [];
                 dataShare.forEach(function (data) {
                     Scope.set(data);
-                    listenKeys.concat(Object.keys(data));
-                });
-                Event.subscribeEvent(Scope, "update share data", listenKeys, function() {
-                    Scope.update();
-                });
+
+                    listenKeys = listenKeys.concat(Object.keys(data));
+                    listenKeys = listenKeys.map(function (lKey) {
+                        return {
+                            "key": lKey,
+                            "uId": Scope.uId
+                        };
+                    }, this);
+
+                    Watcher.subscribe(listenKeys, Scope);
+                }, this);
             }
 
             //  scope永远在依赖数组第一个

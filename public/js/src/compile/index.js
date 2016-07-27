@@ -40,6 +40,7 @@
      * @constructor
      */
     function Compile(el) {
+        this.uId = Tool.randomStr();
         this.bootstrap(el);
     }
 

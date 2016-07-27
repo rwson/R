@@ -7,14 +7,12 @@
 
 (function (root, factory) {
     if (typeof define === "function" && define.amd) {
-        define(["tool"], function (Tool) {
-            return factory(root, Tool);
+        define(["tool", "watcher"], function (Tool, Watcher) {
+            return factory(root, Tool, Watcher);
         });
-    } else {
-        root.RFor = RFor;
     }
 
-}(window, function (root, Tool, undefined) {
+}(window, function (root, Tool, Watcher, undefined) {
 
     /**
      * Controller对应的scope对象
@@ -70,8 +68,22 @@
          * @param obj   要更新的数据
          */
         "update": function (obj) {
+            var watcherList = Watcher.watcherList,
+                uId = this.uId,
+                updater;
             Object.keys(obj).forEach(function (key) {
-                this.data[key] = obj[key];
+                if (!Tool.isEqual(this.get(key), obj[key])) {
+                    this.data[key] = obj[key];
+                    if (watcherList.length) {
+                        watcherList.forEach(function (watcher) {
+                            updater = {};
+                            if (!Tool.isEqual(watcher.uId, uId)) {
+                                updater[key] = obj[key];
+                                watcher.scope.update(updater);
+                            }
+                        });
+                    }
+                }
             }, this);
         },
 

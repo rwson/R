@@ -12,6 +12,8 @@ require.config({
         "event": "src/lib/Event",
         "dom": "src/lib/DOM",
 
+        "watcher": "src/watcher/index",
+
         "rClick": "src/directive/r-click",
         "rBind": "src/directive/r-bind",
         "RHref": "src/directive/r-href",

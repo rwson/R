@@ -1,0 +1,64 @@
+/**
+ * index.js
+ * Watcher类,实现一个数据的监听
+ */
+
+"use strict";
+
+(function (root, factory) {
+    if (typeof define === "function" && define.amd) {
+        define([
+            "tool"
+        ], function (Tool, Event) {
+            return factory(window, Tool);
+        });
+    }
+}(window, function (root, Tool, Dom) {
+
+    /**
+     * 写成一个静态类,方便可以在内部框架内部进行调用而不用实例化
+     */
+    var Watcher = {
+
+        /**
+         * 监听数组
+         */
+        "watcherList": [],
+
+        /**
+         * 重置方法
+         */
+        "reset": function () {
+            this.watcherList = [];
+        },
+
+        /**
+         * 添加相关属性的订阅监听
+         * @param keys      属性(Array)
+         * @param callback  当检测到属性值更新触发的回调函数
+         */
+        "subscribe": function (keys, callback) {
+            var watchList = keys.map(function (watch) {
+                watch.scope = callback;
+                return watch;
+            });
+            this.watcherList = this.watcherList.concat(watchList);
+        },
+
+        /**
+         * 取消对该属性的订阅
+         * @param keys
+         */
+        "unSubscribe": function (keys) {
+            if (!Tool.isType(keys, "array")) {
+                keys = [keys];
+            }
+            this.watcherList = this.watcherList.filter(function (watcher) {
+                return !(~(keys.indexOf(watcher.key)));
+            });
+        }
+    };
+
+    return Watcher;
+
+}));
