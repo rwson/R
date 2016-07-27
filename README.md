@@ -16,12 +16,28 @@ Demo是一个极简SPA应用
     
     //  访问 localhost:3000
 
+----
+
 #### API
 
-声明Controller
+##### 声明Controller
     
 
-    R.controller("indexCtrl", function(scope, pageParams) {
+    R.controller("indexCtrl", function(scope) {
+        
+        scope.set({
+            "key": "value",
+            //  ...
+        });
+        
+        scope.defineEvents({
+            "event1": function() {
+                //  ...
+            },
+            "event2": function() {
+                //  ...
+            }
+        });
         
     });
     
@@ -39,6 +55,14 @@ Demo是一个极简SPA应用
     });
     
 来设置绑定指令中所需的数据
+
+通过
+
+    scope.update({
+        "key1": "value2"
+    });
+        
+来修改相应数据
         
 通过
         
@@ -51,16 +75,18 @@ Demo是一个极简SPA应用
         }
     });
         
-来设置绑定指令(事件类型所需要的处理函数)
-        
+来设置绑定指令(绑定事件指令所需要的处理函数)
 
 ---
     
-自定义Provider
+##### 自定义Provider
 
 
     R.provider("provider1", function() {
-        //  ...
+        return {
+            "key": "value",
+            //  ...
+        };
     });
     
 或
@@ -72,33 +98,59 @@ Demo是一个极简SPA应用
 
 通过
         
-    R.provider(name, anyType);
+    R.provider(name, any valid types);
         
-声明一个Provider
-
-    
+声明一个Provider,需要注意的是,当函数第二个参数为function的时候,必须存在一个返回值,否则将是一个无效Provider
 
 ---
 
-Controller添加依赖注入(添加provider)
+##### 自定义Service
 
-    R.inject("indexCtrl", ["pageParams"]);
+    R.service("shareData", function() {
+        return {
+            "key": "value",
+            //  ...
+        };
+    });
+    
+或
+
+    R.service("shareData", {
+        "key": "value",
+        //  ...
+    });
+
+通过
+    
+    R.service(name, any valid types);
+
+声明一个Service,需要注意的是,当函数第二个参数为function的时候,必须存在一个返回值,否则将是一个无效Service,通过数据共享可以实现相同数据在不同Controller种双向绑定的目的
+
+---
+
+##### Controller添加依赖注入(添加provider(相关[自定义]功能模块)/service(Controller数据共享))
+
+    R.conntroller("appCtrl", function(scope, pageParams, shareData, customProvider){
+        
+        //  ...
+        
+    });
+
+    R.inject("appCtrl", ["pageParams", "shareData", "customProvider"]);
 
 通过
         
     R.inject(controllerName, dependens);
             
-将已经声明的Provider添加到对应的Controller中
+将已经声明的Provider/Service添加到对应的Controller中
 
 其中dependens可以是字符串或者数组字符串类型
 
 scope无需注入,并且始终作为controller回调的第一个参数
-    
-
 
 ---
 
-路由配置
+##### 路由配置
 
 
     R.config({
@@ -157,7 +209,13 @@ r-key-up | r-key-up="keyDownFn" | 和r-key-down类型,事件类型变成keyup,�
 
 #### TODO
 
+- ~~提供R.factory/R.service方法,使得Controller之间实现数据共享([AngularJs](https://angular.io/)中的service和factory有返回值类型区别,R中没有给返回值做类型限制,所以实现一个service,达到数据共享的目的)~~
 - 提供R.directive方法,支持自定义指令
-- 提供R.factory/R.service方法,使得Controller之间实现数据共享
-- 提供更多指令
+- 提供更多内置指令
 - 目前仅支持require形式的引入,提供支持CMD/script标签引入的方式
+- 优化在通过Service方式共享数据时更新过慢的问题
+- 目前路由配置中pushState对应的值为false的时候还是采用HTML5的处理方式,此处需要改成hash的处理方式
+
+----
+
+此框架可以无侵入的和其他jQuery类库搭配使用

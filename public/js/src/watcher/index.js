@@ -34,12 +34,12 @@
 
         /**
          * 添加相关属性的订阅监听
-         * @param keys      属性(Array)
-         * @param callback  当检测到属性值更新触发的回调函数
+         * @param keys  属性(Array)
+         * @param scope Scope类的实例
          */
-        "subscribe": function (keys, callback) {
+        "subscribe": function (keys, scope) {
             var watchList = keys.map(function (watch) {
-                watch.scope = callback;
+                watch.scope = scope;
                 return watch;
             });
             this.watcherList = this.watcherList.concat(watchList);

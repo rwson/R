@@ -31,6 +31,12 @@
     <div r-controller="appCtrl">
         <input type="text" r-model="fullname"/>
         <p r-bind="fullname"></p>
+        <input type="text" r-model="todo" r-key-up="keyUp" />
+        <ul>
+            <li r-for="item in todos">
+                <span r-bind="item.title"></span>
+            </li>
+        </ul>
     </div>
 
     <p class="split-paragraph">上下不同Controller</p>
