@@ -39,6 +39,11 @@
         "provider": {}
     };
 
+    /**
+     * 路由模块
+     * @type {{cfg: {path: {}, pushState: boolean, default: string, root: null}, finalCfg: {}, pageParams: {}, getCurrent: Function, navigate: Function, requestTemplate: Function, config: Function, initEvents: Function}}
+     * @private
+     */
     var _route = {
 
         //  默认配置
@@ -470,9 +475,66 @@
 
     };
 
-    //  定义一个provider
+    /**
+     * pageParams
+     * 用于获取url上的参数(queryString/path)
+     */
     R.provider("pageParams", function () {
         return _route.pageParams;
+    });
+
+    /**
+     * cookie
+     * 实现cookie读写操作
+     */
+    R.provider("cookie", function () {
+
+        return {
+
+            /**
+             * 设置cookie
+             * @param key       cookie名
+             * @param val       cookie值
+             * @param expTime   过期时间
+             */
+            "set": function (key, val, expTime) {
+                expTime = expTime || 30;
+                var exp = new Date();
+                exp.setTime(exp.getTime() + expTime * 24 * 60 * 60 * 1000);
+                document.cookie = key + "=" + escape(value) + ";expires=" + exp.toGMTString();
+            },
+
+            /**
+             * 获取cookie
+             * @param key   cookie名
+             * @returns {null|string}
+             */
+            "get": function (key) {
+                if (!key) {
+                    return null;
+                }
+                var reg = new RegExp("(^| )" + key + "=([^;]*)(;|$)"),
+                    arr = document.cookie.match(reg);
+                return arr === null ? null : unescape(arr[2]);
+            },
+
+            /**
+             * 删除cookie
+             * @param key   cookie名
+             */
+            "delete": function (key) {
+                if (!key) {
+                    return;
+                }
+                var exp = new Date();
+                exp.setTime(exp.getTime() - 1);
+                var cval = this.get(key);
+                if (cval !== null) {
+                    document.cookie = key + "=" + cval + ";expires=" + exp.toGMTString();
+                }
+            }
+        };
+
     });
 
     return R;
