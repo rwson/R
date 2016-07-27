@@ -292,7 +292,7 @@
                 return false;
             }
             if (arguments.length > 3) {
-                argus = [].slice.call(arguments, 2);
+                argus = _array2.slice.call(arguments, 2);
             }
             return new Function(body).apply(context, argus);
         },

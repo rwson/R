@@ -201,7 +201,6 @@
                         res.push({
                             "directive": directive[name],
                             "directiveName": name,
-                            "priority": directive[name].priority,
                             "dirType": directive[name].dirType,
                             "exp": Tool.trim(exp),
                             "el": el
@@ -209,13 +208,6 @@
                     }
                 }
             }, this);
-
-            //  绑定了多条指令,根据priority给指令排序(指定执行顺序)
-            if (res.length > 1) {
-                res.sort(function (prev, next) {
-                    return prev.priority > next.priority;
-                });
-            }
 
             return res;
         },

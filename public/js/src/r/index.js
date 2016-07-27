@@ -21,7 +21,7 @@
     var _controllerSuffix = "CONTROLLER_";      //  Controller前缀
     var _directiveSuffix = "DIRECTIVE_";        //  Directive前缀
     var _serviceSuffix = "SERVICE_";            //  Service前缀
-    var _providerSuffix = "SERVICE_";           //  Provider前缀
+    var _providerSuffix = "PROVIDER_";          //  Provider前缀
 
     var paramRoute = /(\/\:\w+)+/g;             //  带url参数REST风格的路由
     var replaceParam = /(\/\:\w+)/g;            //  替换掉url中参数的表示
@@ -55,8 +55,6 @@
 
         //  url中所带参数,包含queryString和path
         "pageParams": {},
-
-        "_compile": null,
 
         /**
          * 获取当前path在配置中的相关参数
@@ -313,24 +311,54 @@
         },
 
         /**
-         * 启动
          * @param el    根元素
+         * @param route 是否启用了路由模式
          */
-        "bootstrap": function (el) {
-            var context = document.querySelector(el);
+        "bootstrap": function (el, route) {
+            var context, controllers, loopArr, loopI, loopLen, loopKey, loopKey2, curCtrl, curCtrlEl;
 
-            _route.finalCfg.root = context;
+            route = route || false;
 
-            _route.navigate(function (ctrlEle, cfgObj) {
-                this.initScope(ctrlEle, cfgObj);
-                _route.initEvents(this.initScope.bind(this));
-            }.bind(this));
+            context = document.querySelector(el);
+
+            /**
+             * 启用了路由模式
+             * 查找当前页面的path或者hash匹配的路由配置
+             * 请求相关模板路径,成功后再对模板进行编译等操作
+             */
+            if (route) {
+                _route.finalCfg.root = context;
+                _route.navigate(function (ctrlEle, cfgObj) {
+                    this.initScope(ctrlEle, cfgObj);
+                    _route.initEvents(this.initScope.bind(this));
+                }.bind(this));
+            } else {
+
+                /**
+                 * 没有启用路由模式
+                 * 遍历之前声明的
+                 */
+                controllers = _store.controllers;
+                loopArr = Object.keys(controllers);
+                loopI = 0;
+                loopLen = loopArr.length;
+                for (; loopI < loopLen; loopI++) {
+                    loopKey = loopArr[loopI];
+                    loopKey2 = loopKey.replace(_controllerSuffix, "");
+                    curCtrlEl = Dom.getCtrlElement(loopKey2, context);
+                    curCtrl = controllers[loopKey];
+                    if (curCtrlEl) {
+                        curCtrl = controllers[loopKey];
+                        this.initScope(curCtrlEl, curCtrl);
+                    }
+                }
+            }
 
         },
 
         /**
          * 初始化作用域
-         * @param ctrlEle   根元素
+         * @param ctrlEle   scope根元素(绑定了r-controller指令)
          * @param cfgObj    配置中保存的信息
          */
         "initScope": function (ctrlEle, cfgObj) {
@@ -366,6 +394,8 @@
             //  开始编译
             Scope.link(ctrlEle);
         },
+
+        "_compile": null,
 
         /**
          * 获取指定名称对应的provider

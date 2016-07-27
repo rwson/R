@@ -15,7 +15,6 @@
 
     function RFor(dirCfg) {
         dirBase.call(this, dirCfg);
-        this.priority = 2;
         this.parentNode = this.el.parentNode;
         this.childDir = dirCfg.childDir;
         return this;
