@@ -76,13 +76,6 @@
         },
 
         /**
-         * 删除数据
-         * @param key   属性值
-         */
-        "remove": function (key) {
-        },
-
-        /**
          * 声明事件
          * @param obj   事件对象
          */

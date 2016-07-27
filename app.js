@@ -15,7 +15,6 @@ app.use(bodyParser.urlencoded({extended: false}));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-
 //  模拟文章列表请求
 app.get("/list/articles", function (req, res, next) {
     res.json({
@@ -46,6 +45,10 @@ app.get("/detail/content", function (req, res, next) {
             "content": "我是详情内容!"
         }
     });
+});
+
+app.get("/index2", function (req, res, next) {
+    res.render("index2");
 });
 
 //  404

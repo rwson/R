@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>routeable</title>
+    <link rel='stylesheet' href='/css/style.css'/>
+    <style>
+        .split-paragraph {
+            border-bottom: 1px solid #bbb;
+            border-top: 1px solid #bbb;
+            padding: 10px;
+        }
+
+        input {
+            border: 1px solid #bbb;
+            background: transparent;
+            height: 30px;
+            line-height: 30px;
+            margin: 5px 0;
+            text-indent: 10px;
+        }
+
+        input:focus {
+            outline: none;
+        }
+    </style>
+</head>
+<body>
+
+<div id="app">
+
+    <div r-controller="appCtrl">
+        <input type="text" r-model="fullname"/>
+        <p r-bind="fullname"></p>
+    </div>
+
+    <p class="split-paragraph">上下不同Controller</p>
+
+    <div r-controller="appCtrl2">
+        <input type="text" r-model="fullname"/>
+        <p r-bind="fullname"></p>
+    </div>
+
+</div>
+
+
+<script src="/js/lib/require.min.js"></script>
+<script src="/js/config/requireConfig.js"></script>
+<script>
+    require(["app2"]);
+</script>
+</body>
+</html>

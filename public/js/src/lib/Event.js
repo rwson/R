@@ -114,12 +114,14 @@
          * 在一个对象上指定监听事件
          * @param target        事件绑定的目标对象
          * @param evName        事件名
+         * @param keys          监听数据的属性名称
          * @param callback      回调
          */
-        "subscribeEvent": function (target, evName, callback) {
+        "subscribeEvent": function (target, evName, keys, callback) {
             if (!target._listeners) {
                 target._listeners = []
             }
+            target._listenKeys = keys;
             target._listeners.push({
                 "evName": evName,
                 "callback": callback

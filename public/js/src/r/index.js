@@ -34,11 +34,9 @@
      */
     var _store = {
         "controllers": {},
-        "directives": {},
         "service": {},
         "provider": {}
     };
-
 
     var _route = {
 
@@ -266,7 +264,7 @@
          * @param fn    directive函数
          */
         "directive": function (name, fn) {
-            _store.directives[_directiveSuffix + name] = fn;
+
         },
 
         /**
@@ -294,6 +292,9 @@
          */
         "inject": function (name, deps) {
             var target = this._get(name);
+            if (!target) {
+                return;
+            }
             if (!target.deps) {
                 target.deps = [];
             }
@@ -303,7 +304,17 @@
 
             //  获取之前声明的函数
             deps = deps.map(function (depName) {
-                return this._getProvider(depName);
+                if (this._getProvider(depName)) {
+                    return {
+                        "type": "provider",
+                        "callback": this._getProvider(depName)
+                    };
+                } else if (this._getService(depName)) {
+                    return {
+                        "type": "service",
+                        "callback": this._getService(depName)
+                    };
+                }
             }, this);
 
             //  添加到原来的依赖数组中
@@ -336,7 +347,7 @@
 
                 /**
                  * 没有启用路由模式
-                 * 遍历之前声明的
+                 * 遍历之前声明的controller对象查找匹配的controller
                  */
                 controllers = _store.controllers;
                 loopArr = Object.keys(controllers);
@@ -349,7 +360,9 @@
                     curCtrl = controllers[loopKey];
                     if (curCtrlEl) {
                         curCtrl = controllers[loopKey];
-                        this.initScope(curCtrlEl, curCtrl);
+                        this.initScope(curCtrlEl, {
+                            "controller": loopKey2
+                        });
                     }
                 }
             }
@@ -362,12 +375,16 @@
          * @param cfgObj    配置中保存的信息
          */
         "initScope": function (ctrlEle, cfgObj) {
-
             var deps = [],
-                cfgCtrlName, finalCtrl;
+                dataShare = [],
+                Scope, listenKeys, depCallback, cfgCtrlName, finalCtrl;
 
             cfgCtrlName = cfgObj.controller;
             finalCtrl = _store.controllers[_controllerSuffix + cfgCtrlName];
+
+            if (!finalCtrl) {
+                return;
+            }
 
             Dom.setAttributes(ctrlEle, {
                 "r-controller": cfgCtrlName
@@ -377,13 +394,32 @@
             //  如果是函数就执行函数,否则直接返回
             if (finalCtrl.deps) {
                 deps = finalCtrl.deps.map(function (dep) {
-                    return Tool.isType(dep, "function") ? dep() : dep;
+                    depCallback = Tool.isType(dep.callback, "function") ? dep.callback() : dep.callback;
+
+                    //  如果这个dependence对应的type为service,则继续放入数据共享的list
+                    if (dep.type === "service") {
+                        dataShare.push(depCallback);
+                    }
+
+                    return depCallback;
                 });
             }
 
             //  实例化Compile和scope
             this._compile = new Compile(ctrlEle);
-            var Scope = new finalCtrl.scope(this._compile);
+            Scope = new finalCtrl.scope(this._compile);
+
+            //  如果存在数据共享数组,事先调用scope下的set方法设置数据
+            if (dataShare.length) {
+                listenKeys = [];
+                dataShare.forEach(function (data) {
+                    Scope.set(data);
+                    listenKeys.concat(Object.keys(data));
+                });
+                Event.subscribeEvent(Scope, "update share data", listenKeys, function() {
+                    Scope.update();
+                });
+            }
 
             //  scope永远在依赖数组第一个
             deps.unshift(Scope);
@@ -403,7 +439,16 @@
          * @returns {*}
          */
         "_getProvider": function (name) {
-            return _store.provider[_providerSuffix + name] || _store.service[_serviceSuffix + name];
+            return _store.provider[_providerSuffix + name];
+        },
+
+        /**
+         * 获取指定名称对应的service
+         * @param name  service名称
+         * @returns {*}
+         */
+        "_getService": function (name) {
+            return _store.service[_serviceSuffix + name];
         },
 
         /**

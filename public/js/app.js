@@ -16,8 +16,6 @@ define("app", ["r"], function (R) {
     //  首页控制器
     R.controller("indexCtrl", function (scope, pageParams, testProvider) {
 
-        console.log(testProvider);
-
         scope.set({
             "text": "" + ((+new Date()) + Math.random()),
             "name": "",
@@ -70,7 +68,7 @@ define("app", ["r"], function (R) {
             }
         });
     });
-    R.inject("indexCtrl", ["pageParams", "testProvider"]);
+    R.inject("indexCtrl", ["pageParams", "testProvider", "testProvider"]);
 
     //  列表页控制器
     R.controller("listCtrl", function (scope, pageParams) {
@@ -138,7 +136,7 @@ define("app", ["r"], function (R) {
 
     R.config(routeConfig);
 
-    R.bootstrap("#app");
+    R.bootstrap("#app", true);
 
     /**
      * 发起get请求

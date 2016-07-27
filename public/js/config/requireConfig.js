@@ -30,6 +30,7 @@ require.config({
         "compile": "src/compile/index",
         "r": "src/r/index",
 
-        "app": "app"
+        "app": "app",
+        "app2": "app2"
     }
 });
