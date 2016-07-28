@@ -55,6 +55,7 @@
                     dirBase.call(this, dirCfg);
                 }
                 Tool.isType(opt.constructor, "function") && opt.constructor.call(this, dirCfg);
+                this.priority = opt.priority || 0;
                 this.dirType = opt.type;
                 this.link = opt.link;
                 this.update = opt.update;

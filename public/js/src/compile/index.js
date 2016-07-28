@@ -121,7 +121,7 @@
                         //  存储到elMap中
                         if (directives.length) {
                             mapInfo = {
-                                "ctrlName": this.ctrlName,
+                                "ctrlName": ctrlName,
                                 "el": el,
                                 "firstLink": true,
                                 "directives": directives
@@ -132,9 +132,6 @@
 
                     //  遍历当前元素所有父元素
                     Dom.getParent(el, rootEle, function (parent) {
-
-                        //console.log("取到一个父元素...");
-                        //console.log(parent);
 
                         //  获取当前元素的父元素的rid属性,再根据它获取父元素在eleMap中的指令信息
                         pRid = Dom.getAttributes(parent, "rid")["rid"];
@@ -165,8 +162,6 @@
                             }
                         }
                     }.bind(this));
-
-                    //console.groupEnd();
                 }
             }, this);
         },
@@ -178,7 +173,7 @@
         "getDirectives": function (el) {
             var tagAttrs = Dom.getDOMAttrs(el),
                 res = [],
-                dirClass,name, exp;
+                dirClass, name, exp;
 
             if (!Dom.isHTMLNode(el)) {
                 return;
@@ -197,7 +192,7 @@
                     dirClass = directive[name];
 
                     //  处理自定义指令存放在一个对象中的
-                    if(!Tool.isType(dirClass, "function") && Tool.isType(dirClass, "object")) {
+                    if (!Tool.isType(dirClass, "function") && Tool.isType(dirClass, "object")) {
                         dirClass = dirClass.constructor;
                     }
 
@@ -213,7 +208,13 @@
                 }
             }, this);
 
-            return res;
+            /**
+             * 返回根据优先级排序后的指令数组
+             * @type {Array.<T>}
+             */
+            return res.sort(function (a, b) {
+                return a.priority > b.priority;
+            });
         },
 
         /**

@@ -23,11 +23,9 @@
 
         "link": function (el, exp, scope) {
             this.scope = this.scope || scope;
-            
         },
 
         "update": function (exp) {
-
         }
 
     };

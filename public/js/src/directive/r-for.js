@@ -131,6 +131,27 @@
                         }, this);
                     }
 
+                    //  本身元素不止绑定了r-for一个指令
+                    if (directives.length > 1) {
+                        directives.forEach(function (dir) {
+                            console.log(dir);
+                            if(dir.directiveName !== "RFor") {
+                                dir.el = elCloned;
+                                tDir = new dir.directive(dir);
+                                //  取得指令绑定是属性值
+                                expArr = dir.exp.split(".").slice(1);
+                                value = scope.exec(dir.exp) || scope.execDeep(inExp, expArr);
+
+                                //  判断当前指令类型,事件类型就修改回调函数里面this指向
+                                if (dir.dirType === "event") {
+                                    tDir.link(elCloned, value, this.scope, inExp);
+                                } else {
+                                    tDir.link(elCloned, value, this.scope);
+                                }
+                            }
+                        }, this);
+                    }
+
                     //  把当前循环元素添加到文档片段中
                     fragement.appendChild(elCloned);
                 }, this);
