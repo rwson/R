@@ -12,12 +12,13 @@
             "event",
             "compile",
             "scope",
-            "watcher"
-        ], function (Tool, Dom, Event, Compile, Scope, Watcher) {
-            return factory(window, Tool, Dom, Event, Compile, Scope, Watcher);
+            "watcher",
+            "directive"
+        ], function (Tool, Dom, Event, Compile, Scope, Watcher, directive) {
+            return factory(window, Tool, Dom, Event, Compile, Scope, Watcher, directive);
         });
     }
-}(window, function (root, Tool, Dom, Event, Compile, Scope, Watcher, undefined) {
+}(window, function (root, Tool, Dom, Event, Compile, Scope, Watcher, directive, undefined) {
 
     var _controllerSuffix = "CONTROLLER_";      //  Controller前缀
     var _directiveSuffix = "DIRECTIVE_";        //  Directive前缀
@@ -182,11 +183,14 @@
             if (Tool.isType(finalCfg.path, "Object")) {
                 Object.keys(finalCfg.path).forEach(function (item) {
                     cPath = finalCfg.path[item];
+
                     res = ("" + item).match(paramRoute);
                     regex = new RegExp(("" + item).replace(replaceParam, "\\/\\w+"));
                     toMerge = {
                         "path": item
                     };
+
+                    //  url中带有"/:",将该配置项变成正则表达式,并且添加相关正则
                     if (res) {
                         toMerge = {
                             "config": item,
@@ -194,6 +198,8 @@
                             "regex": regex
                         };
                     }
+
+                    //  合并默认参数和传入的参数
                     cfgObj[item] = Tool.merge(cPath, toMerge, true);
                 });
                 finalCfg.path = cfgObj;
@@ -209,7 +215,6 @@
                 path, target, tagName, pathEs, loopI, loopLen, child;
 
             //  所有a标签的点击事件
-
             Event.delegatEvent(document, ["click"], function (ev) {
                 ev = ev || event;
                 target = ev.target;
@@ -219,6 +224,7 @@
                 loopI = 0;
                 loopLen = pathEs.length;
 
+                //  循环触发该事件的列表
                 for (; loopI < loopLen; loopI++) {
                     child = pathEs[loopI];
                     if (Dom.isHTMLNode(child)) {
@@ -270,13 +276,9 @@
         },
 
         /**
-         * 声明directive
-         * @param name  directive名称
-         * @param fn    directive函数
+         * 自定义directive
          */
-        "directive": function (name, fn) {
-
-        },
+        "directive": directive.extend,
 
         /**
          * 声明service

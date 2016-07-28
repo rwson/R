@@ -130,10 +130,6 @@
                         }
                     }
 
-                    //console.group("递归获取元素的父元素");
-                    //console.log("当前元素");
-                    //console.log(el);
-
                     //  遍历当前元素所有父元素
                     Dom.getParent(el, rootEle, function (parent) {
 
@@ -182,7 +178,7 @@
         "getDirectives": function (el) {
             var tagAttrs = Dom.getDOMAttrs(el),
                 res = [],
-                name, exp;
+                dirClass,name, exp;
 
             if (!Dom.isHTMLNode(el)) {
                 return;
@@ -198,9 +194,16 @@
                 if (dirReg.test(name)) {
                     name = Tool.toCamelCase(name);
 
+                    dirClass = directive[name];
+
+                    //  处理自定义指令存放在一个对象中的
+                    if(!Tool.isType(dirClass, "function") && Tool.isType(dirClass, "object")) {
+                        dirClass = dirClass.constructor;
+                    }
+
                     if (directive.hasOwnProperty(name)) {
                         res.push({
-                            "directive": directive[name],
+                            "directive": dirClass,
                             "directiveName": name,
                             "dirType": directive[name].dirType,
                             "exp": Tool.trim(exp),

@@ -189,6 +189,45 @@ controller声明的controller的名字,当模板文件被请求成功并且放�
 
 ---
 
+##### 自定义指令
+
+    R.directive("RCustom" ,{
+        "extend": true,
+        "type": "dom",
+        "constructor": function(dirCfg) {
+            //  ...
+        },
+        "link": function(el, exp, scope) {
+            //  ...
+        },
+        "update": function(exp) {
+            //  ...
+        }
+    });
+
+
+通过
+    
+    R.config(name, opt);
+
+可以实现自定义指令
+
+1.name:作为该指令出现的名称,驼峰命名法,最后绑定到HTML标签上的时候用"-"分割,并且全小写
+
+2.opt参数说明:
+
+
+name | 意义 | 类型 | 是否可选
+---|---|---|---
+extend | 是否继承父类,默认继承,继承父类可以调用父类的构造器,重写父类相关成员属性 | boolean | 是
+type | 指令类型,现阶段没有意义 | string | 是
+priority | 指令优先级,知道指令执行顺序,现阶段没有意义 | number | 是
+link | link方法,做第一次编译时被调用 | function | 必传
+update | update方法,做相关数据更新时被调用 | function | 必传
+
+
+---
+
 #### 支持的指令(directive)
 
 directive | 使用方式 | 描述
@@ -211,8 +250,8 @@ r-key-up | r-key-up="keyDownFn" | 和r-key-down类型,事件类型变成keyup,�
 
 - ~~提供R.factory/R.service方法,使得Controller之间实现数据共享([AngularJs](https://angular.io/)中的service和factory有返回值类型区别,R中没有给返回值做类型限制,所以实现一个service,达到数据共享的目的)~~
 - ~~目前路由配置中pushState对应的值为false的时候还是采用HTML5的处理方式,此处需要改成hash的处理方式~~
-- 提供R.directive方法,支持自定义指令
-- 提供更多内置指令
+- ~~提供R.directive方法,支持自定义指令~~
+- 提供更多内置指令以及指令优先级(约定执行顺序)
 - 目前仅支持require形式的引入,提供支持CMD/script标签引入的方式
 - 优化在通过Service方式共享数据时更新过慢的问题
 

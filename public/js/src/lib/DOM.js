@@ -266,6 +266,9 @@
         "getAttributes": function (el, attrs) {
             var attrList = [];
             var output = {};
+            if(!el) {
+                return output;
+            }
             var tagName = el.tagName && el.tagName.toLowerCase();
             if (Tool.isType(attrs, "String")) {
                 attrList = [attrs];

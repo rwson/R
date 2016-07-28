@@ -18,10 +18,30 @@ define("app2", ["r"], function (R) {
         };
     });
 
+    //  自定义指令r-text
+    R.directive("RText", {
+        "extend": true,
+        "type": "dom",
+        "priority": 1,
+        "constructor": function (dirCfg) {
+            console.log(dirCfg);
+        },
+        "link": function (el, exp, scope) {
+            this.scope = scope;
+            if (typeof exp !== "undefined") {
+                el.textContent = exp;
+            }
+        },
+        "update": function (exp) {
+            this.el.textContent = exp;
+        }
+    });
+
     R.controller("appCtrl", function (scope, shareData, shareTodos) {
 
         scope.set({
-            "todo": ""
+            "todo": "",
+            "text": "test custom directive"
         });
 
         scope.defineEvents({
