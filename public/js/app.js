@@ -131,7 +131,7 @@ define("app", ["r"], function (R) {
                 "controller": "detailCtrl"
             }
         },
-        "pushState": true
+        "pushState": false
     };
 
     R.config(routeConfig);

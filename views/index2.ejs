@@ -44,6 +44,11 @@
     <div r-controller="appCtrl2">
         <input type="text" r-model="fullname"/>
         <p r-bind="fullname"></p>
+        <ul>
+            <li r-for="item in todos">
+                <span r-bind="item.title"></span>
+            </li>
+        </ul>
     </div>
 
 </div>

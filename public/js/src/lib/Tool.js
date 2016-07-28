@@ -91,8 +91,8 @@
             var path = decodeURIComponent(location.pathname + this.getSearch());
             var hash = location.href.match(/#(.*)$/);
             var output = {};
-            hash = hash ? hash[0].replace(/\#/g, "") : "";
-            if (!path.indexOf((rootPath || "/"))) {
+            hash = hash ? hash[1] : rootPath;
+            if (!path.indexOf(rootPath)) {
                 path = "/" + path.slice(rootPath.length);
             }
             output.hash = hash;

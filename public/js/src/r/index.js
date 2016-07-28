@@ -119,7 +119,7 @@
          */
         "navigate": function (callback) {
             var cfg = this.finalCfg,
-                cPath = Tool.getHashOrState(cfg.default || "/"),
+                cPath = Tool.getHashOrState(cfg.default),
                 path = cfg.pushState ? cPath.path : cPath.hash,
                 curCfgObj = this.getCurrent(path),
                 framement, divNode;
@@ -180,11 +180,10 @@
                 regex;                                              //  正则表达式对象
 
             if (Tool.isType(finalCfg.path, "Object")) {
-                //  Object形式的配置
                 Object.keys(finalCfg.path).forEach(function (item) {
                     cPath = finalCfg.path[item];
                     res = ("" + item).match(paramRoute);
-                    regex = new RegExp(("" + item).replace(replaceParam, "\\/\\w+"), "g");
+                    regex = new RegExp(("" + item).replace(replaceParam, "\\/\\w+"));
                     toMerge = {
                         "path": item
                     };
@@ -227,8 +226,14 @@
                         tagName = child.tagName.toLowerCase();
 
                         if (tagName === "a" && path) {
-                            history.pushState({}, "", path);
-                            this.navigate(callback);
+
+                            //  HTML5中pushState不会触发popstate事件,手动调用navigate
+                            if (cfg.pushState) {
+                                history.pushState({}, "", path);
+                                this.navigate(callback);
+                            } else {
+                                location.hash = path;
+                            }
                             break;
                         }
                     }
@@ -535,6 +540,40 @@
             }
         };
 
+    });
+
+    /**
+     * ajax
+     * 向后端发送http请求
+     */
+    R.provider("http", function () {
+        var httpDefault = {
+                "url": "",
+                "": ""
+            },
+            jsonpID = 0,
+            document = window.document,
+            key,
+            name,
+            rscript = /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi,
+            scriptTypeRE = /^(?:text|application)\/javascript/i,
+            xmlTypeRE = /^(?:text|application)\/xml/i,
+            jsonType = "application/json",
+            htmlType = "text/html",
+            blankRE = /^\s*$/,
+            finalCfg;
+
+        return {
+            "request": function (opt) {
+                finalCfg = Tool.merge(httpDefault, opt, true);
+            },
+            "get": function (opt) {
+                finalCfg = Tool.merge(httpDefault, opt, true);
+            },
+            "post": function (opt) {
+                finalCfg = Tool.merge(httpDefault, opt, true);
+            }
+        };
     });
 
     return R;

@@ -26,36 +26,31 @@
         "watcherList": [],
 
         /**
-         * 重置方法
-         */
-        "reset": function () {
-            this.watcherList = [];
-        },
-
-        /**
          * 添加相关属性的订阅监听
-         * @param keys  属性(Array)
+         * @param keys  Array.<Object>
          * @param scope Scope类的实例
          */
         "subscribe": function (keys, scope) {
-            var watchList = keys.map(function (watch) {
-                watch.scope = scope;
-                return watch;
-            });
-            this.watcherList = this.watcherList.concat(watchList);
+            keys.forEach(function (watcher) {
+                watcher.scope = scope;
+                this.watcherList.push(watcher);
+            }, this);
         },
 
         /**
          * 取消对该属性的订阅
-         * @param keys
+         * @param uIds  Array.<uId>
          */
-        "unSubscribe": function (keys) {
-            if (!Tool.isType(keys, "array")) {
-                keys = [keys];
+        "unSubscribe": function (uIds) {
+            if (!Tool.isType(uIds, "array")) {
+                uIds = [uIds];
             }
             this.watcherList = this.watcherList.filter(function (watcher) {
-                return !(~(keys.indexOf(watcher.key)));
+                return !(~(uIds.indexOf(watcher.uId)));
             });
+            if (!this.watcherList.length) {
+                this.watcherList = Tool.copy(this.watcherBackup);
+            }
         }
     };
 

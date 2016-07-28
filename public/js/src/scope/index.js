@@ -74,10 +74,10 @@
             Object.keys(obj).forEach(function (key) {
                 if (!Tool.isEqual(this.get(key), obj[key])) {
                     this.data[key] = obj[key];
-                    if (watcherList.length) {
+                    if (watcherList.length > 1) {
                         watcherList.forEach(function (watcher) {
                             updater = {};
-                            if (!Tool.isEqual(watcher.uId, uId)) {
+                            if (!Tool.isEqual(watcher.uId, uId) && Tool.isEqual(key, watcher.key)) {
                                 updater[key] = obj[key];
                                 watcher.scope.update(updater);
                             }
@@ -85,6 +85,9 @@
                     }
                 }
             }, this);
+            if(watcherList.length.length === 1) {
+                Watcher.reWatchAll();
+            }
         },
 
         /**

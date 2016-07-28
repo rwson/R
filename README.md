@@ -210,12 +210,10 @@ r-key-up | r-key-up="keyDownFn" | 和r-key-down类型,事件类型变成keyup,�
 #### TODO
 
 - ~~提供R.factory/R.service方法,使得Controller之间实现数据共享([AngularJs](https://angular.io/)中的service和factory有返回值类型区别,R中没有给返回值做类型限制,所以实现一个service,达到数据共享的目的)~~
+- ~~目前路由配置中pushState对应的值为false的时候还是采用HTML5的处理方式,此处需要改成hash的处理方式~~
 - 提供R.directive方法,支持自定义指令
 - 提供更多内置指令
 - 目前仅支持require形式的引入,提供支持CMD/script标签引入的方式
 - 优化在通过Service方式共享数据时更新过慢的问题
-- 目前路由配置中pushState对应的值为false的时候还是采用HTML5的处理方式,此处需要改成hash的处理方式
 
 ----
-
-R可以无侵入的和其他**类库(如jQuery)**搭配使用
