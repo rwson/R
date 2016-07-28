@@ -221,7 +221,7 @@ name | 意义 | 类型 | 是否可选
 ---|---|---|---
 extend | 是否继承父类,默认继承,继承父类可以调用父类的构造器,重写父类相关成员属性 | boolean | 是
 type | 指令类型,现阶段没有意义 | string | 是
-priority | 指令优先级,知道指令执行顺序,现阶段没有意义 | number | 是
+priority | 指令优先级,指定指令执行顺序,现阶段没有意义 | number | 是
 link | link方法,做第一次编译时被调用 | function | 必传
 update | update方法,做相关数据更新时被调用 | function | 必传
 
@@ -242,7 +242,7 @@ r-hide | r-hide="condition" | 和r-show相反
 r-for | r-else="item in list" | 循环一个list(Array),渲染页面
 r-keydown | r-keydown="keyDownFn" | 在当前元素触发keydown事件的时候,运行keyDownFn
 r-key-down | r-key-down="keyDownFn" | 在当前元素触发keydown事件的时候,执行相关函数,常用于表单元素
-r-key-up | r-key-up="keyDownFn" | 和r-key-down类型,事件类型变成keyup,常用于表单元素
+r-key-up | r-key-up="keyDownFn" | 和r-key-down类似,事件类型变成keyup,常用于表单元素
 
 ----
 

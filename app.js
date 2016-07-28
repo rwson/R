@@ -31,6 +31,10 @@ app.get("/list/articles", function (req, res, next) {
             {
                 "title": "详情链接带urlQueryString",
                 "link": "/detail?id=12345"
+            },
+            {
+                "title": "详情链接带path参数和urlQueryString",
+                "link": "/detail/abcdefg?id=12345"
             }
         ]
     });

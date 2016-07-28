@@ -134,8 +134,7 @@
                     //  本身元素不止绑定了r-for一个指令
                     if (directives.length > 1) {
                         directives.forEach(function (dir) {
-                            console.log(dir);
-                            if(dir.directiveName !== "RFor") {
+                            if (dir.directiveName !== "RFor") {
                                 dir.el = elCloned;
                                 tDir = new dir.directive(dir);
                                 //  取得指令绑定是属性值
