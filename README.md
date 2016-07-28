@@ -208,7 +208,7 @@ controller声明的controller的名字,当模板文件被请求成功并且放�
 
 通过
     
-    R.config(name, opt);
+    R.directive(name, opt);
 
 可以实现自定义指令
 
