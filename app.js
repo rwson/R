@@ -47,8 +47,15 @@ app.get("/detail/content", function (req, res, next) {
     });
 });
 
+//  渲染index2.ejs
 app.get("/index2", function (req, res, next) {
     res.render("index2");
+});
+
+app.get("/test/ajax/provider", function (req, res, next) {
+    res.send(200, {
+        "submit": req.query
+    });
 });
 
 //  404

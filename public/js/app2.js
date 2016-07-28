@@ -76,9 +76,21 @@ define("app2", ["r"], function (R) {
     R.inject("appCtrl", "shareData", "shareTodos");
 
 
-    R.controller("appCtrl2", function (scope, shareData, shareTodos) {
+    R.controller("appCtrl2", function (scope, shareData, shareTodos, http) {
+        http({
+            "url": "/test/ajax/provider",
+            "type": "GET",
+            "data": {
+                "name": "rwson"
+            },
+            "success": function (res) {
+                console.log(res);
+            },
+            "error": function (ex) {
+            }
+        });
     });
-    R.inject("appCtrl2", "shareData", "shareTodos");
+    R.inject("appCtrl2", "shareData", "shareTodos", "http");
 
     R.bootstrap("#app");
 

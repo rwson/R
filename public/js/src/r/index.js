@@ -13,12 +13,13 @@
             "compile",
             "scope",
             "watcher",
-            "directive"
-        ], function (Tool, Dom, Event, Compile, Scope, Watcher, directive) {
-            return factory(window, Tool, Dom, Event, Compile, Scope, Watcher, directive);
+            "directive",
+            "ajax"
+        ], function (Tool, Dom, Event, Compile, Scope, Watcher, directive, ajax) {
+            return factory(window, Tool, Dom, Event, Compile, Scope, Watcher, directive, ajax);
         });
     }
-}(window, function (root, Tool, Dom, Event, Compile, Scope, Watcher, directive, undefined) {
+}(window, function (root, Tool, Dom, Event, Compile, Scope, Watcher, directive, ajax, undefined) {
 
     var _controllerSuffix = "CONTROLLER_";      //  Controller前缀
     var _directiveSuffix = "DIRECTIVE_";        //  Directive前缀
@@ -546,36 +547,10 @@
 
     /**
      * ajax
-     * 向后端发送http请求
+     * 向后端发送http请求(具体用法参照jQuery)
      */
     R.provider("http", function () {
-        var httpDefault = {
-                "url": "",
-                "": ""
-            },
-            jsonpID = 0,
-            document = window.document,
-            key,
-            name,
-            rscript = /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi,
-            scriptTypeRE = /^(?:text|application)\/javascript/i,
-            xmlTypeRE = /^(?:text|application)\/xml/i,
-            jsonType = "application/json",
-            htmlType = "text/html",
-            blankRE = /^\s*$/,
-            finalCfg;
-
-        return {
-            "request": function (opt) {
-                finalCfg = Tool.merge(httpDefault, opt, true);
-            },
-            "get": function (opt) {
-                finalCfg = Tool.merge(httpDefault, opt, true);
-            },
-            "post": function (opt) {
-                finalCfg = Tool.merge(httpDefault, opt, true);
-            }
-        };
+        return ajax;
     });
 
     return R;

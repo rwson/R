@@ -30,6 +30,9 @@ require.config({
         "directive": "src/directive/index",
         "scope": "src/scope/index",
         "compile": "src/compile/index",
+
+        "ajax": "src/ajax/index",
+
         "r": "src/r/index",
 
         "app": "app",
