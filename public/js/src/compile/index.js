@@ -26,10 +26,10 @@
     var loopDirReg = /^\s*(.+)\s+in{1}\s+(.*?)\s*(\s+track\s+by\s+(.+)\s*)?$/;
 
     //  常用的条件语句类型
-    var equalDirReg = /\s+(==|===|>|>=|<|<=|!=|!==)\s+/;
+    var equalDirReg = /((\!)?\=+|>(\=)?|<(\=)?|\|\||\&\&)/g;
 
     //  提取条件语句中的条件
-    var equalReg = /(==|===|>|>=|<|<=|!=|!==)/;
+    var equalReg = /((\!)?\=+|>(\=)?|<(\=)?|\|\||\&\&)/g;
 
     //  指令类型的正则
     var dirReg = /^r\-/;
@@ -253,8 +253,6 @@
                             finalExp = Tool.trim(splitDir[0]);
                         }
 
-                        console.log(finalExp);
-
                         directiveIns = new dir.directive(cEle);
 
                         exp = scope.exec(finalExp);
@@ -268,7 +266,7 @@
                                 exp = Tool.buildFunction("return " + splitDir.join("") + ";");
                             }
 
-                            directiveIns.link(cEle.el, exp, scope);
+                            directiveIns.link(cEle.el, exp, scope);``
 
                             //  判断是否已经存在该指令对应的数组对象,没有就新建一个
                             if (!this.directiveMap.hasOwnProperty(finalExp)) {

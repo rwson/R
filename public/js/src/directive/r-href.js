@@ -1,5 +1,5 @@
 /**
- * r-bind指令
+ * r-href指令
  */
 
 "use strict";

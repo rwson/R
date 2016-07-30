@@ -80,6 +80,7 @@ define("app2", ["r"], function (R) {
         http({
             "url": "/test/ajax/provider",
             "type": "GET",
+            "dataType": "json",
             "data": {
                 "name": "rwson"
             },

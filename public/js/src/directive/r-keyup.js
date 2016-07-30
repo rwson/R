@@ -1,5 +1,5 @@
 /**
- * r-click指令
+ * r-keyup指令
  */
 
 "use strict";

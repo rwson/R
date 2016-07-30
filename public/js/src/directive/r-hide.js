@@ -1,5 +1,5 @@
 /**
- * r-if指令
+ * r-hide指令
  */
 
 "use strict";

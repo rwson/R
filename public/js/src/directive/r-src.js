@@ -1,5 +1,5 @@
 /**
- * r-if指令
+ * r-src指令
  */
 
 "use strict";
@@ -13,13 +13,13 @@
 
 }(window, function (root, Tool, Event, dirBase, undefined) {
 
-    function RShow(dirCfg) {
+    function RSrc(dirCfg) {
         dirBase.call(this, dirCfg);
     }
 
-    RShow.prototype = {
+    RSrc.prototype = {
 
-        "constructor": RShow,
+        "constructor": RSrc,
 
         "link": function (el, exp, scope) {
             this.scope = this.scope || scope;
@@ -31,9 +31,9 @@
     };
 
     return {
-        "name": "RShow",
+        "name": "RSrc",
         "type": "control",
-        "constructor": RShow
+        "constructor": RSrc
     };
 
 }));

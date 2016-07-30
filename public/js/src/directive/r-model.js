@@ -13,9 +13,9 @@
 
 }(window, function (root, Tool, Event, Dom, dirBase, undefined) {
 
-    var textTypeReg = /text|password|number|tel|email|url/gi,           //  可以输入的几种文本类型
-        checkTypeReg = /radio|checkbox/gi,                              //  单复选
-        changeTypeReg = /^[date|month|time|week|range]/,                //  change以后的几种
+    var textTypeReg = /text|password|number|tel|email|url/,             //  可以输入的几种文本类型
+        checkTypeReg = /radio|checkbox/,                                //  单复选
+        changeTypeReg = /date|month|time|week|range/,                   //  change以后的几种
         tagName, elType, disabled, rid, isAvailable;
 
     function RModel(dirCfg) {
@@ -70,6 +70,7 @@
 
                     Event.removeEvent(el, "change");
                     Event.addEvent(el, "change", function () {
+                        console.log(el.value);
                         _doUpdate.call(this, el.value, scope);
                     }.bind(this));
                 }

@@ -1,5 +1,5 @@
 /**
- * r-if指令
+ * r-else指令
  */
 
 "use strict";
