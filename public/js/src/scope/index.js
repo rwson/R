@@ -17,11 +17,17 @@
     //  条件判断语句(&&/||/==/===/!=/!==/>/</>=/<=)
     var conditionReg = /((\!)?\=+|>(\=)?|<(\=)?|\|\||\&\&)/g;
 
-    //  boolean值之间的计算(!/!!/!!!/!...)
+    //  boolean值之间的计算(!xyz/!!xyz/!!!xyz/!...xyz)
     var boolReg = /\!+/g;
 
-    //  计算表达式(+/-/*///%)
-    var calculateReg = /(\+|\-\*|\/|\%)/g;
+    //  基本数学计算表达式(+/-/*///%)
+    var calculateReg = /[\+|\-|\/*|\/|\%]/g;
+
+    //  括号,指定含有计算表达式中的计算优先级
+    var bracketsReg = /^\([\w\W]+\)$/g;
+
+    //  用于替换表达式中的开头和结尾括号
+    var bracketsReplace = /^\(|\)$/g;
 
     /**
      * Controller对应的scope对象
@@ -68,7 +74,6 @@
          */
         "get": function (key) {
             var target = this.data[key];
-
             return Tool.isReferenceType(target) ? Tool.copy(target, true) : target;
         },
 
@@ -94,7 +99,7 @@
                     }
                 }
             }, this);
-            if(watcherList.length.length === 1) {
+            if (watcherList.length.length === 1) {
                 Watcher.reWatchAll();
             }
         },
@@ -118,16 +123,100 @@
 
         /**
          * 获取深层对象下的相关属性值(a["b"]["c"]["d"][,...])
+         * @param expStr    属性值的嵌套(String)
          * @param context   被获取属性的对象
-         * @param expArr    属性值的嵌套(String/Array)
          * @returns {*}
          */
-        "execDeep": function (context, expArr) {
+        "execDeep": function (expStr, context) {
 
-
-            if (!!expArr) {
-                return Tool.buildFunction("return this." + expArr.join(".") + ";", context);
+            if(Tool.isUndefined(expStr)) {
+                return undefined;
             }
+
+            if(!expStr.match) {
+                console.log(expStr);
+            }
+
+            var condition = expStr.match(conditionReg),
+                strArr, executeStr, canculate, boolean, booleanIn;
+
+            //  判断是否存在条件判断语句,拼凑不同的数组
+            if (condition !== null) {
+                condition = condition[0];
+                strArr = expStr.split(condition);
+            } else {
+                strArr = [expStr];
+            }
+
+            //  遍历每一项,判断是否需要加this
+            strArr = strArr.map(function (strItem) {
+
+                //  去空格
+                strItem = Tool.trim(strItem);
+
+                //  判断该条语句中是否存在数学计算和转boolean运算
+                canculate = strItem.match(calculateReg);
+                boolean = strItem.match(boolReg);
+
+                //  存在计算表达式
+                if (canculate) {
+                    canculate = canculate[0];
+                    strItem = strItem.split(canculate);
+                    strItem = strItem.map(function (str) {
+                        booleanIn = str.match(boolReg);
+                        str = Tool.trim(str);
+
+                        //  表达式中含有转boolean匀速
+                        if (booleanIn) {
+                            booleanIn = booleanIn[0];
+                            str = str.replace(booleanIn, "");
+
+                            //  尝试
+                            try {
+                                new Function("return this." + str).call(context);
+                                str = booleanIn + "(this." + str + ")";
+                            } catch (ex) {
+                                str = booleanIn + "(" + str + ")";
+                            }
+                        } else {
+                            try {
+                                new Function("return this." + str).call(context);
+                                str = "(this." + str + ")";
+                            } catch (ex) {
+                                str = "(" + str + ")";
+                            }
+                        }
+                        return str;
+                    }).join(" " + canculate + " ");
+                }
+
+
+                if (boolean) {
+                    boolean = boolean[0];
+                    strItem = strItem.replace(boolean, "");
+                }
+
+                try {
+                    new Function("return this." + strItem);
+                    strItem = "(this." + strItem + ")";
+                } catch (ex) {
+                    strItem = "(" + strItem + ")";
+                }
+
+                if(boolean) {
+                    strItem = boolean + strItem;
+                }
+
+                return strItem;
+            });
+
+            if(condition) {
+                executeStr = strArr.join(condition);
+            } else {
+                executeStr = strArr.join(" ");
+            }
+
+            return new Function("return " + strArr + ";").call(context);
         },
 
         /**

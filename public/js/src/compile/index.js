@@ -253,6 +253,8 @@
                             finalExp = Tool.trim(splitDir[0]);
                         }
 
+                        console.log(finalExp);
+
                         directiveIns = new dir.directive(cEle);
 
                         exp = scope.exec(finalExp);

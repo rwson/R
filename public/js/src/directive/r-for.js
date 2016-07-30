@@ -80,8 +80,8 @@
                                                 tDir = new cDir.directive(dir);
 
                                                 //  取得指令绑定是属性值
-                                                expArr = cDir.exp.split(".").slice(1);
-                                                value = scope.exec(cDir.exp) || scope.execDeep(inExp, expArr);
+                                                expArr = cDir.exp.split(".").slice(1).join(".");
+                                                value = scope.exec(cDir.exp) || scope.execDeep(expArr, inExp);
 
                                                 //  判断当前指令类型,事件类型就修改回调函数里面this指向
                                                 if (cDir.dirType === "event") {
@@ -112,8 +112,8 @@
                                                 tDir = new cDir.directive(dir);
 
                                                 //  取得指令绑定是属性值
-                                                expArr = cDir.exp.split(".").slice(1);
-                                                value = scope.exec(cDir.exp) || scope.execDeep(inExp, expArr);
+                                                expArr = cDir.exp.split(".").slice(1).join(".");
+                                                value = scope.exec(cDir.exp) || scope.execDeep(expArr, inExp);
 
                                                 //  判断当前指令类型,事件类型就修改回调函数里面this指向
                                                 if (cDir.dirType === "event") {
@@ -138,8 +138,8 @@
                                 dir.el = elCloned;
                                 tDir = new dir.directive(dir);
                                 //  取得指令绑定是属性值
-                                expArr = dir.exp.split(".").slice(1);
-                                value = scope.exec(dir.exp) || scope.execDeep(inExp, expArr);
+                                expArr = dir.exp.split(".").slice(1).join(".");
+                                value = scope.exec(dir.exp) || scope.execDeep(expArr, inExp);
 
                                 //  判断当前指令类型,事件类型就修改回调函数里面this指向
                                 if (dir.dirType === "event") {
