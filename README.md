@@ -244,6 +244,43 @@ r-keydown | r-keydown="keyDownFn" | 在当前元素触发keydown事件的时候,
 r-key-down | r-key-down="keyDownFn" | 在当前元素触发keydown事件的时候,执行相关函数,常用于表单元素
 r-key-up | r-key-up="keyDownFn" | 和r-key-down类似,事件类型变成keyup,常用于表单元素
 
+---
+
+#### 内置provider
+
+##### - pageParams
+
+method/attribure | 使用方式 | 描述
+---|---|---
+path | pageParams.path | 取得在配置路由时url中指定的参数名称和值(作为键值对形式展现)
+queryString | pageParams.queryString | 取得url查询字符串相关参数(作为键值对形式展现)
+
+
+##### - cookie
+
+method/attribure | 使用方式 | 描述
+---|---|---
+set | cookie.set("name", "value", 30) | 设置浏览器cookie内容,第一个参数是cookie名称,第二个是对应的值,第三个是过期时间
+get | cookie.get("name") | 获取浏览器的cookie,传入cookie名
+delete | cookie.delete("name") | 删除浏览器的cookie,传入cookie名
+
+##### - http
+
+此处集成的是jQuery/Zepto中的ajax模块,具体用法见jQuery中[ajax](http://hemin.cn/jq/jQuery.ajax.html)部分的API
+
+
+    http.ajax({
+        //  ...
+    });
+    
+    http.get({
+        //  ...
+    });
+    
+    //  ...
+    
+    //  此处的http是controller回调函数的形参,对应注入http模块,也可改成其他的
+
 ----
 
 #### TODO
@@ -254,5 +291,6 @@ r-key-up | r-key-up="keyDownFn" | 和r-key-down类似,事件类型变成keyup,�
 - 提供更多内置指令以及指令优先级(约定执行顺序)
 - 目前仅支持require形式的引入,提供支持CMD/script标签引入的方式
 - 优化在通过Service方式共享数据时更新过慢的问题
+- 指令表达式内的复杂计算问题(现在仅支持指令内的基本表达式(逻辑判断条件,其他类型转布尔操作,加减乘除模[a.b.c + a.b.d * 5 + a.b.e.f / a.c ]),对于要遵守相关优先级[(a.b.c + a.cb) / a.e.f]这种的暂未做支持)
 
 ----
