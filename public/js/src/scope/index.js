@@ -14,6 +14,15 @@
 
 }(window, function (root, Tool, Watcher, undefined) {
 
+    //  条件判断语句(&&/||/==/===/!=/!==/>/</>=/<=)
+    var conditionReg = /((\!)?\=+|>(\=)?|<(\=)?|\|\||\&\&)/g;
+
+    //  boolean值之间的计算(!/!!/!!!/!...)
+    var boolReg = /\!+/g;
+
+    //  计算表达式(+/-/*///%)
+    var calculateReg = /(\+|\-\*|\/|\%)/g;
+
     /**
      * Controller对应的scope对象
      * @param compile   Compile类的实例
@@ -114,9 +123,8 @@
          * @returns {*}
          */
         "execDeep": function (context, expArr) {
-            if (!Tool.isType(expArr, "array")) {
-                expArr = [expArr];
-            }
+
+
             if (!!expArr) {
                 return Tool.buildFunction("return this." + expArr.join(".") + ";", context);
             }
