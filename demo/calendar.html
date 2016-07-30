@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>日期选择</title>
+</head>
+<body>
+
+    <div id="app">
+        <div r-controller="calendarApp">
+
+            <div r-show="showLevel == 'date'"></div>
+
+            <div r-show="showLevel == 'month'"></div>
+
+            <div r-show="showLevel == 'year'"></div>
+
+        </div>
+    </div>
+
+    <script src="/js/lib/require.min.js"></script>
+    <script src="/js/config/requireConfig.js"></script>
+    <script>
+        require(["calendarCtrl"]);
+    </script>
+</body>
+</html>

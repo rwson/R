@@ -266,7 +266,7 @@
                                 exp = Tool.buildFunction("return " + splitDir.join("") + ";");
                             }
 
-                            directiveIns.link(cEle.el, exp, scope);``
+                            directiveIns.link(cEle.el, exp, scope);
 
                             //  判断是否已经存在该指令对应的数组对象,没有就新建一个
                             if (!this.directiveMap.hasOwnProperty(finalExp)) {

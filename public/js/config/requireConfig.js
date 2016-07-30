@@ -36,6 +36,7 @@ require.config({
         "r": "src/r/index",
 
         "app": "app",
-        "app2": "app2"
+        "app2": "app2",
+        "calendarCtrl": "calendarCtrl"
     }
 });

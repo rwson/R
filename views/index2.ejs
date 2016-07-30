@@ -30,29 +30,29 @@
 
     <div r-controller="appCtrl">
 
-        <!--<h2 r-text="text" style="background: #ccc;"></h2>-->
-        <!--<input type="text" r-model="text" />-->
+        <h2 r-text="text" style="background: #ccc;"></h2>
+        <input type="text" r-model="text" />
 
         <input type="text" r-model="fullname"/>
-        <!--<p r-bind="fullname"></p>-->
-        <!--<input type="text" r-model="todo" r-key-up="keyUp" />-->
-        <!--<ul>-->
-            <!--<li r-for="item in todos">-->
-                <!--<span r-bind="item.title"></span>-->
-            <!--</li>-->
-        <!--</ul>-->
+        <p r-bind="fullname"></p>
+        <input type="text" r-model="todo" r-key-up="keyUp" />
+        <ul>
+            <li r-for="item in todos">
+                <span r-bind="item.title"></span>
+            </li>
+        </ul>
     </div>
 
     <p class="split-paragraph">上下不同Controller</p>
 
     <div r-controller="appCtrl2">
         <input type="text" r-model="fullname"/>
-        <!--<p r-bind="fullname"></p>-->
-        <!--<ul>-->
-            <!--<li r-for="item in todos">-->
-                <!--<span r-bind="item.title"></span>-->
-            <!--</li>-->
-        <!--</ul>-->
+        <p r-bind="fullname"></p>
+        <ul>
+            <li r-for="item in todos">
+                <span r-bind="item.title"></span>
+            </li>
+        </ul>
     </div>
 
 </div>

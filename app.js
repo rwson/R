@@ -15,6 +15,21 @@ app.use(bodyParser.urlencoded({extended: false}));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+//  渲染index2.ejs
+app.get("/index2", function (req, res, next) {
+    res.render("index2");
+});
+
+//  渲染index2.ejs
+app.get("/navigation", function (req, res, next) {
+    res.render("navigation");
+});
+
+//  各demo示例路由
+app.get("/demo/*", function (req, res, next) {
+    res.sendfile(path.resolve(path.join(__dirname, req.path + ".html")));
+});
+
 //  模拟文章列表请求
 app.get("/list/articles", function (req, res, next) {
     res.json({
@@ -51,11 +66,7 @@ app.get("/detail/content", function (req, res, next) {
     });
 });
 
-//  渲染index2.ejs
-app.get("/index2", function (req, res, next) {
-    res.render("index2");
-});
-
+//  测试ajax
 app.get("/test/ajax/provider", function (req, res, next) {
     res.send(200, {
         "submit": req.query
