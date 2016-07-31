@@ -133,10 +133,6 @@
                 return undefined;
             }
 
-            if(!expStr.match) {
-                console.log(expStr);
-            }
-
             var condition = expStr.match(conditionReg),
                 strArr, executeStr, canculate, boolean, booleanIn;
 
@@ -216,7 +212,7 @@
                 executeStr = strArr.join(" ");
             }
 
-            return new Function("return " + strArr + ";").call(context);
+            return new Function("return " + executeStr + ";").call(context);
         },
 
         /**

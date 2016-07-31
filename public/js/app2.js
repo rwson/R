@@ -24,7 +24,6 @@ define("app2", ["r"], function (R) {
         "type": "dom",
         "priority": 1,
         "constructor": function (dirCfg) {
-            console.log(dirCfg);
         },
         "link": function (el, exp, scope) {
             this.scope = scope;
@@ -41,8 +40,15 @@ define("app2", ["r"], function (R) {
 
         scope.set({
             "todo": "",
+            "str": "test",
             "text": "test custom directive"
         });
+
+        setTimeout(function () {
+            scope.update({
+                "str": "test1"
+            });
+        }, 2000);
 
         scope.defineEvents({
             "addTodo": function (ev) {
@@ -80,12 +86,11 @@ define("app2", ["r"], function (R) {
         http({
             "url": "/test/ajax/provider",
             "type": "GET",
-            "dataType": "json",
             "data": {
                 "name": "rwson"
             },
             "success": function (res) {
-                console.log(res);
+                console.log(JSON.parse(res));
             },
             "error": function (ex) {
             }
