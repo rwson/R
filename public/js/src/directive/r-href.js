@@ -14,6 +14,7 @@
 }(window, function (root, Tool, Dom, dirBase, undefined) {
 
     function RHref(dirCfg) {
+        dirCfg.name = "RHref";
         dirBase.call(this, dirCfg);
         return this;
     }
@@ -23,8 +24,6 @@
         "constructor": RHref,
 
         "link": function (el, exp, scope) {
-            //  修正scope
-            this.scope = this.scope || scope;
             if (!Tool.isUndefined(exp)) {
                 Dom.setAttributes(el, {
                     "href": exp

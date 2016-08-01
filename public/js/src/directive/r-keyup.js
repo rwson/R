@@ -14,6 +14,7 @@
 }(window, function (root, Tool, Event, dirBase, undefined) {
 
     function RKeyUp(dirCfg) {
+        dirCfg.name = "RKeyUp";
         dirBase.call(this, dirCfg);
         this.context = root;
         return this;
@@ -24,10 +25,11 @@
         "constructor": RKeyUp,
 
         "link": function (el, exp, scope, context) {
-            //  修正scope
-            this.scope = this.scope || scope;
-            Event.removeEvent(el, "keyup", exp);
-            Event.addEvent(el, "keyup", exp);
+            this.bindFn = this.scope.execDeep(this.finalExp, this.scope.events).result;
+            if (Tool.isType(this.bindFn, "function")) {
+                Event.removeEvent(el, "keyup", this.bindFn.bind(context));
+                Event.addEvent(el, "keyup", this.bindFn.bind(context));
+            }
         }
 
     };

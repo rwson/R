@@ -14,6 +14,7 @@
 }(window, function (root, Tool, Event, Dom, dirBase, undefined) {
 
     function RIf(dirCfg) {
+        dirCfg.name = "RIf";
         dirBase.call(this, dirCfg);
         this.index = Dom.getChildIndex(this.parentNode, this.el);
     }

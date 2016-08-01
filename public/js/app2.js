@@ -26,12 +26,11 @@ define("app2", ["r"], function (R) {
         "constructor": function (dirCfg) {
         },
         "link": function (el, exp, scope) {
-            this.scope = scope;
             if (typeof exp !== "undefined") {
                 el.textContent = exp;
             }
         },
-        "update": function (exp) {
+        "update": function (el, exp, scope) {
             this.el.textContent = exp;
         }
     });

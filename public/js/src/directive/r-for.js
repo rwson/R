@@ -14,6 +14,7 @@
 }(window, function (root, Tool, Dom, dirBase, undefined) {
 
     function RFor(dirCfg) {
+        dirCfg.name = "RFor";
         dirBase.call(this, dirCfg);
         this.parentNode = this.el.parentNode;
         this.childDir = dirCfg.childDir;
@@ -25,15 +26,19 @@
         "constructor": RFor,
 
         "link": function (el, exp, scope) {
-            this.scope = this.scope || scope;
             this.parentNode.innerHTML = "";
-            if (exp && exp.length) {
+
+            var execRes = this.scope.execDeep(this.finalExp, this.scope.data);
+            this.originalData = execRes.result;
+            this.updateExp = execRes.executeStr;
+
+            if (this.originalData && this.originalData.length) {
                 var fragement = Dom.createFragment();
                 var directives = this.directives;
                 var elCloned, rid, children, childEl, childDir, childDirs, tDir, expArr, value, loopParent;
 
                 //  遍历list数据
-                exp.forEach(function (inExp) {
+                this.originalData.forEach(function (inExp) {
 
                     //  当前元素的一个副本,及父元素
                     elCloned = this.el.cloneNode(true);
@@ -57,7 +62,6 @@
 
                             if (childDirs && childDir.length) {
 
-
                                 //  同样保存当前子元素的一个副本
                                 childEl = dir.el.cloneNode(true);
 
@@ -77,6 +81,7 @@
                                             //  遍历当前子元素的指令
                                             childDirs.forEach(function (cDir) {
                                                 //  实例化指令
+
                                                 tDir = new cDir.directive(dir);
 
                                                 //  取得指令绑定是属性值
@@ -159,8 +164,11 @@
             }
         },
 
-        "update": function (val) {
-            this.link(this.el, val, this.scope);
+        "update": function () {
+            var newData = this.scope.execByStr(this.updateExp, this.scope.data);
+            if(this.originalData.length === 0) {
+                this.link(this.el, newData, this.scope);
+            }
         }
     };
 

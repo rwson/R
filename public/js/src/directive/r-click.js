@@ -14,6 +14,7 @@
 }(window, function (root, Tool, Event, Dom, dirBase, undefined) {
 
     function RClick(dirCfg) {
+        dirCfg.name = "RClick";
         dirBase.call(this, dirCfg);
         return this;
     }
@@ -23,11 +24,10 @@
         "constructor": RClick,
 
         "link": function (el, exp, scope, context) {
-            //  修正scope
-            this.scope = this.scope || scope;
-            if(!Tool.isUndefined(exp)) {
-                Event.removeEvent(el, "click", exp);
-                Event.addEvent(el, "click", exp.bind(context));
+            this.bindFn = this.scope.execDeep(this.finalExp, this.scope.events).result;
+            if (Tool.isType(this.bindFn, "function")) {
+                Event.removeEvent(el, "click", this.bindFn);
+                Event.addEvent(el, "click", this.bindFn.bind(context));
             }
         }
     };

@@ -99,9 +99,6 @@
                     }
                 }
             }, this);
-            if (watcherList.length.length === 1) {
-                Watcher.reWatchAll();
-            }
         },
 
         /**
@@ -123,14 +120,20 @@
 
         /**
          * 获取深层对象下的相关属性值(a["b"]["c"]["d"][,...])
-         * @param expStr    属性值的嵌套(String)
+         * @param expStr    指令表达式字符串
          * @param context   被获取属性的对象
-         * @returns {*}
+         * @returns {{
+         *      "executeStr": string,
+         *      "result": *
+         * }}
          */
         "execDeep": function (expStr, context) {
 
-            if(Tool.isUndefined(expStr)) {
-                return undefined;
+            if (!expStr) {
+                return {
+                    "executeStr": "",
+                    "result": ""
+                };
             }
 
             var condition = expStr.match(conditionReg),
@@ -167,7 +170,7 @@
                             booleanIn = booleanIn[0];
                             str = str.replace(booleanIn, "");
 
-                            //  尝试
+                            //  判断是否需要this.
                             try {
                                 new Function("return this." + str).call(context);
                                 str = booleanIn + "(this." + str + ")";
@@ -186,7 +189,6 @@
                     }).join(" " + canculate + " ");
                 }
 
-
                 if (boolean) {
                     boolean = boolean[0];
                     strItem = strItem.replace(boolean, "");
@@ -199,20 +201,36 @@
                     strItem = "(" + strItem + ")";
                 }
 
-                if(boolean) {
+                if (boolean) {
                     strItem = boolean + strItem;
                 }
 
                 return strItem;
             });
 
-            if(condition) {
+            if (condition) {
                 executeStr = strArr.join(condition);
             } else {
                 executeStr = strArr.join(" ");
             }
 
-            return new Function("return " + executeStr + ";").call(context);
+            return {
+                "executeStr": executeStr,
+                "result": new Function("return " + executeStr + ";").call(context)
+            };
+        },
+
+        /**
+         * 根据第一次编译拼接好的执行字符串,来获取数据,而不用重新编译
+         * @param execStr   执行字符串
+         * @param context   上下文作用域
+         * @returns {*}
+         */
+        "execByStr": function (execStr, context) {
+            if (!execStr) {
+                return;
+            }
+            return new Function("return " + execStr).call(context);
         },
 
         /**

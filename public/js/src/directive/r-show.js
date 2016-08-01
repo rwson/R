@@ -14,6 +14,7 @@
 }(window, function (root, Tool, Event, dirBase, undefined) {
 
     function RShow(dirCfg) {
+        dirCfg.name = "RShow";
         dirBase.call(this, dirCfg);
     }
 
@@ -22,8 +23,6 @@
         "constructor": RShow,
 
         "link": function (el, exp, scope) {
-            this.scope = this.scope || scope;
-
             if(exp) {
                 el.style.display = "block";
             } else {

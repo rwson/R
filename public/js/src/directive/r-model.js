@@ -19,6 +19,7 @@
         tagName, elType, disabled, rid, isAvailable;
 
     function RModel(dirCfg) {
+        dirCfg.name = "RModel";
         dirBase.call(this, dirCfg);
         return this;
     }
@@ -28,22 +29,22 @@
         "constructor": RModel,
 
         "link": function (el, exp, scope) {
-
-            //  修正scope
-            this.scope = this.scope || scope;
-
             //  获取当前元素相关信息
             tagName = el.tagName.toLowerCase();
             elType = el.type;
             disabled = el.disabled;
             isAvailable = Dom.isHide(el) || Dom.isExist(el);
 
+            var execRes = this.scope.execDeep(this.finalExp, this.scope.data);
+            this.originalData = execRes.result;
+            this.updateExp = execRes.executeStr;
+
             if (isAvailable && !disabled) {
                 if ((Tool.isEqual(tagName, "input") && (!elType || textTypeReg.test(elType)))
                     || Tool.isEqual(tagName, "textarea")) {
 
-                    if (!Tool.isUndefined(exp)) {
-                        el.value = exp;
+                    if (!Tool.isUndefined(this.originalData)) {
+                        this.el.value = this.originalData;
                     }
 
                     Event.removeEvent(el, ["keydown", "keypress", "keyup"]);
@@ -54,7 +55,7 @@
                 } else if (Tool.isEqual(tagName, "input") && checkTypeReg.test(elType)) {
 
                     if (!Tool.isUndefined(exp)) {
-                        el.checked = exp;
+                        this.el.checked = this.originalData;
                     }
 
                     Event.removeEvent(el, "click");
@@ -65,20 +66,23 @@
                 } else if (Tool.isEqual(tagName, "input") && (changeTypeReg.test(elType))) {
 
                     if (!Tool.isUndefined(exp)) {
-                        el.value = exp;
+                        this.el.value = this.originalData;
                     }
 
                     Event.removeEvent(el, "change");
                     Event.addEvent(el, "change", function () {
-                        console.log(el.value);
                         _doUpdate.call(this, el.value, scope);
                     }.bind(this));
                 }
             }
         },
 
-        "update": function (val) {
-            this.el.value = val;
+        "update": function () {
+            var newVal = this.scope.execByStr(this.updateExp, this.scope.data);
+            if (!Tool.isEqual(newVal, this.originalData)) {
+                this.el.value = newVal;
+                this.originalData = newVal;
+            }
         }
     };
 
@@ -90,7 +94,7 @@
      */
     function _doUpdate(value, scope) {
         var update = {};
-        update[this.exp] = value;
+        update[this.finalExp] = value;
         scope.update(update);
     }
 

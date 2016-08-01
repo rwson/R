@@ -14,6 +14,7 @@
 }(window, function (root, Tool, Dom, dirBase, undefined) {
 
     function RBind(dirCfg) {
+        dirCfg.name = "RBind";
         dirBase.call(this, dirCfg);
         return this;
     }
@@ -23,15 +24,22 @@
         "constructor": RBind,
 
         "link": function (el, exp, scope) {
-            //  修正scope
-            this.scope = this.scope || scope;
-            if (!Tool.isUndefined(exp)) {
-                el.innerHTML = exp;
+
+            var execRes = this.scope.execDeep(this.finalExp, this.scope.data);
+            this.originalData = execRes.result;
+            this.updateExp = execRes.executeStr;
+
+            if (!Tool.isUndefined(this.originalData)) {
+                this.el.innerHTML = this.originalData;
             }
         },
 
         "update": function (exp) {
-            this.el.innerHTML = exp;
+            var newVal = this.scope.execByStr(this.updateExp, this.scope.data);
+            if (!Tool.isEqual(newVal, this.originalData)) {
+                this.el.innerHTML = newVal;
+                this.originalData = newVal;
+            }
         }
 
     };

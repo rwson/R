@@ -14,6 +14,7 @@
 }(window, function (root, Tool, Event, dirBase, undefined) {
 
     function RHide(dirCfg) {
+        dirCfg.name = "RHide";
         dirBase.call(this,dirCfg);
     }
 

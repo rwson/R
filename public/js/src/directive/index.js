@@ -32,7 +32,9 @@
 
     var exportObj = {},
         customOpt = {
-            "extend": true
+            "extend": true,
+            "dirType": "dom",
+            "priority": 0
         },
         argus = [].slice.call(arguments, 2);
 
@@ -52,13 +54,37 @@
         exportObj[name] = {
             "constructor": function (dirCfg) {
                 if (opt.extend) {
+                    dirCfg.name = name;
                     dirBase.call(this, dirCfg);
                 }
+
                 Tool.isType(opt.constructor, "function") && opt.constructor.call(this, dirCfg);
-                this.priority = opt.priority || 0;
+                this.priority = opt.priority;
                 this.dirType = opt.type;
-                this.link = opt.link;
-                this.update = opt.update;
+
+                this.link = function () {
+                    var execRes;
+                    if (this.dirType === "dom") {
+                        execRes = this.scope.execDeep(this.finalExp, this.scope.data);
+                        this.originalData = execRes.result;
+                        this.updateExp = execRes.executeStr;
+                        opt.link(this.el, this.originalData, this.scope);
+                    } else if (this.dirType === "events") {
+                        execRes = this.scope.execDeep(this.finalExp, this.scope.events);
+                        this.bindFn = execRes.result;
+                        opt.link(this.el, this.bindFn, this.scope);
+                    }
+                };
+
+                this.update = function () {
+                    var newVal = this.scope.execByStr(this.updateExp, this.scope.data);
+                    if (!Tool.isEqual(newVal, this.originalData)) {
+                        if (Tool.isType(opt.update, "function")) {
+                            opt.update.call(this, this.el, newVal, this.scope);
+                        }
+                        this.originalData = newVal;
+                    }
+                };
             }
         };
     };

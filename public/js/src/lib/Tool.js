@@ -4,17 +4,17 @@
 
 "use strict";
 
-(function (root, factory) {
+(function(root, factory) {
     if (typeof define === "function" && define.amd) {
-        define([], function () {
+        define([], function() {
             return factory(window);
         });
     }
 
-}(window, function (root, undefined) {
+}(window, function(root, undefined) {
 
-    var _class2 = {};                                       //  Object.prototype
-    var _array2 = [];                                       //  Array.prototype
+    var _class2 = {}; //  Object.prototype
+    var _array2 = []; //  Array.prototype
 
     var Tool = {
 
@@ -23,7 +23,7 @@
          * @param str   字符串
          * @returns {string}
          */
-        "trim": function (str) {
+        "trim": function(str) {
             str = "" + str;
             if (str.trim) {
                 return str.trim();
@@ -37,18 +37,18 @@
          * @param target    目标对象
          * @param opt       配置参数
          */
-        "transfer": function (target, opt) {
+        "transfer": function(target, opt) {
             var getter, setter;
             if (this.isType(target, "object")) {
-                Object.keys(target).forEach(function (key) {
+                Object.keys(target).forEach(function(key) {
                     //  过滤掉"_xxx"这种key,可减少最多一倍的遍历次数
                     if (!(/^\_/).test(key)) {
                         var _key = "_" + key;
                         Object.defineProperty(target, key, {
-                            "get": function () {
+                            "get": function() {
                                 return this[_key];
                             },
-                            "set": function (val) {
+                            "set": function(val) {
                                 //  this[_key] !== undefined && !Tool.isEqual(this[_key], val)代表是通过update更新的数据,而不是set新增的
                                 if ((!Tool.isUndefined(this[_key]) && !Tool.isEqual(this[_key], val))) {
                                     Tool.isType(opt.beforeUpdate, "function") && opt.beforeUpdate.call((opt.context || this), key, val);
@@ -70,7 +70,7 @@
          * @param needState 是否支持
          * @param path      目标路由
          */
-        "pushStateOrHash": function (needState, path) {
+        "pushStateOrHash": function(needState, path) {
             if (!path) {
                 return;
             }
@@ -86,7 +86,7 @@
          * @param   rootPath    首页路径
          * @returns {hash: "", path: ""}
          */
-        "getHashOrState": function (rootPath) {
+        "getHashOrState": function(rootPath) {
             rootPath = rootPath || "/";
             var path = decodeURIComponent(location.pathname + this.getSearch());
             var hash = location.href.match(/#(.*)$/);
@@ -104,7 +104,7 @@
          * 获取url中那一串?xxx=yyy
          * @returns {String || ""}
          * */
-        "getSearch": function () {
+        "getSearch": function() {
             var match;
             match = location.href.replace(/#.*/, "").match(/\?.+/);
             return match ? match[0] : "";
@@ -115,13 +115,13 @@
          * @param url   被获取的字符串
          * @returns {{}||Object}
          */
-        "getQueryString": function (url) {
+        "getQueryString": function(url) {
             var arr = url.split("?")[1].split("&");
             var output = {};
             if (!url || url.indexOf("?") < 0) {
                 return output;
             }
-            arr.forEach(function (item) {
+            arr.forEach(function(item) {
                 var _temp = item.split("=");
                 output[_temp[0]] = decodeURIComponent(_temp[1]);
                 _temp = null;
@@ -136,8 +136,8 @@
          * @param override      是否支持相同属性值覆盖
          * @returns {Object}
          */
-        "merge": function (obj1, obj2, override) {
-            Object.keys(obj2).forEach(function (i) {
+        "merge": function(obj1, obj2, override) {
+            Object.keys(obj2).forEach(function(i) {
                 if (obj1[i] && override) {
                     obj1[i] = obj2[i];
                 } else {
@@ -153,7 +153,7 @@
          * @param typeStr   希望的类型字符串(Boolean Number String Function Array Date RegExp Object)
          * @returns {boolean}
          */
-        "isType": function (obj, typeStr) {
+        "isType": function(obj, typeStr) {
             return _class2.toString.call(obj).toLowerCase() === ("[object " + typeStr + "]").toLowerCase();
         },
 
@@ -162,7 +162,7 @@
          * @param obj   被判断的对象
          * @returns {boolean}
          */
-        "isUndefined": function (obj) {
+        "isUndefined": function(obj) {
             return obj === undefined;
         },
 
@@ -171,7 +171,7 @@
          * @param obj   被判断的对象
          * @returns {boolean}
          */
-        "isReferenceType": function (obj) {
+        "isReferenceType": function(obj) {
             return this.isType(obj, "Object") || this.isType(obj, "Array");
         },
 
@@ -181,7 +181,7 @@
          * @param obj2  第二个对象
          * @returns {boolean}
          */
-        "isEqual": function (obj1, obj2) {
+        "isEqual": function(obj1, obj2) {
             return _eq(obj1, obj2, [], []);
         },
 
@@ -191,7 +191,7 @@
          * @param deep  是否深拷贝
          * @returns {*}
          */
-        "copy": function (obj, deep) {
+        "copy": function(obj, deep) {
             //  typeof []/{} -> "object"
             if (!deep || obj === null || typeof obj !== "object") {
                 return obj;
@@ -215,9 +215,9 @@
          * @param target
          * @returns {{}}
          */
-        "copyAsEmpty": function (target) {
+        "copyAsEmpty": function(target) {
             var res = {};
-            Object.keys(target).forEach(function (key) {
+            Object.keys(target).forEach(function(key) {
                 res[key] = "";
             });
             return res;
@@ -228,12 +228,12 @@
          * @param str
          * @returns {*}
          */
-        "toCamelCase": function (str) {
+        "toCamelCase": function(str) {
             str = ("" + str);
             if (!("" + str)) {
                 return "";
             }
-            return str.replace(/[^\b-]{1,90}/g, function (word) {
+            return str.replace(/[^\b-]{1,90}/g, function(word) {
                 return word.substring(0, 1).toUpperCase() + word.substring(1);
             }).replace(/\-/g, "");
         },
@@ -243,7 +243,7 @@
          * @param list  被判断的对象
          * @returns {boolean}
          */
-        "isFakeArray": function (list) {
+        "isFakeArray": function(list) {
             return list && (typeof list === "object") && isFinite(list.length) && (list.length >= 0) && (list.length === Math.floor(list.length)) && list.length < 4294967296;
         },
 
@@ -252,7 +252,7 @@
          * @param fakeArray     伪数组
          * @returns {Array.<T>}
          */
-        "toArray": function (fakeArray) {
+        "toArray": function(fakeArray) {
             var res = [];
             if (Tool.isFakeArray(fakeArray)) {
                 res = _array2.slice.call(fakeArray);
@@ -264,7 +264,7 @@
          * 生成一个随机字符串
          * @returns {string}
          */
-        "randomStr": function () {
+        "randomStr": function() {
             return ("" + Math.random()).toString(16).replace(".", "");
         },
 
@@ -272,7 +272,7 @@
          * 执行回调函数
          * @returns {*}
          */
-        "executeCallback": function () {
+        "executeCallback": function() {
             var fn = arguments[0];
             var args = _array2.slice.call(arguments, 1);
             if (Tool.isType(fn, "Function")) {
@@ -287,7 +287,7 @@
          * @param argus     参数列表
          * @returns {*}
          */
-        "buildFunction": function (body, context, argus) {
+        "buildFunction": function(body, context, argus) {
             if (!arguments.length) {
                 return false;
             }
@@ -301,13 +301,13 @@
          * http请求(GET)
          * @param opts  配置参数
          */
-        "getRequest": function (opts) {
+        "getRequest": function(opts) {
             var xhr = new XMLHttpRequest();
             //  支持带cookie发起请求
             xhr.withCredentials = true;
             xhr.open("GET", opts.url, true);
             xhr.send(null);
-            xhr.onreadystatechange = function () {
+            xhr.onreadystatechange = function() {
                 if (xhr.readyState === 4) {
                     if ((xhr.status >= 200 && xhr.status < 300) || xhr.status == 304) {
                         Tool.executeCallback(opts.success, (opts.context || root), xhr);
@@ -322,7 +322,7 @@
          * 抛出异常
          * @param msg   异常信息
          */
-        "exception": function (msg) {
+        "exception": function(msg) {
             throw msg;
         }
 
@@ -405,13 +405,14 @@
         }
 
         // 获取两个对象的构造器
-        var aCtor = a.constructor, bCtor = b.constructor;
+        var aCtor = a.constructor,
+            bCtor = b.constructor;
 
         //  判断两个对象如果不是不是同一个类的实例则认为不相等
         if (aCtor !== bCtor && !(Tool.isType(bCtor, "function") &&
-            (aCtor instanceof aCtor) &&
-            Tool.isType(bCtor, "function") &&
-            (bCtor instanceof bCtor))) {
+                (aCtor instanceof aCtor) &&
+                Tool.isType(bCtor, "function") &&
+                (bCtor instanceof bCtor))) {
             return false;
         }
 
@@ -420,7 +421,8 @@
         bStack.push(b);
 
         //  局部变量
-        var size = 0, result = true;
+        var size = 0,
+            result = true;
 
         // 数组类型比较
         if (className == '[object Array]') {

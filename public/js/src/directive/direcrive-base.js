@@ -23,10 +23,29 @@
         this.parentNode = this.el.parentNode;
         this.directives = dir.directives;
         this.scope = dir.scope;
-        this.exp = dir.directives ? dir.directives[0].exp : dir.exp;
         this.rid = Dom.getAttributes(this.el, ["rid"])["rid"];
         this.pPid = Dom.getAttributes(this.parentNode, ["rid"])["rid"];
         this.priority = 0;
+        this.exp = "";
+        this.updateExp = "";
+        this.finalExp = "";
+        this.originalData = null;
+        this.bindFn = null;
+
+        if (dir.name) {
+            var curDirective = this.directives.filter(function (directive) {
+                return directive.directiveName === dir.name;
+            });
+            if (curDirective.length) {
+                this.exp = curDirective[0]["exp"];
+                this.finalExp = this.exp;
+
+                //  RFor指令的特殊处理
+                if (dir.name === "RFor") {
+                    this.finalExp = this.exp.split(" ")[2];
+                }
+            }
+        }
     }
 
     return DirectiveBase;

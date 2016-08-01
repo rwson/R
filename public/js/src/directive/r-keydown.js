@@ -14,6 +14,7 @@
 }(window, function (root, Tool, Event, dirBase, undefined) {
 
     function RKeyDown(dirCfg) {
+        dirCfg.name = "RKeyDown";
         dirBase.call(this, dirCfg);
         this.context = root;
         return this;
@@ -24,10 +25,10 @@
         "constructor": RKeyDown,
 
         "link": function (el, exp, scope, context) {
-            //  修正scope
-            this.scope = this.scope || scope;
-            Event.removeEvent(el, "keydown", exp);
-            Event.addEvent(el, "keydown", exp);
+            var execRes = this.scope.execDeep(this.finalExp, this.scope.events);
+            this.bindFn = execRes.result;
+            Event.removeEvent(el, "keydown", this.bindFn);
+            Event.addEvent(el, "keydown", this.bindFn.bind(context));
         }
 
     };

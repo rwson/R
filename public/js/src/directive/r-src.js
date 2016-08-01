@@ -14,6 +14,7 @@
 }(window, function (root, Tool, Event, dirBase, undefined) {
 
     function RSrc(dirCfg) {
+        dirCfg.name = "RSrc";
         dirBase.call(this, dirCfg);
     }
 
@@ -22,7 +23,7 @@
         "constructor": RSrc,
 
         "link": function (el, exp, scope) {
-            this.scope = this.scope || scope;
+
         },
 
         "update": function (exp) {

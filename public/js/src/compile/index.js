@@ -222,7 +222,7 @@
             this.compile();
 
             var ele = this.eleMap, mapKeys = Object.keys(ele),
-                cEle, directives, dir, finalExp, directiveIns, exp, execEd, childDirMap, splitDir, equalType;
+                cEle, directives, dir, finalExp, directiveIns, childDirMap, splitDir;
 
             mapKeys.forEach(function (key) {
                 childDirMap = [];
@@ -236,25 +236,24 @@
                     //  ES5中Array.prototype.forEach不支持break,所以直接for循环,在遇到r-for的时候break该次循环
                     for (var i = 0, len = directives.length; i < len; i++) {
                         dir = directives[i];
-                        finalExp = dir.exp;
-
-                        //  r-for指令
-                        if (loopDirReg.test(finalExp)) {
-                            execEd = loopDirReg.exec(finalExp);
-                            finalExp = execEd[2];
-                        }
 
                         directiveIns = new dir.directive(cEle);
 
                         //  cEle中的firstLink是true,说明没有嵌套在r-for中
                         if (cEle.firstLink) {
 
-                            exp = scope.execDeep(finalExp, scope.data) || scope.execDeep(finalExp, scope.events);
+                            directiveIns.link(cEle.el, dir.exp, scope);
 
-                            directiveIns.link(cEle.el, exp, scope);
+                            finalExp = dir.exp;
 
+                            //  RFor指令
+                            if(loopDirReg.test(finalExp)) {
+                                finalExp = Tool.trim(finalExp.split(" ")[2]);
+                            }
+
+                            //  条件判断语句
                             splitDir = finalExp.match(conditionReg);
-                            if(splitDir) {
+                            if (splitDir) {
                                 finalExp = Tool.trim(finalExp.split(splitDir[0])[0]);
                             }
 
