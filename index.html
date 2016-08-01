@@ -20,29 +20,454 @@
 
     <section class="main-content">
       <h3>
-<a id="welcome-to-github-pages" class="anchor" href="#welcome-to-github-pages" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Welcome to GitHub Pages.</h3>
+<a id="r" class="anchor" href="#r" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>R</h3>
 
-<p>This automatic page generator is the easiest way to create beautiful pages for all of your projects. Author your page content here <a href="https://guides.github.com/features/mastering-markdown/">using GitHub Flavored Markdown</a>, select a template crafted by a designer, and publish. After your page is generated, you can check out the new <code>gh-pages</code> branch locally. If you’re using GitHub Desktop, simply sync your repository and you’ll see the new branch.</p>
+<p>javaScript轻量级MVVM框架</p>
+
+<hr>
+
+<h4>
+<a id="useagedemo" class="anchor" href="#useagedemo" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Useage(Demo)</h4>
+
+<p>Demo是一个极简SPA应用</p>
+
+<pre><code>git clone https://github.com/rwson/R
+
+cd R &amp;&amp; npm install
+
+npm start
+
+//  访问 localhost:3000
+</code></pre>
+
+<hr>
 
 <h3>
-<a id="designer-templates" class="anchor" href="#designer-templates" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Designer Templates</h3>
+<a id="api" class="anchor" href="#api" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>API</h3>
 
-<p>We’ve crafted some handsome templates for you to use. Go ahead and click 'Continue to layouts' to browse through them. You can easily go back to edit your page before publishing. After publishing your page, you can revisit the page generator and switch to another theme. Your Page content will be preserved.</p>
+<h5>
+<a id="声明controller" class="anchor" href="#%E5%A3%B0%E6%98%8Econtroller" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>声明Controller</h5>
 
-<h3>
-<a id="creating-pages-manually" class="anchor" href="#creating-pages-manually" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Creating pages manually</h3>
+<pre><code>R.controller("indexCtrl", function(scope) {
 
-<p>If you prefer to not use the automatic generator, push a branch named <code>gh-pages</code> to your repository to create a page manually. In addition to supporting regular HTML content, GitHub Pages support Jekyll, a simple, blog aware static site generator. Jekyll makes it easy to create site-wide headers and footers without having to copy them across every page. It also offers intelligent blog support and other advanced templating features.</p>
+    scope.set({
+        "key": "value",
+        //  ...
+    });
 
-<h3>
-<a id="authors-and-contributors" class="anchor" href="#authors-and-contributors" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Authors and Contributors</h3>
+    scope.defineEvents({
+        "event1": function() {
+            //  ...
+        },
+        "event2": function() {
+            //  ...
+        }
+    });
 
-<p>You can <a href="https://help.github.com/articles/basic-writing-and-formatting-syntax/#mentioning-users-and-teams" class="user-mention">@mention</a> a GitHub username to generate a link to their profile. The resulting <code>&lt;a&gt;</code> element will link to the contributor’s GitHub Profile. For example: In 2007, Chris Wanstrath (<a href="https://github.com/defunkt" class="user-mention">@defunkt</a>), PJ Hyett (<a href="https://github.com/pjhyett" class="user-mention">@pjhyett</a>), and Tom Preston-Werner (<a href="https://github.com/mojombo" class="user-mention">@mojombo</a>) founded GitHub.</p>
+});
+</code></pre>
 
-<h3>
-<a id="support-or-contact" class="anchor" href="#support-or-contact" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Support or Contact</h3>
+<p>通过</p>
 
-<p>Having trouble with Pages? Check out our <a href="https://help.github.com/pages">documentation</a> or <a href="https://github.com/contact">contact support</a> and we’ll help you sort it out.</p>
+<pre><code>R.controller(name, fn);
+</code></pre>
+
+<p>声明一个Controller</p>
+
+<p>在Controller中通过</p>
+
+<pre><code>scope.set({
+    "key1": "value1",
+    "key2": []
+});
+</code></pre>
+
+<p>来设置绑定指令中所需的数据</p>
+
+<p>通过</p>
+
+<pre><code>scope.update({
+    "key1": "value2"
+});
+</code></pre>
+
+<p>来修改相应数据</p>
+
+<p>通过</p>
+
+<pre><code>scope.defineEvents({
+    "event1": function() {
+        //  ...
+    },
+    "event2": function() {
+        //  ...
+    }
+});
+</code></pre>
+
+<p>来设置绑定指令(绑定事件指令所需要的处理函数)</p>
+
+<hr>
+
+<h5>
+<a id="自定义provider" class="anchor" href="#%E8%87%AA%E5%AE%9A%E4%B9%89provider" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>自定义Provider</h5>
+
+<pre><code>R.provider("provider1", function() {
+    return {
+        "key": "value",
+        //  ...
+    };
+});
+</code></pre>
+
+<p>或</p>
+
+<pre><code>R.provider("provider2", {
+    "key": "value",
+    //  ...
+});
+</code></pre>
+
+<p>通过</p>
+
+<pre><code>R.provider(name, any valid types);
+</code></pre>
+
+<p>声明一个Provider,需要注意的是,当函数第二个参数为function的时候,必须存在一个返回值,否则将是一个无效Provider</p>
+
+<hr>
+
+<h5>
+<a id="自定义service" class="anchor" href="#%E8%87%AA%E5%AE%9A%E4%B9%89service" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>自定义Service</h5>
+
+<pre><code>R.service("shareData", function() {
+    return {
+        "key": "value",
+        //  ...
+    };
+});
+</code></pre>
+
+<p>或</p>
+
+<pre><code>R.service("shareData", {
+    "key": "value",
+    //  ...
+});
+</code></pre>
+
+<p>通过</p>
+
+<pre><code>R.service(name, any valid types);
+</code></pre>
+
+<p>声明一个Service,需要注意的是,当函数第二个参数为function的时候,必须存在一个返回值,否则将是一个无效Service,通过数据共享可以实现相同数据在不同Controller种双向绑定的目的</p>
+
+<hr>
+
+<h5>
+<a id="controller添加依赖注入添加provider相关自定义功能模块servicecontroller数据共享" class="anchor" href="#controller%E6%B7%BB%E5%8A%A0%E4%BE%9D%E8%B5%96%E6%B3%A8%E5%85%A5%E6%B7%BB%E5%8A%A0provider%E7%9B%B8%E5%85%B3%E8%87%AA%E5%AE%9A%E4%B9%89%E5%8A%9F%E8%83%BD%E6%A8%A1%E5%9D%97servicecontroller%E6%95%B0%E6%8D%AE%E5%85%B1%E4%BA%AB" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Controller添加依赖注入(添加provider(相关[自定义]功能模块)/service(Controller数据共享))</h5>
+
+<pre><code>R.conntroller("appCtrl", function(scope, pageParams, shareData, customProvider){
+
+    //  ...
+
+});
+
+R.inject("appCtrl", ["pageParams", "shareData", "customProvider"]);
+</code></pre>
+
+<p>通过</p>
+
+<pre><code>R.inject(controllerName, dependens);
+</code></pre>
+
+<p>将已经声明的Provider/Service添加到对应的Controller中</p>
+
+<p>其中dependens可以是字符串或者数组字符串类型</p>
+
+<p>scope无需注入,并且始终作为controller回调的第一个参数</p>
+
+<hr>
+
+<h5>
+<a id="路由配置" class="anchor" href="#%E8%B7%AF%E7%94%B1%E9%85%8D%E7%BD%AE" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>路由配置</h5>
+
+<pre><code>R.config({
+    "path": {
+        "/": {
+            "tplPath": "tpl/index.html",
+            "controller": "indexCtrl"
+        },
+        "/list/:id": {
+            "tplPath": "tpl/list.html",
+            "controller": "listCtrl"
+        }
+    },
+    "pushState": true / false
+});
+</code></pre>
+
+<p>通过</p>
+
+<pre><code>R.config({
+    "path": {
+
+    },
+    "pushState": true
+});
+</code></pre>
+
+<p>指定当前应用的路由</p>
+
+<p>在path中,key可以是字符串或者REST风格(/list/:id)的路由配置</p>
+
+<p>value对应一个Object,有tplPath和controller,且都为字符串类型</p>
+
+<p>tplPath指定当前path对应的模板路径,当前检测到匹配当前路径后,会通过ajax的方式去请求该模板文件,并且放到DOM中,进行编译</p>
+
+<p>controller声明的controller的名字,当模板文件被请求成功并且放到DOM中后会执行对应的controller的回调</p>
+
+<hr>
+
+<h5>
+<a id="自定义指令" class="anchor" href="#%E8%87%AA%E5%AE%9A%E4%B9%89%E6%8C%87%E4%BB%A4" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>自定义指令</h5>
+
+<pre><code>R.directive("RCustom" ,{
+    "extend": true,
+    "type": "dom",
+    "constructor": function(dirCfg) {
+        //  ...
+    },
+    "link": function(el, exp, scope) {
+        //  ...
+    },
+    "update": function(exp) {
+        //  ...
+    }
+});
+</code></pre>
+
+<p>通过</p>
+
+<pre><code>R.directive(name, opt);
+</code></pre>
+
+<p>可以实现自定义指令</p>
+
+<p>1.name:作为该指令出现的名称,驼峰命名法,最后绑定到HTML标签上的时候用"-"分割,并且全小写</p>
+
+<p>2.opt参数说明:</p>
+
+<table>
+<thead>
+<tr>
+<th>name</th>
+<th>意义</th>
+<th>类型</th>
+<th>是否可选</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>extend</td>
+<td>是否继承父类,默认继承,继承父类可以调用父类的构造器,重写父类相关成员属性</td>
+<td>boolean</td>
+<td>是</td>
+</tr>
+<tr>
+<td>type</td>
+<td>指令类型,现阶段没有意义</td>
+<td>string</td>
+<td>是</td>
+</tr>
+<tr>
+<td>priority</td>
+<td>指令优先级,指定指令执行顺序,现阶段没有意义</td>
+<td>number</td>
+<td>是</td>
+</tr>
+<tr>
+<td>link</td>
+<td>link方法,做第一次编译时被调用</td>
+<td>function</td>
+<td>必传</td>
+</tr>
+<tr>
+<td>update</td>
+<td>update方法,做相关数据更新时被调用</td>
+<td>function</td>
+<td>必传</td>
+</tr>
+</tbody>
+</table>
+
+<hr>
+
+<h4>
+<a id="支持的指令directive" class="anchor" href="#%E6%94%AF%E6%8C%81%E7%9A%84%E6%8C%87%E4%BB%A4directive" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>支持的指令(directive)</h4>
+
+<table>
+<thead>
+<tr>
+<th>directive</th>
+<th>使用方式</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>r-bind</td>
+<td>r-bind="data"</td>
+<td>绑定数据的data属性,并且在有数据的时候会做为当前标签的textContent显示</td>
+</tr>
+<tr>
+<td>r-model</td>
+<td>r-model="name"</td>
+<td>绑定数据中的name属性,在键盘输入的时候修改对应数据中的值,常用于表单元素</td>
+</tr>
+<tr>
+<td>r-href</td>
+<td>r-href="link"</td>
+<td>绑定数据中的link属性,常搭配a标签使用,指定a标签的href属性</td>
+</tr>
+<tr>
+<td>r-if</td>
+<td>r-if="condition"</td>
+<td>只有在condition为true的时候,输出当前元素及其子元素</td>
+</tr>
+<tr>
+<td>r-else</td>
+<td>r-else="condition"</td>
+<td>和r-if相反</td>
+</tr>
+<tr>
+<td>r-show</td>
+<td>r-show="condition"</td>
+<td>只有在condition为true的时候,显示当前元素</td>
+</tr>
+<tr>
+<td>r-hide</td>
+<td>r-hide="condition"</td>
+<td>和r-show相反</td>
+</tr>
+<tr>
+<td>r-for</td>
+<td>r-else="item in list"</td>
+<td>循环一个list(Array),渲染页面</td>
+</tr>
+<tr>
+<td>r-keydown</td>
+<td>r-keydown="keyDownFn"</td>
+<td>在当前元素触发keydown事件的时候,运行keyDownFn</td>
+</tr>
+<tr>
+<td>r-key-down</td>
+<td>r-key-down="keyDownFn"</td>
+<td>在当前元素触发keydown事件的时候,执行相关函数,常用于表单元素</td>
+</tr>
+<tr>
+<td>r-key-up</td>
+<td>r-key-up="keyDownFn"</td>
+<td>和r-key-down类似,事件类型变成keyup,常用于表单元素</td>
+</tr>
+</tbody>
+</table>
+
+<hr>
+
+<h4>
+<a id="内置provider" class="anchor" href="#%E5%86%85%E7%BD%AEprovider" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>内置provider</h4>
+
+<h5>
+<a id="--pageparams" class="anchor" href="#--pageparams" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>- pageParams</h5>
+
+<table>
+<thead>
+<tr>
+<th>method/attribure</th>
+<th>使用方式</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>path</td>
+<td>pageParams.path</td>
+<td>取得在配置路由时url中指定的参数名称和值(作为键值对形式展现)</td>
+</tr>
+<tr>
+<td>queryString</td>
+<td>pageParams.queryString</td>
+<td>取得url查询字符串相关参数(作为键值对形式展现)</td>
+</tr>
+</tbody>
+</table>
+
+<h5>
+<a id="--cookie" class="anchor" href="#--cookie" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>- cookie</h5>
+
+<table>
+<thead>
+<tr>
+<th>method/attribure</th>
+<th>使用方式</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>set</td>
+<td>cookie.set("name", "value", 30)</td>
+<td>设置浏览器cookie内容,第一个参数是cookie名称,第二个是对应的值,第三个是过期时间</td>
+</tr>
+<tr>
+<td>get</td>
+<td>cookie.get("name")</td>
+<td>获取浏览器的cookie,传入cookie名</td>
+</tr>
+<tr>
+<td>delete</td>
+<td>cookie.delete("name")</td>
+<td>删除浏览器的cookie,传入cookie名</td>
+</tr>
+</tbody>
+</table>
+
+<h5>
+<a id="--http" class="anchor" href="#--http" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>- http</h5>
+
+<p>此处集成的是jQuery/Zepto中的ajax模块,具体用法见jQuery中<a href="http://hemin.cn/jq/jQuery.ajax.html">ajax</a>部分的API</p>
+
+<pre><code>http.ajax({
+    //  ...
+});
+
+http.get({
+    //  ...
+});
+
+//  ...
+
+//  此处的http是controller回调函数的形参,对应注入http模块,也可改成其他的
+</code></pre>
+
+<hr>
+
+<h4>
+<a id="todo" class="anchor" href="#todo" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>TODO</h4>
+
+<ul>
+<li><del>提供R.factory/R.service方法,使得Controller之间实现数据共享(<a href="https://angular.io/">AngularJs</a>中的service和factory有返回值类型区别,R中没有给返回值做类型限制,所以实现一个service,达到数据共享的目的)</del></li>
+<li><del>目前路由配置中pushState对应的值为false的时候还是采用HTML5的处理方式,此处需要改成hash的处理方式</del></li>
+<li><del>提供R.directive方法,支持自定义指令</del></li>
+<li>提供更多内置指令以及指令优先级(约定执行顺序)</li>
+<li>目前仅支持require形式的引入,提供支持CMD/script标签引入的方式</li>
+<li>优化在通过Service方式共享数据时更新过慢的问题</li>
+<li>指令表达式内的复杂计算问题(现在仅支持指令内的基本表达式(逻辑判断条件,其他类型转布尔操作,加减乘除模[a.b.c + a.b.d * 5 + a.b.e.f / a.c ]),对于要遵守相关优先级[(a.b.c + a.cb) / a.e.f]这种的暂未做支持)</li>
+</ul>
+
+<hr>
 
       <footer class="site-footer">
         <span class="site-footer-owner"><a href="https://github.com/rwson/R">R</a> is maintained by <a href="https://github.com/rwson">rwson</a>.</span>
