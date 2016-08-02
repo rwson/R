@@ -23,12 +23,13 @@
         this.parentNode = this.el.parentNode;
         this.directives = dir.directives;
         this.scope = dir.scope;
+        this.dataContext = dir.dataContext;
         this.rid = Dom.getAttributes(this.el, ["rid"])["rid"];
         this.pPid = Dom.getAttributes(this.parentNode, ["rid"])["rid"];
         this.priority = 0;
-        this.exp = "";
+        this.exp = dir.exp;
         this.updateExp = "";
-        this.finalExp = "";
+        this.finalExp = this.exp;
         this.originalData = null;
         this.bindFn = null;
 

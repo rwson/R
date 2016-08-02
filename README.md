@@ -223,7 +223,7 @@ extend | 是否继承父类,默认继承,继承父类可以调用父类的构造
 type | 指令类型,现阶段没有意义 | string | 是
 priority | 指令优先级,指定指令执行顺序,现阶段没有意义 | number | 是
 link | link方法,做第一次编译时被调用 | function | 必传
-update | update方法,做相关数据更新时被调用 | function | 必传
+update | update方法,做相关数据更新时被调用 | function | 是
 
 
 ---

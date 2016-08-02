@@ -25,7 +25,9 @@
         "constructor": RKeyUp,
 
         "link": function (el, exp, scope, context) {
+
             this.bindFn = this.scope.execDeep(this.finalExp, this.scope.events).result;
+
             if (Tool.isType(this.bindFn, "function")) {
                 Event.removeEvent(el, "keyup", this.bindFn.bind(context));
                 Event.addEvent(el, "keyup", this.bindFn.bind(context));

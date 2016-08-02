@@ -35,7 +35,12 @@
             disabled = el.disabled;
             isAvailable = Dom.isHide(el) || Dom.isExist(el);
 
-            var execRes = this.scope.execDeep(this.finalExp, this.scope.data);
+            var execRes;
+            if (this.dataContext) {
+                execRes = this.scope.execDeep(this.finalExp, this.dataContext);
+            } else {
+                execRes = this.scope.execDeep(this.finalExp, this.scope.data);
+            }
             this.originalData = execRes.result;
             this.updateExp = execRes.executeStr;
 

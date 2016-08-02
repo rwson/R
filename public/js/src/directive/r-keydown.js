@@ -27,8 +27,12 @@
         "link": function (el, exp, scope, context) {
             var execRes = this.scope.execDeep(this.finalExp, this.scope.events);
             this.bindFn = execRes.result;
-            Event.removeEvent(el, "keydown", this.bindFn);
-            Event.addEvent(el, "keydown", this.bindFn.bind(context));
+
+            //  确定函数为函数类型才绑定事件
+            if(Tool.isType(this.bindFn, "function")) {
+                Event.removeEvent(el, "keydown", this.bindFn);
+                Event.addEvent(el, "keydown", this.bindFn.bind(context));
+            }
         }
 
     };

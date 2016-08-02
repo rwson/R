@@ -8,7 +8,7 @@ define("app2", ["r"], function (R) {
 
     R.service("shareData", function () {
         return {
-            "fullname": "lalala"
+            "fullname": "share full name"
         };
     });
 

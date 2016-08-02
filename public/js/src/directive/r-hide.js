@@ -23,20 +23,34 @@
         "constructor": RHide,
 
         "link": function(el, exp, scope) {
-
-            if(exp) {
-                el.style.display = "none";
+            var execRes;
+            if (this.dataContext) {
+                execRes = this.scope.execDeep(this.finalExp, this.dataContext);
             } else {
-                el.style.display = "block";
+                execRes = this.scope.execDeep(this.finalExp, this.scope.data);
+            }
+
+            this.originalData = execRes.result;
+            this.updateExp = execRes.executeStr;
+
+
+            if(this.originalData) {
+                this.el.style.display = "none";
+            } else {
+                this.el.style.display = "block";
             }
         },
 
         "update": function(exp) {
+            var newVal = this.scope.execByStr(this.updateExp, this.scope.data);
 
-            if(exp) {
-                this.el.style.display = "none";
-            } else {
-                this.el.style.display = "block";
+            if(!Tool.isEqual(newVal, this.originalData)) {
+                if(newVal) {
+                    this.el.style.display = "none";    
+                } else {
+                    this.el.style.display = "block";    
+                }
+                this.originalData = newVal;
             }
         }
 

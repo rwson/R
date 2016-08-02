@@ -5,19 +5,19 @@
 
 "use strict";
 
-(function (root, factory) {
+(function(root, factory) {
     if (typeof define === "function" && define.amd) {
         define([
             "tool",
             "dom",
             "event",
             "directive"
-        ], function (Tool, Dom, Event, directive) {
+        ], function(Tool, Dom, Event, directive) {
             return factory(window, Tool, Dom, Event, directive);
         });
     }
 
-}(window, function (root, Tool, Dom, Event, directive, undefined) {
+}(window, function(root, Tool, Dom, Event, directive, undefined) {
 
     //  无需编译的节点
     var unCompileElems = ["html", "head", "meta", "link", "title", "object", "embed", "script"];
@@ -49,10 +49,10 @@
          * 启动
          * @param el    根元素选择器
          */
-        "bootstrap": function (el) {
-            this.rootElement = el || document.body;     //  根元素,后面缓存绑定r-controller的元素,并且指定相关作用域
-            this.eleMap = {};                           //  元素map,每个元素作为el属性值存放在单独id的对象中
-            this.directiveMap = {};                     //  指令map,调用map的时候,根据指令绑定属性值,遍历相关对象(根据key值定位),减少循环次数
+        "bootstrap": function(el) {
+            this.rootElement = el || document.body; //  根元素,后面缓存绑定r-controller的元素,并且指定相关作用域
+            this.eleMap = {}; //  元素map,每个元素作为el属性值存放在单独id的对象中
+            this.directiveMap = {}; //  指令map,调用map的时候,根据指令绑定属性值,遍历相关对象(根据key值定位),减少循环次数
         },
 
         /**
@@ -60,18 +60,17 @@
          * @param key   数据对应的key
          * @param val   数据值
          */
-        "beforeUpdate": function (key, val) {
-        },
+        "beforeUpdate": function(key, val) {},
 
         /**
          * 数据发送变化,更新DOM
          * @param key   数据对应的key
          * @param val   数据值
          */
-        "update": function (key, val) {
+        "update": function(key, val) {
             var dirMap = this.directiveMap[key];
             if (dirMap && dirMap.length) {
-                dirMap.forEach(function (dir) {
+                dirMap.forEach(function(dir) {
                     dir.directiveIns.update(val);
                 });
             }
@@ -80,7 +79,7 @@
         /**
          * 获取节点,过滤掉不编译的节点
          */
-        "compile": function () {
+        "compile": function() {
             var childEles = Dom.getAllChildElements(this.rootElement);
             this.getAllDirectives(childEles);
         },
@@ -90,7 +89,7 @@
          * @param elList    DOMList
          * @returns {Array}
          */
-        "getAllDirectives": function (elList) {
+        "getAllDirectives": function(elList) {
 
             var rootEle = this.rootElement,
                 ctrlName = Dom.getAttributes(rootEle, "r-controller")["r-controller"],
@@ -99,7 +98,7 @@
                 return [];
             }
 
-            elList.forEach(function (el) {
+            elList.forEach(function(el) {
                 tagName = el.tagName.toLowerCase();
                 if (!~(unCompileElems.indexOf(tagName))) {
 
@@ -128,7 +127,7 @@
                     }
 
                     //  遍历当前元素所有父元素
-                    Dom.getParent(el, rootEle, function (parent) {
+                    Dom.getParent(el, rootEle, function(parent) {
 
                         //  获取当前元素的父元素的rid属性,再根据它获取父元素在eleMap中的指令信息
                         pRid = Dom.getAttributes(parent, "rid")["rid"];
@@ -138,9 +137,17 @@
                         if (pEleMap) {
                             pDirectives = pEleMap.directives;
                             if (pDirectives && pDirectives.length) {
-                                pDirectives.forEach(function (dir) {
+                                pDirectives.forEach(function(dir) {
                                     //  当前父元素的指令中包含"r-for='xxx in yyy[.zzz]'"这种指令
                                     if (dir.directiveName === "RFor" && loopDirReg.test(dir.exp)) {
+
+                                        //  组织RFor子元素绑定指令的指令表达式
+                                        if (mapInfo.directives) {
+                                            mapInfo.directives = mapInfo.directives.map(function(mDir) {
+                                                mDir.exp = mDir.exp.split(".").slice(1).join(".");
+                                                return mDir;
+                                            });
+                                        }
 
                                         //  放到父元素的子指令中去
                                         if (!pEleMap.childDir) {
@@ -167,17 +174,17 @@
          * 获取当前节点上的指令
          * @param el    当前节点
          */
-        "getDirectives": function (el) {
-            var tagAttrs = Dom.getDOMAttrs(el),
-                res = [],
-                dirClass, name, exp;
-
+        "getDirectives": function(el) {
             if (!Dom.isHTMLNode(el)) {
                 return;
             }
 
+            var tagAttrs = Dom.getDOMAttrs(el),
+                res = [],
+                dirClass, name, exp, isContainRFor;
+
             //  遍历所有的标签属性
-            tagAttrs.forEach(function (attr) {
+            tagAttrs.forEach(function(attr) {
 
                 name = attr.name;
                 exp = attr.value;
@@ -185,6 +192,10 @@
                 //  过滤掉非"r-xxx[-yyy]"这种指令
                 if (dirReg.test(name)) {
                     name = Tool.toCamelCase(name);
+
+                    if (name === "RFor") {
+                        isContainRFor = true;
+                    }
 
                     dirClass = directive[name];
 
@@ -205,31 +216,42 @@
                 }
             }, this);
 
+            if (res.length > 1) {
+                res = res.map(function(item) {
+                    if(isContainRFor && item.directiveName !== "RFor") {
+                        item.exp = item.exp.split(".").slice(1).join(".");
+                        item.type = "RForAttr";
+                    }
+                    return item;
+                });
+            }
+
             /**
              * 返回根据优先级排序后的指令数组
              * @type {Array.<T>}
              */
-            return res.sort(function (a, b) {
+            return res.length ? res.sort(function(a, b) {
                 return a.priority > b.priority;
-            });
+            }) : [];
         },
 
         /**
          * 绑定指令
          * @param scope Scope类的实例
          */
-        "link": function (scope) {
+        "link": function(scope) {
             this.compile();
 
-            var ele = this.eleMap, mapKeys = Object.keys(ele),
+            var ele = this.eleMap,
+                mapKeys = Object.keys(ele),
                 cEle, directives, dir, finalExp, directiveIns, childDirMap, splitDir;
 
-            mapKeys.forEach(function (key) {
+            mapKeys.forEach(function(key) {
                 childDirMap = [];
                 cEle = ele[key];
 
                 //  过滤掉已经编译过的元素
-                if (!cEle.compiled) {
+                if (!cEle.compiled && !Tool.isEqual(cEle.type, "RForAttr")) {
                     directives = cEle.directives;
                     cEle.scope = scope;
 
@@ -237,17 +259,17 @@
                     for (var i = 0, len = directives.length; i < len; i++) {
                         dir = directives[i];
 
-                        directiveIns = new dir.directive(cEle);
-
                         //  cEle中的firstLink是true,说明没有嵌套在r-for中
                         if (cEle.firstLink) {
+
+                            directiveIns = new dir.directive(cEle);
 
                             directiveIns.link(cEle.el, dir.exp, scope);
 
                             finalExp = dir.exp;
 
                             //  RFor指令
-                            if(loopDirReg.test(finalExp)) {
+                            if (loopDirReg.test(finalExp)) {
                                 finalExp = Tool.trim(finalExp.split(" ")[2]);
                             }
 
@@ -267,6 +289,7 @@
                                 "directiveIns": directiveIns
                             });
                         }
+
                     }
 
                     this.eleMap[key].compiled = true;
@@ -280,4 +303,3 @@
     return Compile;
 
 }));
-
