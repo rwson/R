@@ -78,13 +78,15 @@ define("app2", ["r"], function (R) {
     R.controller("appCtrl2", function (scope, shareData, shareTodos, http) {
 
         scope.set({
-            "class": true
+            "class": true,
+            "css": false
         });
 
         scope.defineEvents({
             "changeClass": function() {
                 scope.update({
-                    "class": !scope.get("class")
+                    "class": !scope.get("class"),
+                    "css": !scope.get("css")
                 });
             }
         });

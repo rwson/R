@@ -21,7 +21,8 @@
             "rElse",
             "rShow",
             "rHide",
-            "rClass"
+            "rClass",
+            "rCss"
         ], function (Tool, dirBase) {
             var argus = [].slice.call(arguments, 2);
             argus.unshift(Tool, dirBase);

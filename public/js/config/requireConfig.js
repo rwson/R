@@ -26,6 +26,7 @@ require.config({
         "rShow": "src/directive/r-show",
         "rHide": "src/directive/r-hide",
         "rClass": "src/directive/r-class",
+        "rCss": "src/directive/r-css",
 
         "dirBase": "src/directive/direcrive-base",
         "directive": "src/directive/index",
