@@ -297,7 +297,7 @@ R.inject("appCtrl", ["pageParams", "shareData", "customProvider"]);
 <td>update</td>
 <td>update方法,做相关数据更新时被调用</td>
 <td>function</td>
-<td>必传</td>
+<td>是</td>
 </tr>
 </tbody>
 </table>
@@ -355,6 +355,11 @@ R.inject("appCtrl", ["pageParams", "shareData", "customProvider"]);
 <td>r-for</td>
 <td>r-else="item in list"</td>
 <td>循环一个list(Array),渲染页面</td>
+</tr>
+<tr>
+<td>r-class</td>
+<td>r-class="condition : 'class-true' : 'class-false'"</td>
+<td>根据condition的值往当前元素上添加css类,condition暂不支持计算表达式</td>
 </tr>
 <tr>
 <td>r-keydown</td>
