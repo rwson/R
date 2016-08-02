@@ -240,6 +240,7 @@ r-else | r-else="condition" | 和r-if相反
 r-show | r-show="condition" | 只有在condition为true的时候,显示当前元素
 r-hide | r-hide="condition" | 和r-show相反
 r-for | r-else="item in list" | 循环一个list(Array),渲染页面
+r-class | r-class="condition : 'class-true' : 'class-false'" | 根据condition的值往当前元素上添加css类,condition暂不支持计算表达式
 r-keydown | r-keydown="keyDownFn" | 在当前元素触发keydown事件的时候,运行keyDownFn
 r-key-down | r-key-down="keyDownFn" | 在当前元素触发keydown事件的时候,执行相关函数,常用于表单元素
 r-key-up | r-key-up="keyDownFn" | 和r-key-down类似,事件类型变成keyup,常用于表单元素
