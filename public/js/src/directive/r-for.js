@@ -4,14 +4,14 @@
 
 "use strict";
 
-(function(root, factory) {
+(function (root, factory) {
     if (typeof define === "function" && define.amd) {
-        define(["tool", "dom", "dirBase"], function(Tool, Dom, dirBase) {
+        define(["tool", "dom", "dirBase"], function (Tool, Dom, dirBase) {
             return factory(root, Tool, Dom, dirBase);
         });
     }
 
-}(window, function(root, Tool, Dom, dirBase, undefined) {
+}(window, function (root, Tool, Dom, dirBase, undefined) {
 
     function RFor(dirCfg) {
         dirCfg.name = "RFor";
@@ -25,7 +25,7 @@
 
         "constructor": RFor,
 
-        "link": function(el, exp, scope) {
+        "link": function (el, exp, scope) {
             this.parentNode.innerHTML = "";
 
             var execRes = this.scope.execDeep(this.finalExp, this.scope.data);
@@ -38,7 +38,7 @@
                 var elCloned, children, childrenClone, rid, childEl, childDir, childDirs, tDir, expArr, value, loopI, loopLen, loopChild, loopParent;
 
                 //  遍历list数据
-                this.originalData.forEach(function(inExp) {
+                this.originalData.forEach(function (inExp) {
 
                     //  当前元素的一个副本,及父元素
                     elCloned = this.el.cloneNode(true);
@@ -56,7 +56,7 @@
                     if (childDir && childDir.length) {
 
                         //  遍历子元素上的
-                        childDir.forEach(function(dir) {
+                        childDir.forEach(function (dir) {
 
                             //  当前子元素的指令
                             childDirs = dir.directives;
@@ -66,12 +66,12 @@
                                 //  同样保存当前子元素的一个副本
                                 childEl = dir.el.cloneNode(true);
 
-                                childDirs.forEach(function(cDir) {
+                                childDirs.forEach(function (cDir) {
 
                                     loopI = 0;
                                     loopLen = children.length;
 
-                                    for(; loopI < loopLen; loopI ++) {
+                                    for (; loopI < loopLen; loopI++) {
 
                                         loopChild = children.item(loopI);
 
@@ -100,7 +100,7 @@
 
                     //  本身元素不止绑定了r-for一个指令
                     if (directives.length > 1) {
-                        directives.forEach(function(dir) {
+                        directives.forEach(function (dir) {
                             if (dir.directiveName !== "RFor") {
 
                                 dir.directives = directives;
@@ -128,7 +128,7 @@
             }
         },
 
-        "update": function() {
+        "update": function () {
             var newData = this.scope.execByStr(this.updateExp, this.scope.data);
             if (this.originalData.length === 0) {
                 this.link(this.el, newData, this.scope);

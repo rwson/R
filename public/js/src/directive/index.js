@@ -20,7 +20,8 @@
             "rIf",
             "rElse",
             "rShow",
-            "rHide"
+            "rHide",
+            "rClass"
         ], function (Tool, dirBase) {
             var argus = [].slice.call(arguments, 2);
             argus.unshift(Tool, dirBase);
@@ -69,7 +70,7 @@
                         this.originalData = execRes.result;
                         this.updateExp = execRes.executeStr;
                         opt.link(this.el, this.originalData, this.scope);
-                    } else if (this.dirType === "events") {
+                    } else if (this.dirType === "event") {
                         execRes = this.scope.execDeep(this.finalExp, this.scope.events);
                         this.bindFn = execRes.result;
                         opt.link(this.el, this.bindFn, this.scope);

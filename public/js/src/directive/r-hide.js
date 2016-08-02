@@ -15,14 +15,14 @@
 
     function RHide(dirCfg) {
         dirCfg.name = "RHide";
-        dirBase.call(this,dirCfg);
+        dirBase.call(this, dirCfg);
     }
 
     RHide.prototype = {
 
         "constructor": RHide,
 
-        "link": function(el, exp, scope) {
+        "link": function (el, exp, scope) {
             var execRes;
             if (this.dataContext) {
                 execRes = this.scope.execDeep(this.finalExp, this.dataContext);
@@ -34,21 +34,21 @@
             this.updateExp = execRes.executeStr;
 
 
-            if(this.originalData) {
+            if (this.originalData) {
                 this.el.style.display = "none";
             } else {
                 this.el.style.display = "block";
             }
         },
 
-        "update": function(exp) {
+        "update": function (exp) {
             var newVal = this.scope.execByStr(this.updateExp, this.scope.data);
 
-            if(!Tool.isEqual(newVal, this.originalData)) {
-                if(newVal) {
-                    this.el.style.display = "none";    
+            if (!Tool.isEqual(newVal, this.originalData)) {
+                if (newVal) {
+                    this.el.style.display = "none";
                 } else {
-                    this.el.style.display = "block";    
+                    this.el.style.display = "block";
                 }
                 this.originalData = newVal;
             }
@@ -58,7 +58,7 @@
 
     return {
         "name": "RHide",
-        "type": "control",
+        "type": "dom",
         "constructor": RHide
     };
 

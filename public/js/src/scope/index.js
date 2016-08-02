@@ -23,6 +23,9 @@
     //  基本数学计算表达式(+/-/*///%)
     var calculateReg = /[\+|\-|\/*|\/|\%]/g;
 
+    //  三目运算符(a ? 'b' : c)
+    var trinocularExpReg = /[\w\W]+\?[\w\W]+\:[\w\W]+/;
+
     //  括号,指定含有计算表达式中的计算优先级
     var bracketsReg = /^\([\w\W]+\)$/g;
 
@@ -137,7 +140,7 @@
             }
 
             var condition = expStr.match(conditionReg),
-                strArr, executeStr, canculate, boolean, booleanIn;
+                strArr, executeStr, canculate, boolean, booleanIn, isTrinocular;
 
             //  判断是否存在条件判断语句,拼凑不同的数组
             if (condition !== null) {
@@ -157,8 +160,11 @@
                 canculate = strItem.match(calculateReg);
                 boolean = strItem.match(boolReg);
 
-                //  存在计算表达式
-                if (canculate) {
+                //  判断是否为三目运算符
+                isTrinocular = trinocularExpReg.test(isTrinocular);
+
+                //  存在计算表达式,并且不是三目运算(可能输入含运算符的字符串)
+                if (canculate && isTrinocular) {
                     canculate = canculate[0];
                     strItem = strItem.split(canculate);
                     strItem = strItem.map(function (str) {

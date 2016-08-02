@@ -23,17 +23,37 @@
         "constructor": RSrc,
 
         "link": function (el, exp, scope) {
+            var execRes;
+            if (this.dataContext) {
+                execRes = this.scope.execDeep(this.finalExp, this.dataContext);
+            } else {
+                execRes = this.scope.execDeep(this.finalExp, this.scope.data);
+            }
 
+            this.originalData = execRes.result;
+            this.updateExp = execRes.executeStr;
+
+            Dom.setAttributes(this.el, {
+                "src": this.originalData
+            });
+            
         },
 
         "update": function (exp) {
+            var newData = this.scope.execByStr(this.updateExp);
+            if(!Tool.isEqual(newData, this.originalData)) {
+                Dom.setAttributes(this.el, {
+                    "src": newData
+                });
+                this.originalData = newData;
+            }
         }
 
     };
 
     return {
         "name": "RSrc",
-        "type": "control",
+        "type": "dom",
         "constructor": RSrc
     };
 

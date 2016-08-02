@@ -50,7 +50,7 @@
 
     return {
         "name": "RElse",
-        "type": "control",
+        "type": "dom",
         "constructor": RElse
     };
 

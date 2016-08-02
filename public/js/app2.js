@@ -43,12 +43,6 @@ define("app2", ["r"], function (R) {
             "text": "test custom directive"
         });
 
-        setTimeout(function () {
-            scope.update({
-                "str": "test1"
-            });
-        }, 2000);
-
         scope.defineEvents({
             "addTodo": function (ev) {
                 var target = ev.target;
@@ -82,6 +76,19 @@ define("app2", ["r"], function (R) {
 
 
     R.controller("appCtrl2", function (scope, shareData, shareTodos, http) {
+
+        scope.set({
+            "class": true
+        });
+
+        scope.defineEvents({
+            "changeClass": function() {
+                scope.update({
+                    "class": !scope.get("class")
+                });
+            }
+        });
+
         http({
             "url": "/test/ajax/provider",
             "type": "GET",

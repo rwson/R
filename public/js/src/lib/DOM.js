@@ -266,7 +266,7 @@
         "getAttributes": function (el, attrs) {
             var attrList = [];
             var output = {};
-            if(!el) {
+            if (!el) {
                 return output;
             }
             var tagName = el.tagName && el.tagName.toLowerCase();
@@ -276,7 +276,7 @@
                 attrList = attrs;
             }
             attrList.forEach(function (item) {
-                if(!Tool.isUndefined(tagName)) {
+                if (!Tool.isUndefined(tagName)) {
                     var val = el.getAttribute(item);
                     if (val) {
                         output[item] = val;

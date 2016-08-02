@@ -29,7 +29,7 @@
             this.bindFn = execRes.result;
 
             //  确定函数为函数类型才绑定事件
-            if(Tool.isType(this.bindFn, "function")) {
+            if (Tool.isType(this.bindFn, "function")) {
                 Event.removeEvent(el, "keydown", this.bindFn);
                 Event.addEvent(el, "keydown", this.bindFn.bind(context));
             }

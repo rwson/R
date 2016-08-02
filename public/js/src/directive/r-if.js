@@ -50,7 +50,7 @@
 
     return {
         "name": "RIf",
-        "type": "control",
+        "type": "dom",
         "constructor": RIf
     };
 

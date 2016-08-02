@@ -25,6 +25,7 @@ require.config({
         "rElse": "src/directive/r-else",
         "rShow": "src/directive/r-show",
         "rHide": "src/directive/r-hide",
+        "rClass": "src/directive/r-class",
 
         "dirBase": "src/directive/direcrive-base",
         "directive": "src/directive/index",
