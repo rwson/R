@@ -27,10 +27,12 @@ require.config({
         "rHide": "src/directive/r-hide",
         "rClass": "src/directive/r-class",
         "rCss": "src/directive/r-css",
+        "rOption": "src/directive/r-option",
 
         "dirBase": "src/directive/direcrive-base",
         "directive": "src/directive/index",
         "scope": "src/scope/index",
+        "parser": "src/scope/parser",
         "compile": "src/compile/index",
 
         "ajax": "src/ajax/index",

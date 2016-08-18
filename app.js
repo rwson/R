@@ -9,6 +9,8 @@ var app = express();
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
+app.set('port', 3000);
+
 app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: false}));
@@ -77,5 +79,7 @@ app.get("/test/ajax/provider", function (req, res, next) {
 app.use("/", function (req, res, next) {
     res.render("index");
 });
+
+console.log("app start at port:" + app.get("port"));
 
 module.exports = app;

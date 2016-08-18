@@ -79,7 +79,21 @@ define("app2", ["r"], function (R) {
 
         scope.set({
             "class": true,
-            "css": false
+            "css": false,
+            "options": [
+                {
+                    "id": "1",
+                    "title": "aaaaaaaaaa"
+                },
+                {
+                    "id": "2",
+                    "title": "bbbbbbbbb"
+                },
+                {
+                    "id": "3",
+                    "title": "ccccccccc"
+                }
+            ]
         });
 
         scope.defineEvents({

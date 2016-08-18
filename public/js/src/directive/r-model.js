@@ -4,18 +4,18 @@
 
 "use strict";
 
-(function (root, factory) {
+(function(root, factory) {
     if (typeof define === "function" && define.amd) {
-        define(["tool", "event", "dom", "dirBase"], function (Tool, Event, Dom, dirBase) {
+        define(["tool", "event", "dom", "dirBase"], function(Tool, Event, Dom, dirBase) {
             return factory(root, Tool, Event, Dom, dirBase);
         });
     }
 
-}(window, function (root, Tool, Event, Dom, dirBase, undefined) {
+}(window, function(root, Tool, Event, Dom, dirBase, undefined) {
 
-    var textTypeReg = /text|password|number|tel|email|url/,             //  可以输入的几种文本类型
-        checkTypeReg = /radio|checkbox/,                                //  单复选
-        changeTypeReg = /date|month|time|week|range/,                   //  change以后的几种
+    var textTypeReg = /text|password|number|tel|email|url/, //  可以输入的几种文本类型
+        checkTypeReg = /radio|checkbox/,                    //  单复选
+        changeTypeReg = /date|month|time|week|range/,       //  change以后的几种
         tagName, elType, disabled, rid, isAvailable;
 
     function RModel(dirCfg) {
@@ -28,7 +28,7 @@
 
         "constructor": RModel,
 
-        "link": function (el, exp, scope) {
+        "link": function(el, exp, scope) {
             //  获取当前元素相关信息
             tagName = el.tagName.toLowerCase();
             elType = el.type;
@@ -45,15 +45,14 @@
             this.updateExp = execRes.executeStr;
 
             if (isAvailable && !disabled) {
-                if ((Tool.isEqual(tagName, "input") && (!elType || textTypeReg.test(elType)))
-                    || Tool.isEqual(tagName, "textarea")) {
+                if ((Tool.isEqual(tagName, "input") && (!elType || textTypeReg.test(elType))) || Tool.isEqual(tagName, "textarea")) {
 
                     if (!Tool.isUndefined(this.originalData)) {
                         this.el.value = this.originalData;
                     }
 
                     Event.removeEvent(el, ["keydown", "keypress", "keyup"]);
-                    Event.addEvent(el, ["keydown", "keypress", "keyup"], function () {
+                    Event.addEvent(el, ["keydown", "keypress", "keyup"], function() {
                         _doUpdate.call(this, el.value, scope);
                     }.bind(this));
 
@@ -64,25 +63,25 @@
                     }
 
                     Event.removeEvent(el, "click");
-                    Event.addEvent(el, "click", function () {
+                    Event.addEvent(el, "click", function() {
                         _doUpdate.call(this, el.checked, scope);
                     }.bind(this));
 
-                } else if (Tool.isEqual(tagName, "input") && (changeTypeReg.test(elType))) {
+                } else if ((Tool.isEqual(tagName, "input") && (changeTypeReg.test(elType))) || Tool.isEqual(tagName, "select")) {
 
                     if (!Tool.isUndefined(exp)) {
                         this.el.value = this.originalData;
                     }
 
                     Event.removeEvent(el, "change");
-                    Event.addEvent(el, "change", function () {
+                    Event.addEvent(el, "change", function() {
                         _doUpdate.call(this, el.value, scope);
                     }.bind(this));
                 }
             }
         },
 
-        "update": function () {
+        "update": function() {
             var newVal = this.scope.execByStr(this.updateExp, this.scope.data);
             if (!Tool.isEqual(newVal, this.originalData)) {
                 this.el.value = newVal;

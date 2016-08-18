@@ -34,16 +34,16 @@
             this.originalData = execRes.result;
             this.updateExp = execRes.executeStr;
 
-			this.el.classList.add(this.originalData);
+            this.el.classList.add(this.originalData);
         },
 
         "update": function(exp) {
             var newVal = this.scope.execByStr(this.updateExp, this.scope.data);
 
             if (!Tool.isEqual(newVal, this.originalData)) {
-            	this.el.classList.remove(this.originalData);
-            	this.el.classList.add(newVal);
-            	this.originalData = newVal;
+                this.el.classList.remove(this.originalData);
+                this.el.classList.add(newVal);
+                this.originalData = newVal;
             }
         }
 
