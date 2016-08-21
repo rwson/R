@@ -286,11 +286,10 @@ delete | cookie.delete("name") | 删除浏览器的cookie,传入cookie名
 
 #### TODO
 
-- ~~提供R.factory/R.service方法,使得Controller之间实现数据共享([AngularJs](https://angular.io/)中的service和factory有返回值类型区别,R中没有给返回值做类型限制,所以实现一个service,达到数据共享的目的)~~
+- ~~提供R.factory/R.service方法,使得Controller之间实现数据共享([AngularJs 1.x](https://docs.angularjs.org/)中的service和factory有返回值类型区别,R中没有给返回值做类型限制,所以实现一个service,达到数据共享的目的)~~
 - ~~目前路由配置中pushState对应的值为false的时候还是采用HTML5的处理方式,此处需要改成hash的处理方式~~
 - ~~提供R.directive方法,支持自定义指令~~
 - 提供更多内置指令以及指令优先级(约定执行顺序)
-- 目前仅支持require形式的引入,提供支持CMD/script标签引入的方式
 - 优化在通过Service方式共享数据时更新过慢的问题
 - 指令表达式内的复杂计算问题(现在仅支持指令内的基本表达式(逻辑判断条件,其他类型转布尔操作,加减乘除模[a.b.c + a.b.d * 5 + a.b.e.f / a.c ]),对于要遵守相关优先级[(a.b.c + a.cb) / a.e.f]这种的暂未做支持)
 

@@ -22,7 +22,7 @@
     //  无需编译的节点
     var unCompileElems = ["html", "head", "meta", "link", "title", "object", "embed", "script"];
 
-    //  rFor的"xxx in yyy"类型指令值
+    //  rFor的"xxx in yyy"类型指令值(angularjs)
     var loopDirReg = /^\s*(.+)\s+in{1}\s+(.*?)\s*(\s+track\s+by\s+(.+)\s*)?$/;
 
     //  常用的条件语句类型

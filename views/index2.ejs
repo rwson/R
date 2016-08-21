@@ -64,13 +64,13 @@
     <div r-controller="appCtrl2">
         <input type="text" r-model="fullname"/>
         <p r-bind="fullname"></p>
-        <div r-class="class ? 'class-true' : 'class-false'">测试r-class指令</div>
         <div r-class="class ? 'classTrue' : 'classFalse'">测试r-class指令</div>
         <div r-class="class ? 'class_true' : 'class_false'">测试r-class指令</div>
         <div r-class="class ? 'class_true' : 'class_false'">测试r-class指令</div>
         <input type="button" r-click="changeClass" value="点我修改样式" />
 
         <div r-css="css ? 'background: red; border: 10px solid blue;' : 'background: green; border: 5px solid red;' ">测试r-css指令</div>
+        
 
         <ul>
             <li r-for="item in todos">
