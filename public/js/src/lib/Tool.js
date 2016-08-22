@@ -8,8 +8,8 @@
 const _class2 = {}; //  Object.prototype
 const _array2 = []; //  Array.prototype
 
-let privateProps = new WeakMap();
-privateProps.set("eq", (a, b, aStack, bStack) => {
+
+function _eq(a, b, aStack, bStack) {
 // 获取第一个对象原型上的类名
     let className = _class2.toString.call(a);
 
@@ -136,7 +136,7 @@ privateProps.set("eq", (a, b, aStack, bStack) => {
     aStack.pop();
     bStack.pop();
     return result;
-});
+}
 
 class Tool {
 
@@ -262,7 +262,7 @@ class Tool {
      */
     static getQueryString(url) {
         let arr = url.split("?")[1].split("&"),
-            output = {},_temp;
+            output = {}, _temp;
         if (!url || url.indexOf("?") < 0) {
             return output;
         }
@@ -326,7 +326,7 @@ class Tool {
      * @returns {boolean}
      */
     static isEqual(obj1, obj2) {
-        return privateProps.get("eq")(obj1, obj2, [], [])
+        return _eq(obj1, obj2, [], []);
     }
 
     /**
@@ -378,7 +378,6 @@ class Tool {
         return list && (typeof list === "object") && isFinite(list.length) && (list.length >= 0) && (list.length === Math.floor(list.length)) && list.length < 4294967296;
     }
 
-
     /**
      * 把一个伪数组(有length属性,没有数组原型下的方法)转换真数组
      * @param fakeArray     伪数组
@@ -392,7 +391,6 @@ class Tool {
         return res;
     }
 
-
     /**
      * 生成一个随机字符串
      * @returns {string}
@@ -400,7 +398,6 @@ class Tool {
     static randomStr() {
         return ("" + Math.random()).toString(16).replace(".", "");
     }
-
 
     /**
      * 执行回调函数
@@ -413,7 +410,6 @@ class Tool {
             return fn.apply(root, args);
         }
     }
-
 
     /**
      * 返回一个函数执行的后的结果

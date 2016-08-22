@@ -4,58 +4,43 @@
 
 "use strict";
 
-(function (root, factory) {
-    if (typeof define === "function" && define.amd) {
-        define(["tool", "dom", "dirBase"], function (Tool, Dom, dirBase) {
-            return factory(root, Tool, Dom, dirBase);
+import Tool from "../lib/Tool";
+import DOM from "../lib/DOM";
+import DirectiveBase from "./direcrive-base";
+
+class RHref extends DirectiveBase {
+
+    constructor(dirCfg) {
+        super(dirCfg);
+        this.name = "RHref";
+    }
+
+    link(el, exp, scope) {
+        let execRes;
+        if (this.dataContext) {
+            execRes = this.scope.execDeep(this.finalExp, this.dataContext);
+        } else {
+            execRes = this.scope.execDeep(this.finalExp, this.scope.data);
+        }
+
+        this.originalData = execRes.result;
+        this.updateExp = execRes.executeStr;
+
+        DOM.setAttributes(this.el, {
+            "href": this.originalData
         });
     }
 
-}(window, function (root, Tool, Dom, dirBase, undefined) {
-
-    function RHref(dirCfg) {
-        dirCfg.name = "RHref";
-        dirBase.call(this, dirCfg);
-        return this;
+    update(exp) {
+        let newData = this.scope.execByStr(this.updateExp, this.scope.data);
+        if (!Tool.isEqual(newData, this.originalData)) {
+            DOM.setAttributes(this.el, {
+                "href": newData
+            });
+            this.originalData = newData;
+        }
     }
 
-    RHref.prototype = {
+}
 
-        "constructor": RHref,
-
-        "link": function (el, exp, scope) {
-
-            var execRes;
-            if (this.dataContext) {
-                execRes = this.scope.execDeep(this.finalExp, this.dataContext);
-            } else {
-                execRes = this.scope.execDeep(this.finalExp, this.scope.data);
-            }
-
-            this.originalData = execRes.result;
-            this.updateExp = execRes.executeStr;
-
-            Dom.setAttributes(this.el, {
-                "href": this.originalData
-            });
-        },
-
-        "update": function (exp) {
-            var newData = this.scope.execByStr(this.updateExp, this.scope.data);
-            if (!Tool.isEqual(newData, this.originalData)) {
-                Dom.setAttributes(this.el, {
-                    "href": newData
-                });
-                this.originalData = newData;
-            }
-        }
-
-    };
-
-    return {
-        "name": "RHref",
-        "type": "dom",
-        "constructor": RHref
-    };
-
-}));
+export default RHref;

@@ -1,11 +1,10 @@
 /**
- * parser.js
- * scope类,指定作用域
+ * parser模块,解析指令字符串
  */
 
 "use strict";
 
-import * as Tool from "../lib/Tool";
+import Tool from "../lib/Tool";
 
 const conditionReg = /((\!)?\=+|>(\=)?|<(\=)?|\|\||\&\&)/;    //  条件判断
 const boolReg = /^\!+/;                                       //  转布尔操作

@@ -4,21 +4,14 @@
 
 "use strict";
 
-(function (root, factory) {
-    if (typeof define === "function" && define.amd) {
-        define(["dom"], function (Dom) {
-            return factory(root, Dom);
-        });
-    }
-
-}(window, function (root, Dom, undefined) {
+class DirectiveBase{
 
     /**
      * 指令基类
      * @param dir   指令相关配置
      * @constructor
      */
-    function DirectiveBase(dir) {
+    constructor(dir){
         this.el = dir.el;
         this.parentNode = this.el.parentNode;
         this.directives = dir.directives;
@@ -34,7 +27,7 @@
         this.bindFn = null;
 
         if (dir.name) {
-            var curDirective = this.directives.filter(function (directive) {
+            let curDirective = this.directives.filter(function (directive) {
                 return directive.directiveName === dir.name;
             });
             if (curDirective.length) {
@@ -49,6 +42,6 @@
         }
     }
 
-    return DirectiveBase;
+}
 
-}));
+export default DirectiveBase;

@@ -22,5 +22,8 @@
     "serve-favicon": "~2.3.0",
     "jsx-loader": "^0.13.2",
     "webpack": "^1.13.2"
+  },
+  "devDependencies": {
+    "webpack-dashboard": "^0.1.6"
   }
 }

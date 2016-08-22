@@ -4,56 +4,41 @@
 
 "use strict";
 
-(function (root, factory) {
-    if (typeof define === "function" && define.amd) {
-        define(["tool", "event", "dom", "dirBase"], function (Tool, Event, Dom, dirBase) {
-            return factory(root, Tool, Event, Dom, dirBase);
-        });
+import Tool from "../lib/Tool";
+import DOM from "../lib/DOM";
+import Event from "../lib/Event";
+import DirectiveBase from "./direcrive-base";
+
+class RIf extends DirectiveBase {
+
+    constructor(dirCfg) {
+        super(dirCfg);
+        this.name = "RIf";
     }
 
-}(window, function (root, Tool, Event, Dom, dirBase, undefined) {
-
-    function RIf(dirCfg) {
-        dirCfg.name = "RIf";
-        dirBase.call(this, dirCfg);
-        this.index = Dom.getChildIndex(this.parentNode, this.el);
-    }
-
-    RIf.prototype = {
-
-        "constructor": RIf,
-
-        "link": function (el, exp, scope) {
-            this.parentNode.removeChild(el);
-            if (exp) {
-                var node = this.el.cloneNode(true);
-                Dom.insertAfter(this.parentNode, node, this.index);
-                this.rid = Dom.getAttributes(node, ["rid"])["rid"];
-                this.el = node;
-            }
-        },
-
-        "update": function (exp) {
-            var node = this.el,
-                nodeClone = node.cloneNode(true);
-            if (node && Dom.getChildIndex(this.parentNode, node) !== -1) {
-                this.parentNode.removeChild(node);
-            }
-            if (exp) {
-                Dom.insertAfter(this.parentNode, nodeClone, this.index);
-                this.rid = Dom.getAttributes(nodeClone, ["rid"])["rid"];
-                this.el = nodeClone;
-            }
+    link(el, exp, scope) {
+        this.parentNode.removeChild(el);
+        if (exp) {
+            var node = this.el.cloneNode(true);
+            DOM.insertAfter(this.parentNode, node, this.index);
+            this.rid = DOM.getAttributes(node, ["rid"])["rid"];
+            this.el = node;
         }
+    }
 
-    };
+    update(exp) {
+        let node = this.el,
+            nodeClone = node.cloneNode(true);
+        if (node && Dom.getChildIndex(this.parentNode, node) !== -1) {
+            this.parentNode.removeChild(node);
+        }
+        if (exp) {
+            Dom.insertAfter(this.parentNode, nodeClone, this.index);
+            this.rid = Dom.getAttributes(nodeClone, ["rid"])["rid"];
+            this.el = nodeClone;
+        }
+    }
 
-    return {
-        "name": "RIf",
-        "type": "dom",
-        "constructor": RIf
-    };
+}
 
-}));
-
-
+export default RIf;

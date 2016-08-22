@@ -4,56 +4,42 @@
 
 "use strict";
 
-(function (root, factory) {
-    if (typeof define === "function" && define.amd) {
-        define(["tool", "event", "dom", "dirBase"], function (Tool, Event, dom, dirBase) {
-            return factory(root, Tool, Event, dom, dirBase);
-        });
+import Tool from "../lib/Tool";
+import Event from "../lib/Event";
+import DOM from "../lib/DOM";
+import DirectiveBase from "./direcrive-base";
+
+class RElse extends DirectiveBase {
+
+    constructor(dirCfg) {
+        super(dirCfg);
+        this.name = "RElse";
+        this.index = DOM.getChildIndex(this.parentNode, this.el);
     }
 
-}(window, function (root, Tool, Event, Dom, dirBase, undefined) {
-
-    function RElse(dirCfg) {
-        dirCfg.name = "RElse";
-        dirBase.call(this, dirCfg);
-        this.index = Dom.getChildIndex(this.parentNode, this.el);
-    }
-
-    RElse.prototype = {
-
-        "constructor": RElse,
-
-        "link": function (el, exp, scope) {
-            this.parentNode.removeChild(el);
-            if (!exp) {
-                var node = this.el.cloneNode(true);
-                Dom.insertAfter(this.parentNode, node, this.index);
-                this.rid = Dom.getAttributes(node, ["rid"])["rid"];
-                this.el = node;
-            }
-        },
-
-        "update": function (exp) {
-            var node = this.el,
-                nodeClone = node.cloneNode(true);
-            if (node && Dom.getChildIndex(this.parentNode, node) !== -1) {
-                this.parentNode.removeChild(node);
-            }
-            if (!exp) {
-                Dom.insertAfter(this.parentNode, nodeClone, this.index);
-                this.rid = Dom.getAttributes(nodeClone, ["rid"])["rid"];
-                this.el = nodeClone;
-            }
+    link(el, exp, scope) {
+        this.parentNode.removeChild(el);
+        if (!exp) {
+            var node = this.el.cloneNode(true);
+            DOM.insertAfter(this.parentNode, node, this.index);
+            this.rid = DOM.getAttributes(node, ["rid"])["rid"];
+            this.el = node;
         }
+    }
 
-    };
+    update(exp) {
+        var node = this.el,
+            nodeClone = node.cloneNode(true);
+        if (node && DOM.getChildIndex(this.parentNode, node) !== -1) {
+            this.parentNode.removeChild(node);
+        }
+        if (!exp) {
+            DOM.insertAfter(this.parentNode, nodeClone, this.index);
+            this.rid = DOM.getAttributes(nodeClone, ["rid"])["rid"];
+            this.el = nodeClone;
+        }
+    }
 
-    return {
-        "name": "RElse",
-        "type": "dom",
-        "constructor": RElse
-    };
+}
 
-}));
-
-
+export default RElse;

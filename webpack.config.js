@@ -8,12 +8,10 @@
 let webpack = require("webpack");
 
 module.exports = {
-    entry: [
-        `${__dirname}/public/js/index.js`
-    ],
+    entry: `${__dirname}/public/js/src/r/index.js`,
     output: {
-        path: `${__dirname}/public/js/`,
-        filename: "bundle.js"
+        path: `${__dirname}/public/js/src/`,
+        filename: "R.js"
     },
     module: {
         loaders: [

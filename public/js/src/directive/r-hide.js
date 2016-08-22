@@ -4,64 +4,47 @@
 
 "use strict";
 
-(function (root, factory) {
-    if (typeof define === "function" && define.amd) {
-        define(["tool", "event", "dirBase"], function (Tool, Event, dirBase) {
-            return factory(root, Tool, Event, dirBase);
-        });
+import Tool from "../lib/Tool";
+import DOM from "../lib/DOM";
+import DirectiveBase from "./direcrive-base";
+
+class RHide extends DirectiveBase {
+
+    constructor(dirCfg) {
+        super(dirCfg);
+        this.name = "RHide";
     }
 
-}(window, function (root, Tool, Event, dirBase, undefined) {
+    link(el, exp, scope) {
+        let execRes;
+        if (this.dataContext) {
+            execRes = this.scope.execDeep(this.finalExp, this.dataContext);
+        } else {
+            execRes = this.scope.execDeep(this.finalExp, this.scope.data);
+        }
 
-    function RHide(dirCfg) {
-        dirCfg.name = "RHide";
-        dirBase.call(this, dirCfg);
+        this.originalData = execRes.result;
+        this.updateExp = execRes.executeStr;
+
+
+        if (this.originalData) {
+            this.el.style.display = "none";
+        } else {
+            this.el.style.display = "block";
+        }
     }
 
-    RHide.prototype = {
-
-        "constructor": RHide,
-
-        "link": function (el, exp, scope) {
-            var execRes;
-            if (this.dataContext) {
-                execRes = this.scope.execDeep(this.finalExp, this.dataContext);
-            } else {
-                execRes = this.scope.execDeep(this.finalExp, this.scope.data);
-            }
-
-            this.originalData = execRes.result;
-            this.updateExp = execRes.executeStr;
-
-
-            if (this.originalData) {
+    update(exp) {
+        let newVal = this.scope.execByStr(this.updateExp, this.scope.data);
+        if (!Tool.isEqual(newVal, this.originalData)) {
+            if (newVal) {
                 this.el.style.display = "none";
             } else {
                 this.el.style.display = "block";
             }
-        },
-
-        "update": function (exp) {
-            var newVal = this.scope.execByStr(this.updateExp, this.scope.data);
-
-            if (!Tool.isEqual(newVal, this.originalData)) {
-                if (newVal) {
-                    this.el.style.display = "none";
-                } else {
-                    this.el.style.display = "block";
-                }
-                this.originalData = newVal;
-            }
+            this.originalData = newVal;
         }
+    }
+}
 
-    };
-
-    return {
-        "name": "RHide",
-        "type": "dom",
-        "constructor": RHide
-    };
-
-}));
-
-
+export default RHide;

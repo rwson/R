@@ -5,94 +5,68 @@
 
 "use strict";
 
-(function (root, factory) {
-    if (typeof define === "function" && define.amd) {
-        define([
-            "tool",
-            "dirBase",
-            "rBind",
-            "RHref",
-            "rClick",
-            "rFor",
-            "rModel",
-            "rKeyUp",
-            "rKeyDown",
-            "rIf",
-            "rElse",
-            "rShow",
-            "rHide",
-            "rClass",
-            "rCss",
-            "rOption"
-        ], function (Tool, dirBase) {
-            var argus = [].slice.call(arguments, 2);
-            argus.unshift(Tool, dirBase);
-            return factory.apply(window, argus);
-        });
-    }
+import Tool from "../lib/Tool";
 
-}(window, function (Tool, dirBase) {
+import DirectiveBase from "./direcrive-base";
+import RBind from "./r-bind";
+import RClass from "./r-class";
+import RClick from "./r-click";
+import RCss from "./r-css";
+import RElse from "./r-else";
+import RFor from "./r-for";
+import RHide from "./r-hide";
+import RHref from "./r-href";
+import RIf from "./r-if";
+import RKeyDown from "./r-keydown";
+import RKeyUp from "./r-keyup";
+import RModel from "./r-model";
+import RShow from "./r-show";
+import RSrc from "./r-src";
 
-    var exportObj = {},
-        customOpt = {
-            "extend": true,
-            "dirType": "dom",
-            "priority": 0
-        },
-        argus = [].slice.call(arguments, 2);
+let Directives = {
+    RBind,
+    RClass,
+    RClick,
+    RCss,
+    RElse,
+    RFor,
+    RHide,
+    RHref,
+    RIf,
+    RKeyDown,
+    RKeyUp,
+    RShow,
+    RSrc
+};
 
-    //  配置暴露对象
-    argus.forEach(function (item) {
-        exportObj[item["name"]] = item["constructor"];
-        exportObj[item["name"]]["dirType"] = item["type"];
-    });
+Directives.extend = (name, opt) => {
 
-    /**
-     * 自定义指令
-     * @param name  指令名称(驼峰命名)
-     * @param opt   参数选项
-     */
-    exportObj.extend = function (name, opt) {
-        opt = Tool.merge(customOpt, opt, true);
-        exportObj[name] = {
-            "constructor": function (dirCfg) {
-                if (opt.extend) {
-                    dirCfg.name = name;
-                    dirBase.call(this, dirCfg);
-                }
+    let extend = class extends DirectiveBase {
 
-                Tool.isType(opt.constructor, "function") && opt.constructor.call(this, dirCfg);
-                this.priority = opt.priority;
-                this.dirType = opt.type;
+        constructor(opt) {
+            super(opt);
+            Tool.isType(opt.constructor) && opt.constructor.call(this);
+        }
 
-                this.link = function () {
-                    var execRes;
-                    if (this.dirType === "dom") {
-                        execRes = this.scope.execDeep(this.finalExp, this.scope.data);
-                        this.originalData = execRes.result;
-                        this.updateExp = execRes.executeStr;
-                        opt.link(this.el, this.originalData, this.scope);
-                    } else if (this.dirType === "event") {
-                        execRes = this.scope.execDeep(this.finalExp, this.scope.events);
-                        this.bindFn = execRes.result;
-                        opt.link(this.el, this.bindFn, this.scope);
-                    }
-                };
-
-                this.update = function () {
-                    var newVal = this.scope.execByStr(this.updateExp, this.scope.data);
-                    if (!Tool.isEqual(newVal, this.originalData)) {
-                        if (Tool.isType(opt.update, "function")) {
-                            opt.update.call(this, this.el, newVal, this.scope);
-                        }
-                        this.originalData = newVal;
-                    }
-                };
+        link() {
+            var execRes = this.scope.execDeep(this.finalExp, this.scope.data);
+            if (!execRes.result) {
+                execRes = this.scope.execDeep(this.finalExp, this.scope.events);
             }
-        };
+            if (Tool.isType(opt.link, "Function")) {
+                opt.link(this.el, execRes);
+            }
+        }
+
+        update(el, exp) {
+            if (Tool.isType(opt.update, "Function")) {
+                opt.update();
+            }
+        }
+
     };
 
-    return exportObj;
+    Directives[name] = extend;
+};
 
-}));
-
+export default Directives;

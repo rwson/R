@@ -23,8 +23,8 @@ app.get("/index2", function (req, res, next) {
 });
 
 //  渲染index2.ejs
-app.get("/navigation", function (req, res, next) {
-    res.render("navigation");
+app.get("/test", function (req, res, next) {
+    res.render("test");
 });
 
 //  各demo示例路由

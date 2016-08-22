@@ -4,55 +4,39 @@
 
 "use strict";
 
-(function (root, factory) {
-    if (typeof define === "function" && define.amd) {
-        define(["tool", "dom", "dirBase"], function (Tool, Dom, dirBase) {
-            return factory(root, Tool, Dom, dirBase);
-        });
+import DirectiveBase from "./direcrive-base";
+
+class RBind extends DirectiveBase {
+
+    constructor(dirCfg) {
+        super(dirCfg);
+        this.name = "RBind";
     }
 
-}(window, function (root, Tool, Dom, dirBase, undefined) {
-
-    function RBind(dirCfg) {
-        dirCfg.name = "RBind";
-        dirBase.call(this, dirCfg);
-        return this;
-    }
-
-    RBind.prototype = {
-
-        "constructor": RBind,
-
-        "link": function (el, exp, scope) {
-            var execRes;
-            if (this.dataContext) {
-                execRes = this.scope.execDeep(this.finalExp, this.dataContext);
-            } else {
-                execRes = this.scope.execDeep(this.finalExp, this.scope.data);
-            }
-
-            this.originalData = execRes.result;
-            this.updateExp = execRes.executeStr;
-
-            if (!Tool.isUndefined(this.originalData)) {
-                this.el.innerHTML = this.originalData;
-            }
-        },
-
-        "update": function (exp) {
-            var newVal = this.scope.execByStr(this.updateExp, this.scope.data);
-            if (!Tool.isEqual(newVal, this.originalData)) {
-                this.el.innerHTML = newVal;
-                this.originalData = newVal;
-            }
+    link(el, exp, scope) {
+        let execRes;
+        if (this.dataContext) {
+            execRes = this.scope.execDeep(this.finalExp, this.dataContext);
+        } else {
+            execRes = this.scope.execDeep(this.finalExp, this.scope.data);
         }
 
-    };
+        this.originalData = execRes.result;
+        this.updateExp = execRes.executeStr;
 
-    return {
-        "name": "RBind",
-        "type": "dom",
-        "constructor": RBind
-    };
+        if (!Tool.isUndefined(this.originalData)) {
+            this.el.innerHTML = this.originalData;
+        }
+    }
 
-}));
+    update(exp) {
+        var newVal = this.scope.execByStr(this.updateExp, this.scope.data);
+        if (!Tool.isEqual(newVal, this.originalData)) {
+            this.el.innerHTML = newVal;
+            this.originalData = newVal;
+        }
+    }
+
+}
+
+export default RBind;
