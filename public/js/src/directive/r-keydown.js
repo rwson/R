@@ -5,7 +5,7 @@
 "use strict";
 
 import Tool from "../lib/Tool";
-import Event from "../lib/Event";
+import EVENT from "../lib/EVENT";
 import DirectiveBase from "./direcrive-base";
 
 class RKeyDown extends DirectiveBase {
@@ -22,8 +22,8 @@ class RKeyDown extends DirectiveBase {
 
         //  确定函数为函数类型才绑定事件
         if (Tool.isType(this.bindFn, "function")) {
-            Event.removeEvent(el, "keydown", this.bindFn);
-            Event.addEvent(el, "keydown", this.bindFn.bind(context));
+            EVENT.removeEVENT(el, "keydown", this.bindFn);
+            EVENT.addEVENT(el, "keydown", this.bindFn.bind(context));
         }
     }
 

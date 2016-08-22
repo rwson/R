@@ -5,7 +5,7 @@
 "use strict";
 
 import Tool from "../lib/Tool";
-import Event from "../lib/Event";
+import EVENT from "../lib/EVENT";
 import DirectiveBase from "./direcrive-base";
 
 class RShow extends DirectiveBase {

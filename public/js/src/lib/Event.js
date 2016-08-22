@@ -6,7 +6,7 @@
 
 import Tool from "./Tool";
 
-class Event {
+class EVENT {
 
     constructor() {
 
@@ -19,34 +19,34 @@ class Event {
      * @param fn        回调函数
      * @param prevDef   阻止默认事件
      */
-    static addEvent(obj, type, fn, prevDef) {
+    static addEVENT(obj, type, fn, prevDef) {
         let types = type;
         if (Tool.isType(types, "string")) {
             types = [type];
         }
         types.forEach(function (type) {
-            if (obj.attachEvent) {
+            if (obj.attachEVENT) {
                 obj["e" + type + fn] = fn;
                 obj[type + fn] = function (ev) {
                     ev = ev || root.event;
                     obj["e" + type + fn](ev);
                     if (prevDef) {
-                        Event.prevDefault(ev);
+                        EVENT.prevDefault(ev);
                     }
                 };
-                obj.attachEvent("on" + type, function (ev) {
+                obj.attachEVENT("on" + type, function (ev) {
                     ev = ev || root.event;
                     obj[type + fn](ev);
                     if (prevDef) {
-                        Event.prevDefault(ev);
+                        EVENT.prevDefault(ev);
                     }
                 });
             } else {
-                obj.addEventListener(type, function (ev) {
+                obj.addEVENTListener(type, function (ev) {
                     ev = ev || root.event;
                     fn(ev);
                     if (prevDef) {
-                        Event.prevDefault(ev);
+                        EVENT.prevDefault(ev);
                     }
                 }, false);
             }
@@ -60,7 +60,7 @@ class Event {
      * @param type  事件类型(String/Array)
      * @param fn    回调函数
      */
-    static removeEvent(obj, type, fn) {
+    static removeEVENT(obj, type, fn) {
         let types = type;
         if (Tool.isType(types, "string")) {
             types = [type];
@@ -77,9 +77,9 @@ class Event {
      * @param condition     触发事件条件,可以是boolean或者函数(boolean类型的返回值)
      * @param fn            回调函数
      */
-    static delegatEvent(target, type, condition, fn) {
-        this.removeEvent(target, type);
-        this.addEvent(target, type, function (ev) {
+    static delegatEVENT(target, type, condition, fn) {
+        this.removeEVENT(target, type);
+        this.addEVENT(target, type, function (ev) {
             ev = ev || event;
             if ((!Tool.isType(condition, "Function") && condition) || condition()) {
                 Tool.executeCallback(fn, ev);
@@ -112,4 +112,4 @@ class Event {
 
 }
 
-export default Event;
+export default EVENT;

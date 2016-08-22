@@ -101,7 +101,7 @@ var ajax = function (options) {
 // trigger a custom event and return false if it was cancelled
 function triggerAndReturn(context, eventName, data) {
     //todo: Fire off some events
-    //var event = $.Event(eventName)
+    //var event = $.EVENT(eventName)
     //$(context).trigger(event, data)
     return true;//!event.defaultPrevented
 }

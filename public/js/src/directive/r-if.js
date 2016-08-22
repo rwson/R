@@ -6,7 +6,7 @@
 
 import Tool from "../lib/Tool";
 import DOM from "../lib/DOM";
-import Event from "../lib/Event";
+import EVENT from "../lib/EVENT";
 import DirectiveBase from "./direcrive-base";
 
 class RIf extends DirectiveBase {

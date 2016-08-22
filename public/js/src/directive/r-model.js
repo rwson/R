@@ -6,7 +6,7 @@
 
 import Tool from "../lib/Tool";
 import DOM from "../lib/DOM";
-import Event from "../lib/Event";
+import EVENT from "../lib/EVENT";
 import DirectiveBase from "./direcrive-base";
 
 const textTypeReg = /text|password|number|tel|email|url/, //  可以输入的几种文本类型
@@ -56,8 +56,8 @@ class RModel extends DirectiveBase {
                     this.el.value = this.originalData;
                 }
 
-                Event.removeEvent(el, ["keydown", "keypress", "keyup"]);
-                Event.addEvent(el, ["keydown", "keypress", "keyup"], function () {
+                EVENT.removeEVENT(el, ["keydown", "keypress", "keyup"]);
+                EVENT.addEVENT(el, ["keydown", "keypress", "keyup"], function () {
                     _doUpdate.call(this, el.value, scope);
                 }.bind(this));
 
@@ -67,8 +67,8 @@ class RModel extends DirectiveBase {
                     this.el.checked = this.originalData;
                 }
 
-                Event.removeEvent(el, "click");
-                Event.addEvent(el, "click", function () {
+                EVENT.removeEVENT(el, "click");
+                EVENT.addEVENT(el, "click", function () {
                     _doUpdate.call(this, el.checked, scope);
                 }.bind(this));
 
@@ -78,8 +78,8 @@ class RModel extends DirectiveBase {
                     this.el.value = this.originalData;
                 }
 
-                Event.removeEvent(el, "change");
-                Event.addEvent(el, "change", function () {
+                EVENT.removeEVENT(el, "change");
+                EVENT.addEVENT(el, "change", function () {
                     _doUpdate.call(this, el.value, scope);
                 }.bind(this));
             }

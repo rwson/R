@@ -18,10 +18,11 @@
     "debug": "~2.2.0",
     "ejs": "~2.3.3",
     "express": "~4.13.1",
+    "jsx-loader": "^0.13.2",
     "morgan": "~1.6.1",
     "serve-favicon": "~2.3.0",
-    "jsx-loader": "^0.13.2",
-    "webpack": "^1.13.2"
+    "webpack": "^1.13.2",
+    "whatwg-fetch": "^1.0.0"
   },
   "devDependencies": {
     "webpack-dashboard": "^0.1.6"

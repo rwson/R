@@ -1,59 +1,49 @@
 /**
- * index.js
  * Watcher类,实现一个数据的监听
  */
 
 "use strict";
 
-(function (root, factory) {
-    if (typeof define === "function" && define.amd) {
-        define([
-            "tool"
-        ], function (Tool, Event) {
-            return factory(window, Tool);
-        });
+import * as Tool from "../lib/Tool";
+
+class Watcher {
+
+    constructor() {
+        this.watcherList = [];
     }
-}(window, function (root, Tool, Dom) {
+
+    static getList() {
+        return this.watcherList;
+    }
 
     /**
-     * 写成一个静态类,方便可以在内部进行调用而不用实例化
+     * 添加相关属性的订阅监听
+     * @param keys  Array.<Object>
+     * @param scope Scope类的实例
      */
-    var Watcher = {
+    static subscribe(keys, scope) {
+        let watcherList = this.watcherList;
+        keys.forEach((watcher) => {
+            watcher.scope = scope;
+            watcherList.push(watcher);
+        });
+        this.watcherList = watcherList;
+    }
 
-        /**
-         * 监听数组
-         */
-        "watcherList": [],
-
-        /**
-         * 添加相关属性的订阅监听
-         * @param keys  Array.<Object>
-         * @param scope Scope类的实例
-         */
-        "subscribe": function (keys, scope) {
-            keys.forEach(function (watcher) {
-                watcher.scope = scope;
-                this.watcherList.push(watcher);
-            }, this);
-        },
-
-        /**
-         * 取消对该属性的订阅
-         * @param uIds  Array.<uId>
-         */
-        "unSubscribe": function (uIds) {
-            if (!Tool.isType(uIds, "array")) {
-                uIds = [uIds];
-            }
-            this.watcherList = this.watcherList.filter(function (watcher) {
-                return !(~(uIds.indexOf(watcher.uId)));
-            });
-            if (!this.watcherList.length) {
-                this.watcherList = Tool.copy(this.watcherBackup);
-            }
+    /**
+     * 取消对该属性的订阅
+     * @param uIds  Array.<uId>
+     */
+    static unSubscribe(uIds) {
+        let watcherList = this.watcherList;
+        if (!Tool.isType(uIds, "array")) {
+            uIds = [uIds];
         }
-    };
+        this.watcherList = watcherList.filter((watcher) => {
+            return !(~(uIds.indexOf(watcher.uId)));
+        });
+    }
 
-    return Watcher;
+}
 
-}));
+export default Watcher;
