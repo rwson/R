@@ -23,7 +23,7 @@ class RFor extends DirectiveBase {
         this.updateExp = execRes.executeStr;
 
         if (this.originalData && this.originalData.length) {
-            let fragement = Dom.createFragment(),
+            let fragement = DOM.createFragment(),
                 directives = this.directives,
                 elCloned, children, rid, childEl, childDir, childDirs, tDir, value, loopI, loopLen, loopChild;
 
@@ -35,7 +35,7 @@ class RFor extends DirectiveBase {
                 children = elCloned.children;
 
                 rid = Tool.randomStr();
-                Dom.setAttributes(elCloned, {
+                DOM.setAttributes(elCloned, {
                     "rid": rid
                 });
 
@@ -65,10 +65,10 @@ class RFor extends DirectiveBase {
 
                                     loopChild = children.item(loopI);
 
-                                    if (Dom.compareNodes(loopChild, childEl)) {
+                                    if (DOM.compareNodes(loopChild, childEl)) {
 
                                         rid = Tool.randomStr();
-                                        Dom.setAttributes(childEl, {
+                                        DOM.setAttributes(childEl, {
                                             "rid": rid
                                         });
 
