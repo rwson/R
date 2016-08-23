@@ -12,8 +12,8 @@ import DirectiveBase from "./direcrive-base";
 class RIf extends DirectiveBase {
 
     constructor(dirCfg) {
+        dirCfg.name = "RIf";
         super(dirCfg);
-        this.name = "RIf";
     }
 
     link(el, exp, scope) {

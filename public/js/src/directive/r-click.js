@@ -12,8 +12,8 @@ import DirectiveBase from "./direcrive-base";
 class RClick extends DirectiveBase {
 
     constructor(dirCfg) {
+        dirCfg.name = "RClick";
         super(dirCfg);
-        this.name = "RClick";
     }
 
     link(el, exp, scope, context) {

@@ -12,8 +12,8 @@ import DirectiveBase from "./direcrive-base";
 class RElse extends DirectiveBase {
 
     constructor(dirCfg) {
+        dirCfg.name = "RElse";
         super(dirCfg);
-        this.name = "RElse";
         this.index = DOM.getChildIndex(this.parentNode, this.el);
     }
 

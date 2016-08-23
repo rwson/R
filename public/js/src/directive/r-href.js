@@ -11,8 +11,8 @@ import DirectiveBase from "./direcrive-base";
 class RHref extends DirectiveBase {
 
     constructor(dirCfg) {
+        dirCfg.name = "RHref";
         super(dirCfg);
-        this.name = "RHref";
     }
 
     link(el, exp, scope) {

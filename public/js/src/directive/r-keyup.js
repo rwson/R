@@ -12,6 +12,7 @@ class RKeyUp extends DirectiveBase {
 
 
     constructor(dirCfg) {
+        dirCfg.name = "RKeyUp";
         super(dirCfg);
     }
 

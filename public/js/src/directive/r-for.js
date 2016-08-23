@@ -11,8 +11,8 @@ import DirectiveBase from "./direcrive-base";
 class RFor extends DirectiveBase {
 
     constructor(dirCfg) {
+        dirCfg.name = "RFor";
         super(dirCfg);
-        this.name = "RFor";
     }
 
     link(el, exp, scope) {

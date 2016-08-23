@@ -4,6 +4,8 @@
 
 "use strict";
 
+import DOM from "../lib/DOM";
+
 class DirectiveBase{
 
     /**
@@ -17,15 +19,14 @@ class DirectiveBase{
         this.directives = dir.directives;
         this.scope = dir.scope;
         this.dataContext = dir.dataContext;
-        this.rid = Dom.getAttributes(this.el, ["rid"])["rid"];
-        this.pPid = Dom.getAttributes(this.parentNode, ["rid"])["rid"];
+        this.rid = DOM.getAttributes(this.el, ["rid"])["rid"];
+        this.pRid = DOM.getAttributes(this.parentNode, ["rid"])["rid"];
         this.priority = 0;
         this.exp = dir.exp;
         this.updateExp = "";
         this.finalExp = this.exp;
         this.originalData = null;
         this.bindFn = null;
-
         if (dir.name) {
             let curDirective = this.directives.filter(function (directive) {
                 return directive.directiveName === dir.name;

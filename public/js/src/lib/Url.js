@@ -63,15 +63,15 @@ class Url {
      * @returns {{}||Object}
      */
     static getQueryString(url) {
-        let arr = url.split("?")[1].split("&"),
-            output = {}, _temp;
-        if (!url || url.indexOf("?") < 0) {
-            return output;
+        url = url || location.href;
+        let arr = [], output = {}, _temp;
+        if (url.indexOf("?") > -1) {
+            arr = url.split("?")[1].split("&");
+            arr.forEach((item) => {
+                _temp = item.split("=");
+                output[_temp[0]] = decodeURIComponent(_temp[1]);
+            });
         }
-        arr.forEach((item) => {
-            _temp = item.split("=");
-            output[_temp[0]] = decodeURIComponent(_temp[1]);
-        });
         return output;
     }
 }

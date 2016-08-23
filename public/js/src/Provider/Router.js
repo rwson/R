@@ -6,6 +6,7 @@
 "use strict";
 
 import Tool from "../lib/Tool";
+import DOM from "../lib/DOM";
 import Url from "../lib/Url";
 import EVENT from "../lib/EVENT";
 
@@ -23,6 +24,7 @@ class Router {
             "root": null        //  根元素
         };
         this.finalCfg = {};
+        this.pageParams = {};
     }
 
     /**
@@ -76,8 +78,6 @@ class Router {
             loopI = 0,
             loopLen = keys.length,
             loopKey, cfgObj, output, urlSplits, cfgSplits;
-
-        this.pageParams = {};
 
         //  url中存在查询字符串,将url转换成"?"前面的内容,再进行比对
         if (fPath.match(urlQueryStr)) {
@@ -137,7 +137,7 @@ class Router {
                 cfg.root.innerHTML = "";
 
                 //  创建fragement
-                framement = Dom.createFragment();
+                framement = DOM.createFragment();
                 divNode = document.createElement("div");
                 divNode.classList.add("ctrl-ele");
 
@@ -203,8 +203,8 @@ class Router {
             //  循环触发该事件的列表
             for (; loopI < loopLen; loopI++) {
                 child = pathEs[loopI];
-                if (Dom.isHTMLNode(child)) {
-                    path = Dom.getAttributes(child, ["href"]).href;
+                if (DOM.isHTMLNode(child)) {
+                    path = DOM.getAttributes(child, ["href"]).href;
                     tagName = child.tagName.toLowerCase();
 
                     if (tagName === "a" && path) {
@@ -232,3 +232,5 @@ class Router {
     }
 
 }
+
+export default Router;

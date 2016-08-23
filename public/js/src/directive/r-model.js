@@ -29,8 +29,8 @@ function _doUpdate(value, scope) {
 class RModel extends DirectiveBase {
 
     constructor(dirCfg) {
+        dirCfg.name = "RModel";
         super(dirCfg);
-        this.name = "RModel";
     }
 
     link(el, exp, scope) {
@@ -38,7 +38,7 @@ class RModel extends DirectiveBase {
         tagName = el.tagName.toLowerCase();
         elType = el.type;
         disabled = el.disabled;
-        isAvailable = Dom.isHide(el) || Dom.isExist(el);
+        isAvailable = DOM.isHide(el) || DOM.isExist(el);
 
         var execRes;
         if (this.dataContext) {

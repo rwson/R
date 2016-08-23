@@ -11,8 +11,8 @@ import DirectiveBase from "./direcrive-base";
 class RCss extends DirectiveBase {
 
     constructor(dirCfg) {
+        dirCfg.name = "RCss";
         super(dirCfg);
-        this.name = "RCss";
     }
 
     link(el, exp, scope) {

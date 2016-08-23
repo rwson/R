@@ -9,8 +9,6 @@ import Tool from "../lib/Tool";
 import DOM from "../lib/DOM";
 import * as Directive from "../directive/index";
 
-
-
 //  无需编译的节点
 const unCompileElems = ["html", "head", "meta", "link", "title", "object", "embed", "script"];
 
@@ -71,8 +69,8 @@ class Compile {
      * 获取节点,过滤掉不编译的节点
      */
     compile() {
-        let childEles = DOM.getAllChildElements(this.rootElement);
-        this.getAllDirectives(childEles);
+        let childEls = DOM.getAllChildElements(this.rootElement);
+        this.getAllDirectives(childEls);
     }
 
     /**
@@ -128,7 +126,7 @@ class Compile {
                     if (pEleMap) {
                         pDirectives = pEleMap.directives;
                         if (pDirectives && pDirectives.length) {
-                            pDirectives.forEach(function (dir) {
+                            pDirectives.forEach((dir) => {
                                 //  当前父元素的指令中包含"r-for='xxx in yyy[.zzz]'"这种指令
                                 if (dir.directiveName === "RFor" && loopDirReg.test(dir.exp)) {
 
@@ -199,7 +197,6 @@ class Compile {
                     res.push({
                         "directive": dirClass,
                         "directiveName": name,
-                        "dirType": Directive[name].dirType,
                         "exp": Tool.trim(exp),
                         "el": el
                     });
@@ -216,7 +213,6 @@ class Compile {
                 return item;
             });
         }
-
         /**
          * 返回根据优先级排序后的指令数组
          * @type {Array.<T>}
@@ -238,6 +234,7 @@ class Compile {
             cEle, directives, dir, finalExp, directiveIns, childDirMap, splitDir;
 
         mapKeys.forEach(function (key) {
+
             childDirMap = [];
             cEle = ele[key];
 

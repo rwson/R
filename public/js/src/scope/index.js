@@ -36,7 +36,7 @@ class Scope {
      */
     constructor(compiler) {
         this.uId = Tool.randomStr(); //  单独的id
-        this.compiler = compile; //  存储compile实例
+        this.compiler = compiler; //  存储compile实例
         this.data = {}; //  数据对象
         this.events = {}; //  事件对象
     }
@@ -70,7 +70,7 @@ class Scope {
      * @returns {*}
      */
     get(key) {
-        var target = this.data[key];
+        let target = this.data[key];
         return Tool.isReferenceType(target) ? Tool.copy(target, true) : target;
     }
 
@@ -79,9 +79,10 @@ class Scope {
      * @param obj   要更新的数据
      */
     update(obj) {
-        var watcherList = Watcher.get("watcherList"),
+        let watcherList = Watcher.getWatchers(),
             uId = this.uId,
             updater;
+
         Object.keys(obj).forEach(function (key) {
             if (!Tool.isEqual(this.get(key), obj[key])) {
                 this.data[key] = obj[key];
@@ -151,3 +152,5 @@ class Scope {
     }
 
 }
+
+export default Scope;

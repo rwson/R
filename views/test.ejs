@@ -8,12 +8,30 @@
 
 <div id="app">
 
+    <div r-controller="App">
+
+        <input r-model="model" />
+        <p r-bind="model"></p>
+
+    </div>
+
 </div>
 
 
 <script src="/js/src/R.js"></script>
 <script>
-    console.log(R);
+
+    R.controller("App", function (scope, pageParams) {
+        scope.set({
+            "model": "test"
+        });
+
+        console.log(pageParams);
+
+    });
+    R.inject("App", "pageParams");
+    R.bootstrap("#app", false);
+
 </script>
 </body>
 </html>

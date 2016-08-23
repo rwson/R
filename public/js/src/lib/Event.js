@@ -25,7 +25,7 @@ class EVENT {
             types = [type];
         }
         types.forEach(function (type) {
-            if (obj.attachEVENT) {
+            if (obj.attachEvent) {
                 obj["e" + type + fn] = fn;
                 obj[type + fn] = function (ev) {
                     ev = ev || root.event;
@@ -34,7 +34,7 @@ class EVENT {
                         EVENT.prevDefault(ev);
                     }
                 };
-                obj.attachEVENT("on" + type, function (ev) {
+                obj.attachEvent("on" + type, function (ev) {
                     ev = ev || root.event;
                     obj[type + fn](ev);
                     if (prevDef) {
@@ -42,7 +42,7 @@ class EVENT {
                     }
                 });
             } else {
-                obj.addEVENTListener(type, function (ev) {
+                obj.addEventListener(type, function (ev) {
                     ev = ev || root.event;
                     fn(ev);
                     if (prevDef) {

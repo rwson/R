@@ -6,14 +6,31 @@
 
 import * as Tool from "../lib/Tool";
 
+let watcherList = [];
+
 class Watcher {
 
     constructor() {
-        this.watcherList = [];
     }
 
-    static getList() {
-        return this.watcherList;
+    /**
+     * 模拟WatcherList Setter
+     * @param watchers
+     */
+    static setWatchers(watchers) {
+        watcherList = watchers;
+    }
+
+    static setAsEmpty() {
+        watcherList = [];
+    }
+
+    /**
+     * 模拟WatcherList Setter
+     * @return Array.<T>
+     */
+    static getWatchers() {
+        return watcherList;
     }
 
     /**
@@ -22,12 +39,10 @@ class Watcher {
      * @param scope Scope类的实例
      */
     static subscribe(keys, scope) {
-        let watcherList = this.watcherList;
         keys.forEach((watcher) => {
             watcher.scope = scope;
             watcherList.push(watcher);
         });
-        this.watcherList = watcherList;
     }
 
     /**
@@ -35,11 +50,10 @@ class Watcher {
      * @param uIds  Array.<uId>
      */
     static unSubscribe(uIds) {
-        let watcherList = this.watcherList;
         if (!Tool.isType(uIds, "array")) {
             uIds = [uIds];
         }
-        this.watcherList = watcherList.filter((watcher) => {
+        watcherList = watcherList.filter((watcher) => {
             return !(~(uIds.indexOf(watcher.uId)));
         });
     }

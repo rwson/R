@@ -11,8 +11,8 @@ import DirectiveBase from "./direcrive-base";
 class RShow extends DirectiveBase {
 
     constructor(dirCfg) {
+        dirCfg.name = "RShow";
         super(dirCfg);
-        this.name = "RShow";
     }
 
     link(el, exp, scope) {

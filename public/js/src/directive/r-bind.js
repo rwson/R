@@ -4,13 +4,14 @@
 
 "use strict";
 
+import Tool from "../lib/Tool";
 import DirectiveBase from "./direcrive-base";
 
 class RBind extends DirectiveBase {
 
     constructor(dirCfg) {
+        dirCfg.name = "RBind";
         super(dirCfg);
-        this.name = "RBind";
     }
 
     link(el, exp, scope) {

@@ -35,6 +35,7 @@ let Directives = {
     RIf,
     RKeyDown,
     RKeyUp,
+    RModel,
     RShow,
     RSrc
 };

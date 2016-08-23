@@ -11,8 +11,8 @@ import DirectiveBase from "./direcrive-base";
 class RKeyDown extends DirectiveBase {
 
     constructor(dirCfg) {
+        dirCfg.name = "RKeyDown";
         super(dirCfg);
-        this.name = "RKeyDown";
         this.context = window;
     }
 
