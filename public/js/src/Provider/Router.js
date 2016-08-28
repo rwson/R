@@ -9,6 +9,7 @@ import Tool from "../lib/Tool";
 import DOM from "../lib/DOM";
 import Url from "../lib/Url";
 import EVENT from "../lib/EVENT";
+import Ajax from "../Provider/Ajax";
 
 const paramRoute = /(\/\:\w+)+/g;             //  带url参数REST风格的路由
 const replaceParam = /(\/\:\w+)/g;            //  替换掉url中参数的表示
@@ -32,7 +33,7 @@ class Router {
      * @param opt   配置
      */
     config(opt) {
-        var finalCfg = Tool.merge(_route.cfg, opt, true),       //  合并传入的参数和原来的默认配置                                           //
+        var finalCfg = Tool.merge(this.cfg, opt, true),       //  合并传入的参数和原来的默认配置                                           //
             cfgObj = {},                                        //  用来缓存Object方式配置路由的数据
             toMerge = {},                                       //  原来的正则表达式对象和新的属性合并
             cPath,                                              //  Object方式配置路由,会遍历每一项,cPath表示当前一项
@@ -132,8 +133,13 @@ class Router {
             return;
         }
 
-        this.requestTemplate(curCfgObj.tplPath)
-            .then((res)=> {
+
+        Ajax({
+            "url": curCfgObj.tplPath,
+            "type": "GET",
+            "dataType": "text",
+            "context": this,
+            "success": (res) => {
                 cfg.root.innerHTML = "";
 
                 //  创建fragement
@@ -141,46 +147,18 @@ class Router {
                 divNode = document.createElement("div");
                 divNode.classList.add("ctrl-ele");
 
-                divNode.innerHTML = Tool.trim(res.response);
+                divNode.innerHTML = res;
 
                 //  依次作为子节点添加
                 framement.appendChild(divNode);
                 cfg.root.appendChild(framement);
 
                 callback(divNode, curCfgObj);
-            }, (res) => {
-                throw new Error(res);
-            })
-            .catch((ex) => {
+            },
+            "error": (ex) => {
                 throw new Error(ex);
-            });
-    }
-
-    /**
-     * 请求HTML模板片段
-     * @param url       模板路径
-     */
-    requestTemplate(url) {
-        if (url) {
-            let fetchPromise = new Promise((resolve, reject) => {
-                fetch({
-                    "url": url,
-                    "method": "GET",
-                    "withCredentials": true,
-                    "headers": {
-                        "Accept": "text/html"
-                    }
-                }).then((res) => {
-                    if (res.status >= 200 && res.status) {
-                        resolve(res);
-                    } else {
-                        reject(res);
-                    }
-                }).catch((ex) => reject);
-            });
-        } else {
-            Tool.exception("the url path must be a valid string");
-        }
+            }
+        });
     }
 
     /**
@@ -225,7 +203,7 @@ class Router {
         }.bind(this));
 
         //  浏览器前进后退
-        EVENT.delegatEVENT(root, ["popstate"], true, function (ev) {
+        EVENT.delegatEVENT(window, ["popstate"], true, function (ev) {
             this.navigate(callback);
             EVENT.prevDefault(ev);
         }.bind(this));

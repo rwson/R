@@ -152,7 +152,7 @@ class DOM {
     }
 
     /**
-     * 获取元素上的标签属性,并且转换成数组返回
+     * 获取元素上的所有标签属性,并且转换成数组返回
      * @param el    被获取属性的元素
      * @returns {*|Array.<T>}
      */
@@ -287,7 +287,6 @@ class DOM {
         return output;
     }
 
-
     /**
      * 判断元素是否隐藏
      * @param el    元素
@@ -336,7 +335,7 @@ class DOM {
      */
     static insertAfter(parent, el, index) {
         let childList = parent.children;
-        if (index >= childList) {
+        if (index >= childList.length) {
             parent.appendChild(el);
         } else {
             parent.insertBefore(el, childList.item(index));

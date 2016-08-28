@@ -195,14 +195,15 @@ class Tool {
      * @returns {Object}
      */
     static merge(obj1, obj2, override) {
-        Object.keys(obj2).forEach(function (i) {
-            if (obj1[i] && override) {
-                obj1[i] = obj2[i];
+        var res = this.copy(obj1);
+        Object.keys(obj2).forEach((i) => {
+            if (res[i] && override) {
+                res[i] = obj2[i];
             } else {
-                obj1[i] = obj2[i];
+                res[i] = obj2[i];
             }
         });
-        return obj1;
+        return res;
     }
 
     /**
@@ -278,7 +279,7 @@ class Tool {
         if (!("" + str)) {
             return "";
         }
-        return str.replace(/[^\b-]{1,90}/g, function (word) {
+        return str.replace(/[^\b-]{1,90}/g, (word) => {
             return word.substring(0, 1).toUpperCase() + word.substring(1);
         }).replace(/\-/g, "");
     }
@@ -321,7 +322,7 @@ class Tool {
         let fn = arguments[0],
             args = _array2.slice.call(arguments, 1);
         if (Tool.isType(fn, "Function")) {
-            return fn.apply(root, args);
+            return fn.apply(window, args);
         }
     }
 

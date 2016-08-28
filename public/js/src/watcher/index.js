@@ -41,6 +41,7 @@ class Watcher {
     static subscribe(keys, scope) {
         keys.forEach((watcher) => {
             watcher.scope = scope;
+            watcher.calledUpdate = false;
             watcherList.push(watcher);
         });
     }
@@ -55,6 +56,21 @@ class Watcher {
         }
         watcherList = watcherList.filter((watcher) => {
             return !(~(uIds.indexOf(watcher.uId)));
+        });
+    }
+
+    /**
+     * 通知方法
+     * @param   uIds   scope对应的uId
+     * @param callback 回调函数
+     */
+    static notify(uIds, callback) {
+        watcherList.forEach((watcher) => {
+            if(!watcher.calledUpdate && !(~uIds.indexOf(watcher.uId)) && Tool.isType(callback, "Function")) {
+                watcher.calledUpdate = true;
+                callback(watcher);
+                watcher.calledUpdate = false;
+            }
         });
     }
 

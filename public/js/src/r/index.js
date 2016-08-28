@@ -21,7 +21,7 @@ const _directiveSuffix = "DIRECTIVE_";        //  Directive前缀
 const _serviceSuffix = "SERVICE_";            //  Service前缀
 const _providerSuffix = "PROVIDER_";          //  Provider前缀
 
-const router = new Router();
+const routerIns = new Router();
 
 /**
  * 暂存列表
@@ -81,7 +81,7 @@ class R {
      * 代理执行路由模块的config方法
      */
     static config(opt) {
-        router.config(opt);
+        routerIns.config(opt);
     }
 
     /**
@@ -171,10 +171,10 @@ class R {
          * 请求相关模板路径,成功后再对模板进行编译等操作
          */
         if (route) {
-            route.finalCfg.root = context;
-            route.navigate((ctrlEle, cfgObj) => {
+            routerIns.finalCfg.root = context;
+            routerIns.navigate((ctrlEle, cfgObj) => {
                 this.initScope(ctrlEle, cfgObj);
-                route.initEVENTs(this.initScope);
+                routerIns.initEVENTs(this.initScope);
             });
         } else {
 
@@ -277,10 +277,7 @@ class R {
  * 用于获取url上的参数(queryString/path)
  */
 R.provider("pageParams", function () {
-
-    console.log(router);
-
-    return Tool.merge(router.pageParams, {
+    return Tool.merge(routerIns.pageParams, {
         "urlQueryString": Url.getQueryString()
     });
 });
