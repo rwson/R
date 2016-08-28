@@ -5,7 +5,6 @@
 "use strict";
 
 import Tool from "../lib/Tool";
-import DOM from "../lib/DOM";
 import DirectiveBase from "./direcrive-base";
 
 class RCss extends DirectiveBase {

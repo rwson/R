@@ -12,6 +12,7 @@ class RBind extends DirectiveBase {
     constructor(dirCfg) {
         dirCfg.name = "RBind";
         super(dirCfg);
+        this.priority = 2;
     }
 
     link(el, exp, scope) {

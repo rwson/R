@@ -4,9 +4,7 @@
 
 "use strict";
 
-import Tool from "../lib/Tool";
 import DOM from "../lib/DOM";
-import EVENT from "../lib/EVENT";
 import DirectiveBase from "./direcrive-base";
 
 class RIf extends DirectiveBase {
