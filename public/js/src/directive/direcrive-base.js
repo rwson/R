@@ -38,6 +38,7 @@ class DirectiveBase{
                 //  RFor指令的特殊处理
                 if (dir.name === "RFor") {
                     this.finalExp = this.exp.split(" ")[2];
+                    this.childDir = dir.childDir || [];
                 }
             }
         }
